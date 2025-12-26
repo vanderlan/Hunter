@@ -1,0 +1,15 @@
+Summary:
+We are seeking a senior Fullstack Engineer to own and enhance the Claims Orchestration Service (Claims API), a core component that drives OCR, validation, decisioning, and routing within Claims AI workflows. This role is critical to delivering reliable, secure, and scalable event-driven processing that improves claims automation and outcomes.
+
+Responsibilities:
+Take ownership of and enhance the Claims Orchestration Service (Claims API), understanding how it drives OCR, validation, decisioning, and routing in Claims AI workflows.Architect and build distributed, event-based systems using Azure Service Bus and cloud-native patterns.Develop and maintain microservices and RESTful APIs across Node.js, Nest.js, C# , .NET Core, and .NET Framework (preferred).Implement secure authentication patterns and API gateway integrations.Produce and maintain clear API contracts using OpenAPI/Swagger and Kiota.Strengthen automated testing and validation pipelines using NUnit, XUnit, Jest, Cucumber.js, BDD, and Gherkin.Leverage GitHub Copilot as a required part of daily development for coding, testing, documentation, and productivity.Collaborate with engineering leadership as Claims AI components are consolidated under one team.Use GitHub, Azure DevOps, Visual Studio, and VS Code (preferred) for development workflows.
+
+Requirements:
+Advanced expertise in Node.js and TypeScript is required. Strong hands-on experience with Nest.js is mandatory for this role.Experience with Node.js testing frameworks such as Jest, Cucumber.js, Supertest, etc.Strong experience with C# , .NET Core, and .NET Framework.Hands-on experience with Azure Service Bus and event-driven architecture.Proficiency in building REST APIs and distributed systems, including orchestration patterns and event-driven services.Experience implementing authentication, authorization, and secure API practices following industry standards (OAuth2, JWT, etc.).Experience implementing authentication and secure API practices.Proficiency with OpenAPI/Swagger and Kiota for API schema management.Automation and testing experience with NUnit, XUnit, Jest, Cucumber.js, BDD, Gherkin.Proficient with GitHub, Azure DevOps, Visual Studio, and VS Code.GitHub Copilot experience is required.Excellent communication skills and ability to collaborate across engineering, product, and data science.
+
+Must-Have Skills:
+
+
+Nice-to-Have Skills:
+
+

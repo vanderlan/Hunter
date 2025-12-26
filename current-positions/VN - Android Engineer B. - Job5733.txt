@@ -1,0 +1,16 @@
+Summary:
+We are seeking a Senior Android Developer to lead the implementation and maintenance of our Android application using Kotlin. This role is critical for delivering high-quality, secure mobile features that meet product goals and user needs while advancing our CI practices and overall code quality.
+This position offers the chance to work closely with design and product teams in an agile environment, drive features from conception to launch, and influence engineering standards through code reviews and automation. Strong technical leadership, a deep understanding of the Android SDK, and excellent communication skills will make this role impactful and rewarding.
+
+Responsibilities:
+Design and implement new features in the Android application using Kotlin.Develop reliable, maintainable code following object-oriented principles and design patterns.Diagnose and fix bugs, performance issues, and security vulnerabilities in the app.Collaborate with product and design teams to translate requirements into technical solutions.Participate in and lead code reviews to ensure code quality and knowledge sharing.Build and maintain automated tests and contribute to the continuous integration framework.Apply algorithms and data-structure knowledge to optimize app performance and user experience.Drive development through the full Android lifecycle from planning to release in an agile process.
+
+Requirements:
+Bachelor's or Master's degree in computer science or a related field of study.5+ years of experience in software development or a related field.Strong communication skills with the ability to understand and explain technical issues to non technical audiences.Strong experience with Android development using Kotlin, including a deep understanding of the Android SDK.Intimate knowledge of common design patterns, algorithms, and object oriented programming principles.Experience leading development through the full Android development lifecycle.
+
+Must-Have Skills:
+
+
+Nice-to-Have Skills:
+
+

@@ -1,0 +1,15 @@
+Summary:
+We are seeking a highly skilled and experienced Senior Software Development Engineer in Test (SDET) to join our New API pods team. This role is critical in ensuring the quality, reliability, and performance of our API services and back-end systems through the design and development of robust automated test suites. The ideal candidate will play a pivotal role in the software development lifecycle by driving test automation, enhancing code quality, and collaborating closely with developers, QA, and DevOps teams to enable seamless continuous integration and continuous deployment (CI/CD). This position offers an exciting opportunity to influence the testing strategy and contribute to the scalability and maintainability of our API ecosystem within a dynamic, cloud-driven environment.
+
+Responsibilities:
+Design and develop robust automated test suites for functional, regression, integration, and performance testingContribute to the development lifecycle with a strong emphasis on test automation and code qualityCollaborate with developers, QA, and DevOps teams to ensure smooth CI/CD integrationMaintain and improve test automation frameworks, libraries, and reusable componentsBuild and implement tools and systems to increase the efficiency and effectiveness of testingAnalyze test results, identify issues, and support debugging and resolution processesContribute to performance and load testing strategies and implementationsEnsure test coverage for APIs, services, and back-end systemsAdvocate for testability, reliability, and maintainability in all aspects of software development
+
+Requirements:
+
+
+Must-Have Skills:
+5+ years of experience in a Software Development Engineer in Test (SDET) or similar roleStrong programming skills in C# and deep familiarity with the .NET ecosystemExperience designing and maintaining test automation frameworks from the ground upSolid understanding of CI/CD pipelines, version control (Git), and build toolsExperience with test strategy, planning, and execution across the SDLCHands-on experience with automated functional, regression, and performance testingPassion for clean, maintainable, and efficient codeExcellent problem-solving and debugging skillsStrong written and verbal communication skills
+
+Nice-to-Have Skills:
+Experience testing and validating RESTful or SOAP APIs or other web servicesFamiliarity with performance testing tools such as JMeter, k6, or LoadRunnerExperience working in agile or DevOps environments
+

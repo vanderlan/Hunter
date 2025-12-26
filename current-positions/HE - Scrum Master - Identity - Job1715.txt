@@ -1,0 +1,15 @@
+Summary:
+We are seeking a highly skilled and experienced Senior Scrum Master to join our Identity project team. This pivotal role will drive the Agile Scrum process, ensuring adherence to Agile principles while facilitating collaboration across engineering, architecture, QA, and DevOps teams. The Scrum Master will play a critical role in the design and implementation of Identity and Access Management (IAM) and Authentication Management solutions on Azure, ensuring seamless interoperability and secure, scalable cloud-native architectures. This position offers an exciting opportunity to lead a cross-functional team in delivering innovative identity solutions that are vital to our organization’s security and operational excellence.
+
+Responsibilities:
+Facilitate the Scrum process and ensure the team adheres to Agile principles and practices.Collaborate with engineering, architecture, QA, and DevOps teams to define clear, actionable requirements and acceptance criteria.Drive prioritization of the product backlog based on business impact, technical feasibility, and risk assessment.Foster communication across cross-functional teams and stakeholders to ensure alignment and transparency.Oversee the design and implementation of IAM and Authentication Management on Azure, ensuring seamless interoperability.Monitor project progress, resolve blockers, and facilitate timely delivery of features.Define success metrics and KPIs for the Scrum team’s performance and project outcomes.Stay updated on industry trends in Agile methodologies, Authentication Flow & design, cloud-native architectures, and Azure services.Support the product lifecycle from ideation through deployment and iteration, ensuring continuous improvement.
+
+Requirements:
+
+
+Must-Have Skills:
+5+ years of experience in a Scrum Master role, preferably in software modernization projects.Deep understanding of Agile/Scrum methodologies and practices.Experience working with .NET frameworks and Azure cloud services.Familiarity with IAM management platforms, API gateways, and microservices architecture.Strong technical background to engage with engineers on architectural decisions.Proven ability to manage complex projects with multiple stakeholders.Excellent communication, leadership, and problem-solving skills.
+
+Nice-to-Have Skills:
+Experience with Azure API Management, Azure Functions, Logic Apps.Knowledge of CI/CD pipelines, containerization (Docker/Kubernetes).Certification in Scrum Master (CSM, PSM, etc.) is a plus.
+

@@ -1,0 +1,16 @@
+Summary:
+We are seeking a Senior QA Automation Engineer to lead testing efforts across Salesforce Sales Cloud, Service Cloud, Commerce Cloud, and Oracle Cloud ERP integrations. This role is critical to ensuring end-to-end quality for lead generation, quote-to-cash, subscription billing, eCommerce customer journeys, payment gateway flows, and order management systems.
+This position offers the opportunity to drive automation strategy and integration testing across Salesforce, eCommerce platforms, and Oracle Cloud, using Selenium, Playwright, Cucumber and strong API testing practices. The role requires close collaboration with US-based product and engineering teams and the ability to work independently in a fast-paced Agile environment.
+
+Responsibilities:
+Design and implement automated test suites for Salesforce Sales Cloud, Service Cloud, and Commerce Cloud features.Develop and execute integration tests between Salesforce, eCommerce platforms, payment gateways, and Oracle Cloud ERP.Build and maintain API test automation to validate data consistency and reliability across systems.Create and maintain end-to-end test scenarios for lead generation, quote-to-cash, subscription billing, and order management flows.Execute cross-platform eCommerce customer journey testing including payment gateway and order lifecycle validations.Author and maintain Cucumber feature files and automation scripts using Selenium and Playwright.Collaborate with product, development, and operations teams in Agile ceremonies and sprint planning.Track, report, and manage defects and test coverage using Jira and agreed test management practices.Provide clear recommendations to improve quality, testability, and automation coverage.Mentor junior QA engineers and promote best practices in test automation and integration testing.
+
+Requirements:
+5+ years of experience in QA automation with hands-on experience in Salesforce Sales Cloud, Service Cloud, and Commerce Cloud.5+ years of experience in integration testing between CRM, eCommerce platforms, and ERP systems (Oracle Cloud ERP preferred).Strong experience in Salesforce API testing and validating integrations with payment gateways and order management systems.Proficient in test automation using Selenium, Playwright, and Cucumber.Experience with Agile methodology and using Jira for issue and test tracking.Proficiency in SQL and scripting with Python or Java for test automation and data validation.Demonstrated experience designing end-to-end test scenarios for quote-to-cash, subscription billing, and lead-generation workflows.Excellent communication skills and experience collaborating with US-based teams; able to work independently and provide actionable recommendations.Strong understanding of eCommerce platforms and payment gateway integration testing.
+
+Must-Have Skills:
+
+
+Nice-to-Have Skills:
+
+

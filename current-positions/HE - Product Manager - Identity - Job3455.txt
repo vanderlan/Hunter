@@ -1,0 +1,15 @@
+Summary:
+We are seeking a highly skilled and experienced Senior Product Manager to lead the modernization of our Identity and Access Management (IAM) systems. This pivotal role will own the product vision and roadmap, driving the design and implementation of cutting-edge Authorization and IAM solutions that seamlessly integrate with Azure cloud services. The ideal candidate will collaborate closely with engineering, architecture, QA, and DevOps teams to deliver secure, scalable, and innovative identity solutions that support our company’s strategic objectives. This role is critical to enhancing our security posture and enabling seamless, secure access across our cloud-native environments.
+
+Responsibilities:
+Own the product vision and roadmap for the modernization of IAM and Identity ManagementCollaborate with engineering, architecture, QA, and DevOps teams to define clear, actionable requirements and acceptance criteria.Drive prioritization based on business impact, technical feasibility, and risk assessment.Facilitate communication across cross-functional teams and stakeholders to ensure alignment.Oversee the design and implementation of Authorization and Identity Access Management and interact with Azure to ensure seamless interoperabilityMonitor project progress, resolve blockers, and ensure timely delivery of features.Define success metrics and KPIs for the modernization effort.Stay updated on industry trends in IAM design, cloud-native architectures, and Azure services.Manage product lifecycle from ideation through deployment and iteration.
+
+Requirements:
+
+
+Must-Have Skills:
+5+ years of experience in Product Management, preferably in software modernization projects.Deep understanding of Identity Access Management and API Authentication architectures.Experience working with .NET frameworks and Azure cloud services.Familiarity with API management platforms, API gateways, and microservices architecture.Strong technical background to engage with engineers on architectural decisions.Proven ability to manage complex projects with multiple stakeholders.Excellent communication, leadership, and problem-solving skills.
+
+Nice-to-Have Skills:
+Experience with Azure API Management, Azure Functions, Logic Apps.Knowledge of CI/CD pipelines, containerization (Docker/Kubernetes).Experience with Agile/Scrum methodologies.
+

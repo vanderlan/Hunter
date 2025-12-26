@@ -1,0 +1,16 @@
+Summary:
+We are seeking a senior QA Mobile Automation Engineer to lead quality assessment and testing for mobile applications on iOS and Android. This role is critical to delivering reliable, high-quality mobile experiences by combining hands-on manual testing with robust automation.
+This position offers the opportunity to shape test strategy and implement automation using mobile test frameworks such as Espresso, JetPack Compose, and XCUITest while collaborating closely with product and engineering teams in an Agile environment.
+
+Responsibilities:
+Design and execute manual and automated test cases for iOS and Android mobile applications.Develop and maintain automation scripts and test suites using Espresso, JetPack Compose, or XCUITest.Perform exploratory and regression testing, covering functional and edge-case scenarios.Integrate and manage test artifacts and version control using GitHub.Collaborate with developers, product owners, and QA peers to define test plans and acceptance criteria.Troubleshoot, document, and track defects through resolution.Review app behavior and provide actionable feedback to improve quality and user experience.Participate in Agile ceremonies and contribute to continuous improvement of QA processes.
+
+Requirements:
+4+ years of experience in mobile functional automation testing.Proven experience testing iOS and Android applications.Hands-on experience with Espresso, JetPack Compose, and/or XCUITest for automation.Strong understanding of object-oriented programming principles.Practical experience with Manual Testing and Automation Testing, with an expected split of ~50-60% manual and ~40% automation work.Experience using GitHub for version control and collaboration.Comfortable working in Agile Methodologies and participating in team ceremonies.Strong problem-solving skills and excellent verbal and written communication.Collaborative team player who can work across product and engineering teams.
+
+Must-Have Skills:
+
+
+Nice-to-Have Skills:
+
+

@@ -1,0 +1,15 @@
+Summary:
+We are seeking a highly skilled and motivated Senior Software Engineer to join our dynamic development team. In this role, you will design and implement new services using cutting edge technologies to help our client achieve its business goals. You will collaborate closely with the architecture team to develop robust, portable, and interoperable solutions that address the complex challenges faced by a growing organization. Your expertise in software engineering, particularly with Python and Django/FastAPI, as well as your experience with cloud technologies like AWS and Big Data, will be instrumental in driving innovation within our projects
+
+Responsibilities:
+Design and implement new services using modern technologies.Collaborate with the architecture team to develop robust, portable, and interoperable solutions.Work with the Information Security team to ensure applications meet stringent security standards.Take an active role in reducing technical debt within existing codebases.Triage, debug, and assure timely resolution of software defects.
+
+Requirements:
+Expert proficiency in Python and its frameworks(Django/FastAPI).Experience working extensively with BigData workflows.Proficiency in AWS services including DynamoDB, Managed Services, Lambda functions; familiarity is highly recommended.Working experience on SQL databases such as Aurora and MySQLWorking experience on key-value stores such as DynamoDB along with caching solutions such as Redis or ElastiCache.Expertise in architecting and developing scalable software solutions using gRPCbased microservices architecture.Strong understanding of algorithms and data structures which is essential for optimizing performance.Comprehensive knowledge of design patterns including their application context—knowing when to apply specific patterns effectively.Understanding accessibility standards and security compliance requirements within software development processes.
+
+Must-Have Skills:
+
+
+Nice-to-Have Skills:
+
+
