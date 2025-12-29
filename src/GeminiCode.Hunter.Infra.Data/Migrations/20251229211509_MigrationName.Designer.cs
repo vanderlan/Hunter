@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GeminiCode.Hunter.Infra.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251229143820_AddJobPositions")]
-    partial class AddJobPositions
+    [Migration("20251229211509_MigrationName")]
+    partial class MigrationName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

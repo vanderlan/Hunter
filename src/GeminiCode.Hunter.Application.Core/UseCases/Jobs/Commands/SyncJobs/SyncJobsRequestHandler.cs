@@ -3,12 +3,14 @@ using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
+using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Jobs.Commands.SyncJobs;
 
 public class SyncJobsRequestHandler(
     IUnitOfWork unitOfWork,
     IJobScraperService scraperService,
+    IPublisher publisher,
     ILogger<SyncJobsRequestHandler> logger)
     : IRequestHandler<SyncJobsRequest, SyncJobsResponse>
 {
@@ -17,6 +19,7 @@ public class SyncJobsRequestHandler(
         logger.LogInformation("Starting job synchronization");
 
         var response = new SyncJobsResponse();
+        var syncTimestamp = DateTime.UtcNow;
 
         try
         {
@@ -111,6 +114,21 @@ public class SyncJobsRequestHandler(
                 response.UpdatedPositions,
                 response.ClosedPositions
             );
+
+            // Publish notification if there are changes
+            if (response.NewPositions > 0 || response.ClosedPositions > 0)
+            {
+                await publisher.Publish(new JobChangesDetectedNotification
+                {
+                    NewPositionsCount = response.NewPositions,
+                    ClosedPositionsCount = response.ClosedPositions,
+                    UpdatedPositionsCount = response.UpdatedPositions,
+                    TotalScraped = response.TotalScraped,
+                    NewJobTitles = response.NewJobTitles,
+                    ClosedJobTitles = response.ClosedJobTitles,
+                    SyncTimestamp = syncTimestamp
+                }, cancellationToken);
+            }
 
             return response;
         }
