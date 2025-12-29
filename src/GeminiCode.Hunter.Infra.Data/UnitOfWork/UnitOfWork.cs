@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Repositories;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Infra.Data.Context;
+using GeminiCode.Hunter.Infra.Data.Repository;
 using GeminiCode.Hunter.Infra.Data.Repository.Implementations;
 
 namespace GeminiCode.Hunter.Infra.Data.UnitOfWork;
@@ -20,6 +21,9 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
 
     private IRefreshTokenRepository _refreshTokenRepository;
     public IRefreshTokenRepository RefreshTokenRepository => _refreshTokenRepository ??= new RefreshTokenRepository(DbContext);
+
+    private IJobPositionRepository _jobPositionRepository;
+    public IJobPositionRepository JobPositionRepository => _jobPositionRepository ??= new JobPositionRepository(DbContext);
 
     public async Task CommitAsync()
     {
