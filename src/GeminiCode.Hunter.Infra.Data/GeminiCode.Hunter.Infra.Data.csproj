@@ -26,4 +26,8 @@
     <ProjectReference Include="..\GeminiCode.Hunter.Domain.Core\GeminiCode.Hunter.Domain.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

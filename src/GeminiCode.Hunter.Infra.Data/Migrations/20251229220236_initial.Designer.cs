@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GeminiCode.Hunter.Infra.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251229212107_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251229220236_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
