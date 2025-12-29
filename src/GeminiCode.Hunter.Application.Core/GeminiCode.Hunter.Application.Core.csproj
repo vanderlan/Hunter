@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" />
+    <PackageReference Include="OpenAI" />
+    <PackageReference Include="PdfPig" />
   </ItemGroup>
 
   <ItemGroup>

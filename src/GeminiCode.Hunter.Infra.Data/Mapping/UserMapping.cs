@@ -4,7 +4,6 @@ using System;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Extensions;
-using System.Globalization;
 
 namespace GeminiCode.Hunter.Infra.Data.Mapping;
 

@@ -23,4 +23,10 @@ public static class DependenciesInjectionConfiguration
     {
         services.AddScoped<IJobScraperService, JobScraperService>();
     }
+
+    public static void AddAIServices(this IServiceCollection services)
+    {
+        services.AddScoped<IOpenAIService, OpenAIService>();
+        services.AddScoped<IPdfService, PdfService>();
+    }
 }

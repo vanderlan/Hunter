@@ -73,6 +73,7 @@ public static class Bootstrapper
         services.AddDatabaseContext();
         services.AddUnitOfWork();
         services.AddJobServices();
+        services.AddAIServices();
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
