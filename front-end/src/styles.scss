@@ -2,11 +2,12 @@
 
 @include mat.core();
 
-$hunter-primary: mat.define-palette(mat.$indigo-palette);
-$hunter-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$hunter-primary: mat.define-palette(mat.$blue-palette);
+$hunter-accent: mat.define-palette(mat.$cyan-palette, A200, A100, A400);
 $hunter-warn: mat.define-palette(mat.$red-palette);
 
-$hunter-theme: mat.define-light-theme((
+// Dark theme (default)
+$hunter-dark-theme: mat.define-dark-theme((
   color: (
     primary: $hunter-primary,
     accent: $hunter-accent,
@@ -16,7 +17,19 @@ $hunter-theme: mat.define-light-theme((
   density: 0,
 ));
 
-@include mat.all-component-themes($hunter-theme);
+// Light theme
+$hunter-light-theme: mat.define-light-theme((
+  color: (
+    primary: $hunter-primary,
+    accent: $hunter-accent,
+    warn: $hunter-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Apply dark theme by default
+@include mat.all-component-themes($hunter-dark-theme);
 
 * {
   margin: 0;
@@ -31,7 +44,58 @@ html, body {
 
 body {
   margin: 0;
+  transition: background-color 0.3s ease;
+}
+
+// Dark theme styles (default)
+body.dark-theme, body {
+  background-color: #121212;
+  color: #ffffff;
+
+  .app-content {
+    background-color: #121212 !important;
+  }
+
+  .mat-mdc-card {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-form-field {
+    .mat-mdc-input-element {
+      color: #ffffff !important;
+    }
+
+    .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+  }
+}
+
+// Light theme styles
+body.light-theme {
+  @include mat.all-component-colors($hunter-light-theme);
   background-color: #fafafa;
+  color: #000000;
+
+  .app-content {
+    background-color: #fafafa !important;
+  }
+
+  .mat-mdc-card {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .mat-mdc-form-field {
+    .mat-mdc-input-element {
+      color: #000000 !important;
+    }
+
+    .mat-mdc-form-field-label {
+      color: rgba(0, 0, 0, 0.6) !important;
+    }
+  }
 }
 
 .mat-mdc-card {
