@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ThemeService {
   private readonly THEME_KEY = 'hunter_theme';
-  private isDarkTheme = new BehaviorSubject<boolean>(true);
+  private isDarkTheme = new BehaviorSubject<boolean>(false);
   public isDarkTheme$ = this.isDarkTheme.asObservable();
 
   constructor() {
@@ -36,9 +36,9 @@ export class ThemeService {
 
   private getStoredTheme(): string {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(this.THEME_KEY) || 'dark';
+      return localStorage.getItem(this.THEME_KEY) || 'light';
     }
-    return 'dark';
+    return 'light';
   }
 
   private storeTheme(theme: string): void {

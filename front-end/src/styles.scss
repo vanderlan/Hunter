@@ -6,7 +6,7 @@ $hunter-primary: mat.define-palette(mat.$blue-palette);
 $hunter-accent: mat.define-palette(mat.$cyan-palette, A200, A100, A400);
 $hunter-warn: mat.define-palette(mat.$red-palette);
 
-// Dark theme (default)
+// Dark theme
 $hunter-dark-theme: mat.define-dark-theme((
   color: (
     primary: $hunter-primary,
@@ -17,7 +17,7 @@ $hunter-dark-theme: mat.define-dark-theme((
   density: 0,
 ));
 
-// Light theme
+// Light theme (default)
 $hunter-light-theme: mat.define-light-theme((
   color: (
     primary: $hunter-primary,
@@ -28,8 +28,8 @@ $hunter-light-theme: mat.define-light-theme((
   density: 0,
 ));
 
-// Apply dark theme by default
-@include mat.all-component-themes($hunter-dark-theme);
+// Apply light theme by default
+@include mat.all-component-themes($hunter-light-theme);
 
 * {
   margin: 0;
@@ -47,34 +47,8 @@ body {
   transition: background-color 0.3s ease;
 }
 
-// Dark theme styles (default)
-body.dark-theme, body {
-  background-color: #121212;
-  color: #ffffff;
-
-  .app-content {
-    background-color: #121212 !important;
-  }
-
-  .mat-mdc-card {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-  }
-
-  .mat-mdc-form-field {
-    .mat-mdc-input-element {
-      color: #ffffff !important;
-    }
-
-    .mat-mdc-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-  }
-}
-
-// Light theme styles
-body.light-theme {
-  @include mat.all-component-colors($hunter-light-theme);
+// Light theme styles (default)
+body.light-theme, body {
   background-color: #fafafa;
   color: #000000;
 
@@ -94,6 +68,32 @@ body.light-theme {
 
     .mat-mdc-form-field-label {
       color: rgba(0, 0, 0, 0.6) !important;
+    }
+  }
+}
+
+// Dark theme styles
+body.dark-theme {
+  @include mat.all-component-colors($hunter-dark-theme);
+  background-color: #121212;
+  color: #ffffff;
+
+  .app-content {
+    background-color: #121212 !important;
+  }
+
+  .mat-mdc-card {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  .mat-mdc-form-field {
+    .mat-mdc-input-element {
+      color: #ffffff !important;
+    }
+
+    .mat-mdc-form-field-label {
+      color: rgba(255, 255, 255, 0.7) !important;
     }
   }
 }
