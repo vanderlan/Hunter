@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GeminiCode.Hunter.Infra.Data\GeminiCode.Hunter.Infra.Data.csproj" />
+    <ProjectReference Include="..\GeminiCode.Hunter.Domain.Core\GeminiCode.Hunter.Domain.Core.csproj" />
+  </ItemGroup>
+
+</Project>

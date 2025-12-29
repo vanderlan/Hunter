@@ -6,7 +6,7 @@ using HtmlAgilityPack;
 internal class Program
 {
     private const string CareersUrl = "https://taller.applytojob.com/apply/";
-    private const string CsvFile = "C:\\repos\\vanderlan\\Hunter\\positions.csv";
+    private const string CsvFile = "C:\\repos\\vanderlan\\Hunter\\ConsoleApp\\positions.csv";
 
     private static readonly string BaseFolder =
         Path.GetDirectoryName(CsvFile)!;
