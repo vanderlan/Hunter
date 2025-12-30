@@ -2,8 +2,42 @@
 
 @include mat.core();
 
-$hunter-primary: mat.define-palette(mat.$blue-palette);
-$hunter-accent: mat.define-palette(mat.$cyan-palette, A200, A100, A400);
+// Custom color palettes
+$hunter-custom-primary: (
+  50: #fce4e4,
+  100: #f7bbbb,
+  200: #f18e8e,
+  300: #eb6161,
+  400: #e73f3f,
+  500: #b13a2f,
+  600: #a03329,
+  700: #8a2c23,
+  800: #74251d,
+  900: #5f1f1f,
+  A100: #ff8a80,
+  A200: #ff5252,
+  A400: #ff1744,
+  A700: #d50000,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+$hunter-primary: mat.define-palette($hunter-custom-primary, 900, 500, 700);
+$hunter-accent: mat.define-palette($hunter-custom-primary, 500, 300, 700);
 $hunter-warn: mat.define-palette(mat.$red-palette);
 
 // Dark theme
@@ -49,11 +83,11 @@ body {
 
 // Light theme styles (default)
 body.light-theme, body {
-  background-color: #fafafa;
+  background-color: #f5f5f5;
   color: #000000;
 
   .app-content {
-    background-color: #fafafa !important;
+    background-color: #f5f5f5 !important;
   }
 
   .mat-mdc-card {
