@@ -113,8 +113,18 @@
   text-align: center;
   padding: 60px 20px;
 
-  mat-spinner {
+  .ai-loading {
     margin: 0 auto 24px;
+    
+    .ai-star {
+      font-size: 80px;
+      width: 80px;
+      height: 80px;
+      color: #3f51b5;
+      animation: aiPulse 2s ease-in-out infinite;
+      display: block;
+      margin: 0 auto;
+    }
   }
 
   h3 {
@@ -132,6 +142,25 @@
   mat-progress-bar {
     max-width: 400px;
     margin: 0 auto;
+  }
+}
+
+@keyframes aiPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.2) rotate(90deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.2) rotate(270deg);
+    opacity: 0.8;
   }
 }
 

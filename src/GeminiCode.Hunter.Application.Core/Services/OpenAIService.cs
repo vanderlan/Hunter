@@ -151,7 +151,7 @@ public class OpenAIService : IOpenAIService
         sb.AppendLine("3. List specific matching skills found in the CV");
         sb.AppendLine("4. List skills required by the job but missing from the CV");
         sb.AppendLine();
-        sb.AppendLine("Return ONLY positions with match percentage > 20%, ordered by match percentage (highest first).");
+        sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
         
         return sb.ToString();
     }

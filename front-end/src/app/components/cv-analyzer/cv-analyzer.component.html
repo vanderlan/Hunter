@@ -54,7 +54,9 @@
       </div>
 
       <div *ngIf="analyzing" class="analyzing-state">
-        <mat-spinner diameter="60"></mat-spinner>
+        <div class="ai-loading">
+          <mat-icon class="ai-star">auto_awesome_mosaic</mat-icon>
+        </div>
         <h3>Analyzing CV...</h3>
         <p>This may take 15-30 seconds. Please wait.</p>
         <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
