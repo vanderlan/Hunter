@@ -1,5 +1,7 @@
+using System;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
@@ -10,6 +12,7 @@ public class AnalyzeCvRequestHandler(
     IUnitOfWork unitOfWork,
     IPdfService pdfService,
     IOpenAIService openAIService,
+    ICvInfoExtractionService cvInfoExtractionService,
     ILogger<AnalyzeCvRequestHandler> logger)
     : IRequestHandler<AnalyzeCvRequest, AnalyzeCvResponse>
 {
@@ -38,6 +41,12 @@ public class AnalyzeCvRequestHandler(
             }
 
             logger.LogInformation("Extracted {Length} characters from CV", cvText.Length);
+
+            // Extract basic candidate information
+            var (name, email, phone) = cvInfoExtractionService.ExtractBasicInfo(cvText);
+
+            // Store or update candidate information BEFORE analysis
+            await StoreCandidateAsync(name, email, phone, cvText);
 
             // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
@@ -112,5 +121,50 @@ public class AnalyzeCvRequestHandler(
             logger.LogError(ex, "Error analyzing CV");
             throw;
         }
+    }
+
+    private async Task StoreCandidateAsync(string? name, string? email, string? phone, string cvText)
+    {
+        var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+
+        // Check if candidate already exists by email
+        Candidate? existingCandidate = null;
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            existingCandidate = await unitOfWork.CandidateRepository.GetByEmailAsync(email);
+        }
+
+        if (existingCandidate != null)
+        {
+            // Update existing candidate with latest CV
+            logger.LogInformation("Updating existing candidate with email: {Email}", email);
+            
+            existingCandidate.Name = name;
+            existingCandidate.PhoneNumber = phone;
+            existingCandidate.CvText = cvText;
+            existingCandidate.AnalyzedAt = now;
+            
+            unitOfWork.CandidateRepository.Update(existingCandidate);
+        }
+        else
+        {
+            // Create new candidate
+            logger.LogInformation("Creating new candidate");
+            
+            var candidate = new Candidate
+            {
+                Name = name,
+                Email = email,
+                PhoneNumber = phone,
+                CvText = cvText,
+                AnalyzedAt = now
+            };
+
+            await unitOfWork.CandidateRepository.AddAsync(candidate);
+        }
+
+        await unitOfWork.CommitAsync();
+        
+        logger.LogInformation("Candidate information stored successfully");
     }
 }

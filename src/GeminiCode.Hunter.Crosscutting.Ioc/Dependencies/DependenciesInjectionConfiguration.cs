@@ -28,6 +28,7 @@ public static class DependenciesInjectionConfiguration
     {
         services.AddScoped<IOpenAIService, OpenAIService>();
         services.AddScoped<IPdfService, PdfService>();
+        services.AddScoped<ICvInfoExtractionService, CvInfoExtractionService>();
     }
 
     public static void AddNotificationServices(this IServiceCollection services)
