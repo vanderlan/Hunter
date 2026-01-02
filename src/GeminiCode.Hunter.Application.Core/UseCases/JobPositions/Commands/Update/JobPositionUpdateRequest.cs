@@ -1,4 +1,3 @@
-using GeminiCode.Hunter.Domain.Core.Entities;
 using MediatR;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Commands.Update;

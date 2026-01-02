@@ -3,7 +3,6 @@ using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Localization;
-using static GeminiCode.Hunter.Crosscutting.Resources.Messages.MessagesKeys;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Commands.Update;
 
@@ -17,12 +16,9 @@ public class JobPositionUpdateRequestHandler(IUnitOfWork unitOfWork, IStringLoca
         if (jobPosition == null)
             throw new NotFoundException(request.PublicId);
 
-        await ValidateJobPosition(request);
-
         jobPosition.Title = request.Title;
         jobPosition.ExternalUrl = request.ExternalUrl;
         jobPosition.CompanyCode = request.CompanyCode;
-        jobPosition.JobCode = request.JobCode;
         jobPosition.Summary = request.Summary;
         jobPosition.Responsibilities = request.Responsibilities;
         jobPosition.Requirements = request.Requirements;
@@ -34,13 +30,5 @@ public class JobPositionUpdateRequestHandler(IUnitOfWork unitOfWork, IStringLoca
         unitOfWork.JobPositionRepository.Update(jobPosition);
 
         await unitOfWork.CommitAsync();
-    }
-
-    private async Task ValidateJobPosition(JobPositionUpdateRequest request)
-    {
-        var jobPositionFound = await unitOfWork.JobPositionRepository.GetByJobCodeAsync(request.JobCode);
-
-        if (jobPositionFound != null && jobPositionFound.PublicId != request.PublicId)
-            throw new ConflictException(resourceMessages[JobPositionMessages.JobCodeExists], resourceMessages[ExceptionsTitles.ValidationError]);
     }
 }

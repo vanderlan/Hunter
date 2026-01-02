@@ -1,6 +1,5 @@
 using GeminiCode.Hunter.Domain.Core.Entities;
 using MediatR;
-using System;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Commands.Create;
 

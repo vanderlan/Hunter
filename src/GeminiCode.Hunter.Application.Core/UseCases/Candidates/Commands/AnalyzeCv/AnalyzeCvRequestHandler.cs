@@ -1,4 +1,3 @@
-using System;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Entities;
@@ -82,13 +81,13 @@ public class AnalyzeCvRequestHandler(
             // Analyze CV against jobs using OpenAI
             var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(cvText, jobSummaries);
 
-            // Filter matches > 20% and order by match percentage descending
+            // Filter matches > 60% and order by match percentage descending
             var filteredMatches = analysisResult.Matches
-                .Where(m => m.MatchPercentage > 20)
+                .Where(m => m.MatchPercentage > 60)
                 .OrderByDescending(m => m.MatchPercentage)
                 .ToList();
 
-            logger.LogInformation("Found {Count} matches with >20% adherence", filteredMatches.Count);
+            logger.LogInformation("Found {Count} matches with >60% adherence", filteredMatches.Count);
 
             // Map to response DTOs with full job details
             var response = new AnalyzeCvResponse

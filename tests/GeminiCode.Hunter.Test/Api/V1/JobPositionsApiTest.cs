@@ -110,7 +110,6 @@ namespace GeminiCode.Hunter.Test.Api.V1
             //assert
             Assert.NotNull(jobPosition);
             Assert.Equal(jobPositionUpdateRequest.Title, jobPosition.Title);
-            Assert.Equal(jobPositionUpdateRequest.JobCode, jobPosition.JobCode);
             Assert.Equal(jobPositionUpdateRequest.CompanyCode, jobPosition.CompanyCode);
             Assert.True(jobPosition.LastUpdated > jobPositionCreated.LastUpdated);
             Assert.NotNull(jobPosition.PublicId);
