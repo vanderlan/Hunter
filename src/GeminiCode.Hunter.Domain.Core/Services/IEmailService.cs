@@ -10,4 +10,8 @@ public interface IEmailService
         List<string> newJobs,
         List<string> closedJobs,
         DateTime syncTime);
+    
+    Task SendCandidateMatchingNotificationAsync(
+        object matchResults,
+        DateTime syncTime);
 }

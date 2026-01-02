@@ -15,4 +15,14 @@
       <ProjectReference Include="..\GeminiCode.Hunter.Domain.Core\GeminiCode.Hunter.Domain.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="EmailTemplates\*.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="EmailTemplates\*.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

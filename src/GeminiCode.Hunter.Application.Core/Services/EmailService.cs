@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
@@ -10,22 +9,41 @@ namespace GeminiCode.Hunter.Application.Core.Services;
 public class EmailService : IEmailService
 {
     private readonly ILogger<EmailService> _logger;
+    private readonly IEmailTemplateService _templateService;
     private readonly string _smtpHost;
     private readonly int _smtpPort;
     private readonly string _fromEmail;
-    private readonly string _toEmail;
+    private readonly List<string> _toEmails;
     private readonly string _password;
     private readonly bool _enableSsl;
 
-    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
+    public EmailService(
+        IConfiguration configuration, 
+        ILogger<EmailService> logger,
+        IEmailTemplateService templateService)
     {
         _logger = logger;
+        _templateService = templateService;
         
         var emailConfig = configuration.GetSection("Email");
         _smtpHost = emailConfig["SmtpHost"] ?? "smtp.gmail.com";
         _smtpPort = int.Parse(emailConfig["SmtpPort"] ?? "587");
         _fromEmail = emailConfig["FromEmail"] ?? throw new InvalidOperationException("Email:FromEmail is required");
-        _toEmail = emailConfig["ToEmail"] ?? _fromEmail;
+        
+        // Support both single email (ToEmail) and multiple emails (ToEmails)
+        var toEmailsConfig = emailConfig.GetSection("ToEmails").Get<List<string>>();
+        if (toEmailsConfig != null && toEmailsConfig.Any())
+        {
+            _toEmails = toEmailsConfig;
+        }
+        else
+        {
+            var singleEmail = emailConfig["ToEmail"];
+            _toEmails = !string.IsNullOrEmpty(singleEmail) 
+                ? new List<string> { singleEmail } 
+                : new List<string> { _fromEmail };
+        }
+        
         _password = emailConfig["Password"] ?? throw new InvalidOperationException("Email:Password is required");
         _enableSsl = bool.Parse(emailConfig["EnableSsl"] ?? "true");
     }
@@ -43,19 +61,34 @@ public class EmailService : IEmailService
                 return;
             }
 
-            _logger.LogInformation("Sending job changes notification email");
+            _logger.LogInformation("Sending job changes notification email to {Count} recipients", _toEmails.Count);
 
-            var body = BuildEmailBody(newJobs, closedJobs, syncTime);
+            var templateData = new Dictionary<string, object>
+            {
+                ["SyncTime"] = syncTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                ["NewJobsCount"] = newJobs.Count,
+                ["ClosedJobsCount"] = closedJobs.Count,
+                ["HasNewJobs"] = newJobs.Any(),
+                ["HasClosedJobs"] = closedJobs.Any(),
+                ["HasChanges"] = newJobs.Any() || closedJobs.Any(),
+                ["NewJobs"] = newJobs.Cast<object>().ToList(),
+                ["ClosedJobs"] = closedJobs.Cast<object>().ToList()
+            };
+
+            var htmlBody = _templateService.RenderJobChangesTemplate(templateData);
 
             var mail = new MailMessage
             {
                 From = new MailAddress(_fromEmail, "Hunter Job Monitor"),
                 Subject = $"Hunter Job Alert – {newJobs.Count} New, {closedJobs.Count} Closed",
-                Body = body,
-                IsBodyHtml = false
+                Body = htmlBody,
+                IsBodyHtml = true
             };
 
-            mail.To.Add(_toEmail);
+            foreach (var email in _toEmails)
+            {
+                mail.To.Add(email);
+            }
 
             using var smtp = new SmtpClient(_smtpHost, _smtpPort)
             {
@@ -65,7 +98,8 @@ public class EmailService : IEmailService
 
             await smtp.SendMailAsync(mail);
 
-            _logger.LogInformation("Job changes notification email sent successfully to {Email}", _toEmail);
+            _logger.LogInformation("Job changes notification email sent successfully to {Emails}", 
+                string.Join(", ", _toEmails));
         }
         catch (Exception ex)
         {
@@ -73,51 +107,128 @@ public class EmailService : IEmailService
         }
     }
 
-    private static string BuildEmailBody(
-        List<string> newJobs,
-        List<string> closedJobs,
+    public async Task SendCandidateMatchingNotificationAsync(
+        object matchResults,
         DateTime syncTime)
     {
-        var body = new StringBuilder();
-
-        body.AppendLine("═══════════════════════════════════════");
-        body.AppendLine("     HUNTER JOB CHANGES DETECTED");
-        body.AppendLine("═══════════════════════════════════════");
-        body.AppendLine();
-        body.AppendLine($"Sync Time: {syncTime:yyyy-MM-dd HH:mm:ss}");
-        body.AppendLine();
-
-        if (newJobs.Any())
+        try
         {
-            body.AppendLine("━━━ NEW POSITIONS OPENED ━━━");
-            body.AppendLine($"Total: {newJobs.Count}");
-            body.AppendLine();
-            
-            foreach (var job in newJobs)
+            _logger.LogInformation("Sending candidate matching notification email to {Count} recipients", _toEmails.Count);
+
+            var positions = ConvertToPositionsList(matchResults);
+
+            if (!positions.Any())
             {
-                body.AppendLine($"  ✓ {job}");
+                _logger.LogWarning("No matching results to send");
+                return;
             }
-            body.AppendLine();
+
+            var totalMatches = positions.Sum(p => p["TotalMatches"] as int? ?? 0);
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["AnalysisTime"] = syncTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                ["PositionsCount"] = positions.Count,
+                ["TotalMatches"] = totalMatches,
+                ["Positions"] = positions.Cast<object>().ToList()
+            };
+
+            var htmlBody = _templateService.RenderCandidateMatchesTemplate(templateData);
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_fromEmail, "Hunter CV Matcher"),
+                Subject = $"🎯 Hunter Candidate Matches – {totalMatches} Matches for {positions.Count} Position(s)",
+                Body = htmlBody,
+                IsBodyHtml = true
+            };
+
+            foreach (var email in _toEmails)
+            {
+                mail.To.Add(email);
+            }
+
+            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_fromEmail, _password),
+                EnableSsl = _enableSsl
+            };
+
+            await smtp.SendMailAsync(mail);
+
+            _logger.LogInformation("Candidate matching notification email sent successfully to {Emails}",
+                string.Join(", ", _toEmails));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send candidate matching notification email");
+        }
+    }
+
+    private List<Dictionary<string, object>> ConvertToPositionsList(object matchResults)
+    {
+        var positions = new List<Dictionary<string, object>>();
+
+        if (matchResults is IEnumerable<object> results)
+        {
+            foreach (var result in results)
+            {
+                var positionDict = new Dictionary<string, object>();
+                var resultType = result.GetType();
+
+                foreach (var prop in resultType.GetProperties())
+                {
+                    var value = prop.GetValue(result);
+                    
+                    if (prop.Name == "Candidates" && value is IEnumerable<object> candidates)
+                    {
+                        var candidatesList = new List<Dictionary<string, object>>();
+                        var candidatesArray = candidates.Take(10).ToList();
+
+                        foreach (var candidate in candidatesArray)
+                        {
+                            var candidateDict = new Dictionary<string, object>();
+                            var candidateType = candidate.GetType();
+
+                            foreach (var candidateProp in candidateType.GetProperties())
+                            {
+                                var candidateValue = candidateProp.GetValue(candidate);
+                                
+                                if (candidateProp.Name == "MatchPercentage" && candidateValue is double matchPct)
+                                {
+                                    candidateDict["MatchPercentage"] = $"{matchPct:F0}";
+                                    candidateDict["MatchLevel"] = GetMatchLevel(matchPct);
+                                }
+                                else
+                                {
+                                    candidateDict[candidateProp.Name] = candidateValue;
+                                }
+                            }
+
+                            candidatesList.Add(candidateDict);
+                        }
+
+                        positionDict["Candidates"] = candidatesList.Cast<object>().ToList();
+                        
+                        var totalMatches = (int)(resultType.GetProperty("TotalMatches")?.GetValue(result) ?? 0);
+                        positionDict["HasMoreCandidates"] = totalMatches > 10;
+                        positionDict["MoreCandidatesCount"] = Math.Max(0, totalMatches - 10);
+                    }
+                    else
+                    {
+                        positionDict[prop.Name] = value;
+                    }
+                }
+
+                positions.Add(positionDict);
+            }
         }
 
-        if (closedJobs.Any())
-        {
-            body.AppendLine("━━━ POSITIONS CLOSED ━━━");
-            body.AppendLine($"Total: {closedJobs.Count}");
-            body.AppendLine();
-            
-            foreach (var job in closedJobs)
-            {
-                body.AppendLine($"  ✗ {job}");
-            }
-            body.AppendLine();
-        }
+        return positions;
+    }
 
-        body.AppendLine("═══════════════════════════════════════");
-        body.AppendLine();
-        body.AppendLine("This is an automated notification from Hunter CV Analyzer.");
-        body.AppendLine("Visit your Hunter dashboard to analyze CVs against new positions.");
-
-        return body.ToString();
+    private static string GetMatchLevel(double percentage)
+    {
+        return percentage >= 70 ? "high" : percentage >= 50 ? "medium" : "low";
     }
 }

@@ -4,7 +4,9 @@ using GeminiCode.Hunter.Domain.Core.Services;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
 
-public class CvInfoExtractionService(ILogger<CvInfoExtractionService> logger) : ICvInfoExtractionService
+public class CvInfoExtractionService(
+    ILogger<CvInfoExtractionService> logger,
+    IOpenAIService openAIService) : ICvInfoExtractionService
 {
     public (string? name, string? email, string? phone) ExtractBasicInfo(string cvText)
     {
@@ -24,6 +26,50 @@ public class CvInfoExtractionService(ILogger<CvInfoExtractionService> logger) : 
             phone ?? "Not found");
 
         return (name, email, phone);
+    }
+
+    public async Task<string?> ExtractNameWithAIAsync(string cvText)
+    {
+        if (string.IsNullOrWhiteSpace(cvText))
+        {
+            logger.LogWarning("CV text is empty, cannot extract name");
+            return null;
+        }
+
+        try
+        {
+            logger.LogInformation("Extracting candidate name using OpenAI");
+
+            // Take first 1000 characters of CV for name extraction (usually at the top)
+            var cvSample = cvText.Length > 1000 ? cvText.Substring(0, 1000) : cvText;
+
+            var prompt = $@"Extract ONLY the candidate's full name from this CV text. 
+Return just the name, nothing else. If you cannot find the name, return 'Unknown'.
+
+CV Text:
+{cvSample}
+
+Candidate Name:";
+
+            var name = await openAIService.GetCompletionAsync(prompt, maxTokens: 50);
+            
+            if (string.IsNullOrWhiteSpace(name) || name.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogWarning("OpenAI could not extract name from CV");
+                return null;
+            }
+
+            name = name.Trim().Replace("\"", "").Replace("'", "");
+            
+            logger.LogInformation("Extracted name using OpenAI: {Name}", name);
+            
+            return name;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error extracting name with OpenAI");
+            return null;
+        }
     }
 
     private string? ExtractName(string cvText)
