@@ -1,5 +1,6 @@
 using GeminiCode.Hunter.Domain.Core.Entities;
 using MediatR;
+using System;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Commands.Create;
 
@@ -20,6 +21,7 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
         if (request is null)
             return default;
 
+#pragma warning disable CS9035 // Required member must be set
         return new JobPosition
         {
             Title = request.Title,
@@ -34,5 +36,6 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
             IsActive = true,
             LastCheckedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified)
         };
+#pragma warning restore CS9035
     }
 }
