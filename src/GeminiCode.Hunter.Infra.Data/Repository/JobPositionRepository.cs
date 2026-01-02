@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Filters;
 using GeminiCode.Hunter.Domain.Core.Repositories;
+using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using GeminiCode.Hunter.Infra.Data.Context;
 using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
@@ -53,5 +55,30 @@ public class JobPositionRepository(DataContext dataContext) : BaseEntityReposito
     public async Task MarkAsClosedAsync(long jobPositionId)
     {
         await MarkAsInactiveAsync(jobPositionId);
+    }
+
+    public async Task<PagedList<JobPosition>> ListPaginateAsync(JobPositionFilter filter)
+    {
+        IQueryable<JobPosition> query = DataContext.Set<JobPosition>();
+
+        query = ApplyFilters(filter, query);
+
+        var pagination = (filter.Page * filter.Quantity) - filter.Quantity;
+
+        var entityList = await query.OrderByDescending(x => x.CreatedAt)
+            .AsNoTracking()
+            .Skip(pagination)
+            .Take(filter.Quantity)
+            .ToListAsync();
+
+        return new PagedList<JobPosition>(entityList, await query.CountAsync());
+    }
+
+    private static IQueryable<JobPosition> ApplyFilters(JobPositionFilter filter, IQueryable<JobPosition> query)
+    {
+        if (!string.IsNullOrWhiteSpace(filter.Query))
+            query = query.Where(x => x.Title.Contains(filter.Query) || x.CompanyCode.Contains(filter.Query));
+
+        return query;
     }
 }
