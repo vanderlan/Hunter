@@ -111,7 +111,21 @@ export class JobPositionsComponent implements OnInit {
   editJobPosition(jobPosition: JobPosition): void {
     this.isEditing = true;
     this.currentJobPositionId = jobPosition.publicId!;
-    this.jobPositionForm.patchValue(jobPosition);
+    this.loading = true;
+    
+    // Fetch the latest data from API using public ID
+    this.jobPositionService.getJobPositionById(jobPosition.publicId!)
+      .subscribe({
+        next: (data) => {
+          this.jobPositionForm.patchValue(data);
+          this.loading = false;
+        },
+        error: (error) => {
+          this.loading = false;
+          this.snackBar.open('Error loading job position details', 'Close', { duration: 3000 });
+          this.cancelEdit();
+        }
+      });
   }
 
   cancelEdit(): void {
