@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GeminiCode.Hunter.Domain.Core.Services;
