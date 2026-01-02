@@ -69,7 +69,7 @@ public class JobPositionsControllerTest
     }
 
     [Fact]
-    public async Task DeleteJobPosition_WithExistantId_DeleteJobPosition()
+    public async Task DeleteJobPosition_WithExistentId_DeleteJobPosition()
     {
         //arrange & act
         var result = await _jobPositionsController.Delete(_validJobPosition.PublicId);
