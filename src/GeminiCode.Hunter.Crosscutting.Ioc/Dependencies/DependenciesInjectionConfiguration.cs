@@ -34,5 +34,6 @@ public static class DependenciesInjectionConfiguration
     public static void AddNotificationServices(this IServiceCollection services)
     {
         services.AddScoped<IEmailService, EmailService>();
+        services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
     }
 }
