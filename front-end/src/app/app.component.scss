@@ -67,6 +67,30 @@
   }
 }
 
+::ng-deep .mat-mdc-menu-content {
+  .menu-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: #f5f5f5;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+
+    mat-icon {
+      color: #5f1f1f;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  mat-divider {
+    margin: 4px 0;
+  }
+}
+
 .app-content {
   flex: 1;
   overflow-y: auto;

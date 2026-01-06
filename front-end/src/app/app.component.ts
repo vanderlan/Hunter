@@ -5,6 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -17,7 +18,8 @@ import { AuthService } from './services/auth.service';
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatDividerModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -36,5 +38,13 @@ export class AppComponent {
 
   isAdmin(): boolean {
     return this.authService.isAdmin();
+  }
+
+  getUserName(): string {
+    return this.authService.getUserName() || 'User';
+  }
+
+  changePassword(): void {
+    this.router.navigate(['/change-password']);
   }
 }

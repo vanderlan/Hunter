@@ -24,6 +24,15 @@
         <mat-icon>account_circle</mat-icon>
       </button>
       <mat-menu #menu="matMenu">
+        <div class="menu-user-info">
+          <mat-icon>person</mat-icon>
+          <span>{{ getUserName() }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="changePassword()">
+          <mat-icon>lock</mat-icon>
+          <span>Change Password</span>
+        </button>
         <button mat-menu-item (click)="logout()">
           <mat-icon>logout</mat-icon>
           <span>Logout</span>

@@ -85,7 +85,42 @@ export class AuthService {
 
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || null;
+      // Try the full claim URI first, then fallback to short form
+      return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] 
+          || payload.role 
+          || null;
+    } catch {
+      return null;
+    }
+  }
+
+  getUserName(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Use the correct claim URI for givenname
+      return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'] 
+          || payload.name 
+          || payload.givenname
+          || null;
+    } catch {
+      return null;
+    }
+  }
+
+  getUserEmail(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Use the correct claim URI for email address
+      return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] 
+          || payload.email 
+          || payload.emailaddress
+          || null;
     } catch {
       return null;
     }
@@ -125,6 +160,6 @@ export class AuthService {
       if (this.hasToken() && this.isTokenExpired()) {
         this.logout();
       }
-    }, 60000); // Check every minute
+    }, 60000);
   }
 }

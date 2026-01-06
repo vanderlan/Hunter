@@ -23,6 +23,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard, AdminGuard]
   },
   {
+    path: 'change-password',
+    loadComponent: () => import('./components/change-password/change-password.component').then(m => m.ChangePasswordComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }
