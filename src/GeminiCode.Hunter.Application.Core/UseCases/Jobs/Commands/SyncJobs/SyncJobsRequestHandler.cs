@@ -46,6 +46,14 @@ public class SyncJobsRequestHandler(
                 {
                     logger.LogInformation("Processing new job: {Title}", newJob.Title);
 
+                    // Double-check if position already exists in database (prevents race conditions)
+                    var existingPosition = await unitOfWork.JobPositionRepository.GetByExternalUrlAsync(newJob.Url);
+                    if (existingPosition != null)
+                    {
+                        logger.LogWarning("Job position with URL {Url} already exists, skipping", newJob.Url);
+                        continue;
+                    }
+
                     // Scrape full details
                     var details = await scraperService.ScrapeJobDetailsAsync(newJob.Url);
 

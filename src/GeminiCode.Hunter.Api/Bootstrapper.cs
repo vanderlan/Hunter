@@ -8,6 +8,7 @@ using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Create;
 using GeminiCode.Hunter.Application.Core.BackgroundServices;
 using GeminiCode.Hunter.Crosscutting.Ioc.Dependencies;
 using GeminiCode.Hunter.Domain.Core.Authentication;
+using Microsoft.FeatureManagement;
 
 namespace GeminiCode.Hunter.Api;
 
@@ -76,6 +77,7 @@ public static class Bootstrapper
         services.AddJobServices();
         services.AddAIServices();
         services.AddNotificationServices();
+        services.AddFeatureManagement();
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();

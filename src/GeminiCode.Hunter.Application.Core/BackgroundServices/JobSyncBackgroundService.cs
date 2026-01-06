@@ -14,7 +14,7 @@ public class JobSyncBackgroundService(
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
     private static readonly TimeSpan SyncInterval = TimeSpan.FromHours(1);
     private static readonly TimeOnly StartTime = new(8, 0);
-    private static readonly TimeOnly EndTime = new(18, 0);
+    private static readonly TimeOnly EndTime = new(22, 0);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

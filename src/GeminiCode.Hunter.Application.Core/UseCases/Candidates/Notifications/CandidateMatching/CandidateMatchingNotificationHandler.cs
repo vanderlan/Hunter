@@ -1,8 +1,11 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
+using Newtonsoft.Json;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
+using GeminiCode.Hunter.Domain.Core.Features;
 using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Notifications.CandidateMatching;
@@ -11,11 +14,21 @@ public class CandidateMatchingNotificationHandler(
     IUnitOfWork unitOfWork,
     IOpenAIService openAIService,
     IEmailService emailService,
+    IFeatureManager featureManager,
     ILogger<CandidateMatchingNotificationHandler> logger)
     : INotificationHandler<JobChangesDetectedNotification>
 {
     public async Task Handle(JobChangesDetectedNotification notification, CancellationToken cancellationToken)
     {
+        // Check if feature is enabled
+        var isFeatureEnabled = await featureManager.IsEnabledAsync(FeatureFlags.AutoCandidateMatching);
+        
+        if (!isFeatureEnabled)
+        {
+            logger.LogInformation("Auto candidate matching feature is disabled. Skipping candidate analysis.");
+            return;
+        }
+
         // Only process if there are new positions
         if (notification.NewPositionsCount == 0)
         {

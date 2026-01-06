@@ -140,16 +140,47 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
             var sb = new StringBuilder();
             var node = header.NextSibling;
 
+            // List of known section headers to stop at
+            var sectionHeaders = new[] { "Summary", "Responsibilities", "Requirements", "Must-Have Skills", "Nice-to-Have Skills", "Nice to Have" };
+
             while (node != null)
             {
                 var text = node.InnerText.Trim();
 
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    if (text.Length < 40 && char.IsUpper(text[0]))
-                        break;
+                    // Stop if we hit another major section header (h2)
+                    if (node.Name.Equals("h2", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var nodeText = WebUtility.HtmlDecode(text);
+                        if (sectionHeaders.Any(h => nodeText.Equals(h, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            break;
+                        }
+                      }
+                    
 
-                    sb.AppendLine(WebUtility.HtmlDecode(text));
+                    // Include h3 subsection headers as part of the content
+                    if (node.Name.Equals("h3", StringComparison.OrdinalIgnoreCase))
+                    {
+                        sb.AppendLine();
+                        sb.AppendLine($"## {WebUtility.HtmlDecode(text)}");
+                        sb.AppendLine();
+                    }
+                    // Stop at short uppercase text that looks like a new section (but not h3)
+                    else if (text.Length < 40 && char.IsUpper(text[0]) && !node.Name.Equals("li", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Check if it's a known section header
+                        if (sectionHeaders.Any(h => text.Equals(h, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            break;
+                        }
+                        sb.AppendLine(WebUtility.HtmlDecode(text));
+                    }
+                    else
+                    {
+                        sb.AppendLine(WebUtility.HtmlDecode(text));
+                    }
                 }
 
                 node = node.NextSibling;
