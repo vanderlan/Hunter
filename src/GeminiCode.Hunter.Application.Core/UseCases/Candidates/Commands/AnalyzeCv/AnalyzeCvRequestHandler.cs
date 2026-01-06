@@ -4,6 +4,8 @@ using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
+using GeminiCode.Hunter.Domain.Core.Authentication;
+using GeminiCode.Hunter.Domain.Core.Exceptions;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
 
@@ -12,15 +14,21 @@ public class AnalyzeCvRequestHandler(
     IPdfService pdfService,
     IOpenAIService openAIService,
     ICvInfoExtractionService cvInfoExtractionService,
+    ICurrentUser currentUser,
     ILogger<AnalyzeCvRequestHandler> logger)
     : IRequestHandler<AnalyzeCvRequest, AnalyzeCvResponse>
 {
     public async Task<AnalyzeCvResponse> Handle(AnalyzeCvRequest request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Starting CV analysis for file: {FileName}", request.CvFile.FileName);
+        logger.LogInformation("Starting CV analysis for file: {FileName} by user: {UserId}", 
+            request.CvFile.FileName, currentUser.Id);
 
         try
         {
+            // Get current user entity to obtain UserId
+            var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
+                ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
+
             // Validate file
             if (request.CvFile.ContentType != "application/pdf")
             {
@@ -48,7 +56,7 @@ public class AnalyzeCvRequestHandler(
             var name = await cvInfoExtractionService.ExtractNameWithAIAsync(cvText);
 
             // Store or update candidate information BEFORE analysis
-            await StoreCandidateAsync(name, email, phone, cvText);
+            await StoreCandidateAsync(name, email, phone, cvText, user.UserId);
 
             // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
@@ -125,7 +133,7 @@ public class AnalyzeCvRequestHandler(
         }
     }
 
-    private async Task StoreCandidateAsync(string? name, string? email, string? phone, string cvText)
+    private async Task StoreCandidateAsync(string? name, string? email, string? phone, string cvText, long userId)
     {
         var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
@@ -139,22 +147,25 @@ public class AnalyzeCvRequestHandler(
         if (existingCandidate != null)
         {
             // Update existing candidate with latest CV
-            logger.LogInformation("Updating existing candidate with email: {Email}", email);
+            logger.LogInformation("Updating existing candidate with email: {Email}, analyzed by user: {UserId}", 
+                email, userId);
             
             existingCandidate.Name = name;
             existingCandidate.PhoneNumber = phone;
             existingCandidate.CvText = cvText;
             existingCandidate.AnalyzedAt = now;
+            existingCandidate.UserId = userId;
             
             unitOfWork.CandidateRepository.Update(existingCandidate);
         }
         else
         {
             // Create new candidate
-            logger.LogInformation("Creating new candidate");
+            logger.LogInformation("Creating new candidate analyzed by user: {UserId}", userId);
             
             var candidate = new Candidate
             {
+                UserId = userId,
                 Name = name,
                 Email = email,
                 PhoneNumber = phone,

@@ -60,6 +60,9 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("CandidateId");
 
                     b.HasIndex("AnalyzedAt");
@@ -68,6 +71,8 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
 
                     b.HasIndex("PublicId")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Candidate", (string)null);
                 });
@@ -246,6 +251,17 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                             Profile = 1,
                             PublicId = "16537902-1ca7-49ca-82e5-0be137f9aeeb"
                         });
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.Candidate", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
