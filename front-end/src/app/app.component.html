@@ -10,11 +10,11 @@
         <mat-icon>analytics</mat-icon>
         <span>Analyze CV</span>
       </button>
-      <button mat-button routerLink="/job-positions" class="nav-button">
-        <mat-icon>settings</mat-icon>
-        <span>Job Positions</span>
-      </button>
       @if (isAdmin()) {
+        <button mat-button routerLink="/job-positions" class="nav-button">
+          <mat-icon>settings</mat-icon>
+          <span>Job Positions</span>
+        </button>
         <button mat-button routerLink="/users" class="nav-button">
           <mat-icon>people</mat-icon>
           <span>Users</span>

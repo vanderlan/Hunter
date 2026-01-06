@@ -15,7 +15,7 @@ export const routes: Routes = [
   {
     path: 'job-positions',
     loadComponent: () => import('./components/job-positions/job-positions.component').then(m => m.JobPositionsComponent),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, AdminGuard]
   },
   {
     path: 'users',

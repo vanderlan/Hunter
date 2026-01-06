@@ -10,7 +10,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiVersion(1.0)]
 [ApiController]
 [Route("[controller]")]
-[AuthorizeFor(Roles.Admin)]
+[AuthorizeFor(Roles.Admin, Roles.Partner)]
 public class CandidatesController(IMediator mediator) : ControllerBase
 {
     /// <summary>

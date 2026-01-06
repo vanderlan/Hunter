@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://hunter-api/api',
+  apiUrl: 'https://hunter.geminicode.com.br/api',
   apiVersion: '1.0'
 };
