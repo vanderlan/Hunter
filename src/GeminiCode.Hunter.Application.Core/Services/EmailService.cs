@@ -98,8 +98,7 @@ public class EmailService : IEmailService
 
             await smtp.SendMailAsync(mail);
 
-            _logger.LogInformation("Job changes notification email sent successfully to {Emails}", 
-                string.Join(", ", _toEmails));
+            _logger.LogInformation("Job changes notification email sent successfully to {Emails}", string.Join(", ", _toEmails));
         }
         catch (Exception ex)
         {

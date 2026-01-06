@@ -79,6 +79,23 @@ export class AuthService {
     return this.hasToken() && !this.isTokenExpired();
   }
 
+  getUserProfile(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload.role || null;
+    } catch {
+      return null;
+    }
+  }
+
+  isAdmin(): boolean {
+    const profile = this.getUserProfile();
+    return profile === 'admin';
+  }
+
   private setTokens(token: string, refreshToken: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem(this.TOKEN_KEY, token);

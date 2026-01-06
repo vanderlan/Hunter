@@ -1,0 +1,193 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { UserService } from '../../services/user.service';
+import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../models/user.model';
+
+@Component({
+  selector: 'app-user-management',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatCardModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
+    MatPaginatorModule,
+    MatTooltipModule
+  ],
+  templateUrl: './user-management.component.html',
+  styleUrl: './user-management.component.scss'
+})
+export class UserManagementComponent implements OnInit {
+  displayedColumns: string[] = ['name', 'email', 'profile', 'createdAt', 'actions'];
+  dataSource: User[] = [];
+  totalCount = 0;
+  pageSize = 10;
+  pageIndex = 0;
+  searchQuery = '';
+  loading = false;
+  isEditing = false;
+  userForm: FormGroup;
+  currentUserId: string | null = null;
+
+  userProfiles = [
+    { value: UserProfile.Admin, label: 'Admin' },
+    { value: UserProfile.Partner, label: 'Partner' }
+  ];
+
+  constructor(
+    private userService: UserService,
+    private snackBar: MatSnackBar,
+    private fb: FormBuilder
+  ) {
+    this.userForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      profile: [UserProfile.Partner, Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.loading = true;
+    this.userService.getUsers(this.pageIndex + 1, this.pageSize, this.searchQuery).subscribe({
+      next: (response) => {
+        this.dataSource = response.items;
+        this.totalCount = response.count;
+        this.loading = false;
+      },
+      error: (error) => {
+        this.loading = false;
+        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadUsers();
+  }
+
+  onSearch(): void {
+    this.pageIndex = 0;
+    this.loadUsers();
+  }
+
+  showCreateForm(): void {
+    this.isEditing = true;
+    this.currentUserId = null;
+    this.userForm.reset({ profile: UserProfile.Partner });
+    // Add password field for create
+    if (!this.userForm.get('password')) {
+      this.userForm.addControl('password', this.fb.control('', [Validators.required, Validators.minLength(3)]));
+    }
+  }
+
+  editUser(user: User): void {
+    this.isEditing = true;
+    this.currentUserId = user.publicId!;
+    // Remove password field for edit
+    if (this.userForm.get('password')) {
+      this.userForm.removeControl('password');
+    }
+    this.userForm.patchValue({
+      name: user.name,
+      email: user.email,
+      profile: user.profile
+    });
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.currentUserId = null;
+    this.userForm.reset({ profile: UserProfile.Partner });
+    if (this.userForm.get('password')) {
+      this.userForm.removeControl('password');
+    }
+  }
+
+  saveUser(): void {
+    if (this.userForm.invalid) {
+      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.loading = true;
+
+    if (this.currentUserId) {
+      // Update
+      const userData: UserUpdateRequest = this.userForm.value;
+      this.userService.updateUser(this.currentUserId, userData).subscribe({
+        next: () => {
+          this.loading = false;
+          this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+          this.cancelEdit();
+          this.loadUsers();
+        },
+        error: (error) => {
+          this.loading = false;
+          this.snackBar.open(error.error?.message || 'Error updating user', 'Close', { duration: 3000 });
+        }
+      });
+    } else {
+      // Create
+      const userData: UserCreateRequest = this.userForm.value;
+      this.userService.createUser(userData).subscribe({
+        next: () => {
+          this.loading = false;
+          this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+          this.cancelEdit();
+          this.loadUsers();
+        },
+        error: (error) => {
+          this.loading = false;
+          this.snackBar.open(error.error?.message || 'Error creating user', 'Close', { duration: 3000 });
+        }
+      });
+    }
+  }
+
+  deleteUser(user: User): void {
+    if (confirm(`Are you sure you want to delete user "${user.name}"?`)) {
+      this.loading = true;
+      this.userService.deleteUser(user.publicId!).subscribe({
+        next: () => {
+          this.loading = false;
+          this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
+          this.loadUsers();
+        },
+        error: (error) => {
+          this.loading = false;
+          this.snackBar.open(error.error?.message || 'Error deleting user', 'Close', { duration: 3000 });
+        }
+      });
+    }
+  }
+
+  getProfileLabel(profile: UserProfile): string {
+    return profile === UserProfile.Admin ? 'Admin' : 'Partner';
+  }
+}

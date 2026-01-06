@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -15,6 +16,11 @@ export const routes: Routes = [
     path: 'job-positions',
     loadComponent: () => import('./components/job-positions/job-positions.component').then(m => m.JobPositionsComponent),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'users',
+    loadComponent: () => import('./components/user-management/user-management.component').then(m => m.UserManagementComponent),
+    canActivate: [AuthGuard, AdminGuard]
   },
   {
     path: '**',
