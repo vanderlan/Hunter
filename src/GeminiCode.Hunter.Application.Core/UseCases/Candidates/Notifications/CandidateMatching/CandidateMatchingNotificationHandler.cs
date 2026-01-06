@@ -89,7 +89,7 @@ public class CandidateMatchingNotificationHandler(
                         // Analyze this candidate against this position
                         var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(
                             candidate.CvText,
-                            new List<JobPositionSummary> { positionSummary }
+                            [positionSummary]
                         );
 
                         var match = analysisResult.Matches.FirstOrDefault();
@@ -157,8 +157,6 @@ public class CandidateMatchingNotificationHandler(
         {
             logger.LogInformation("Sending candidate matching notification email");
 
-            var body = BuildEmailBody(matchResults, syncTime);
-
             await emailService.SendCandidateMatchingNotificationAsync(matchResults, syncTime);
 
             logger.LogInformation("Candidate matching notification email sent successfully");
@@ -167,55 +165,6 @@ public class CandidateMatchingNotificationHandler(
         {
             logger.LogError(ex, "Failed to send candidate matching notification email");
         }
-    }
-
-    private static string BuildEmailBody(List<PositionMatchResult> matchResults, DateTime syncTime)
-    {
-        var body = new System.Text.StringBuilder();
-
-        body.AppendLine("???????????????????????????????????????");
-        body.AppendLine("  CANDIDATE MATCHES FOR NEW POSITIONS");
-        body.AppendLine("???????????????????????????????????????");
-        body.AppendLine();
-        body.AppendLine($"Analysis Time: {syncTime:yyyy-MM-dd HH:mm:ss}");
-        body.AppendLine($"New Positions Analyzed: {matchResults.Count}");
-        body.AppendLine($"Total Candidate Matches: {matchResults.Sum(r => r.TotalMatches)}");
-        body.AppendLine();
-
-        foreach (var result in matchResults.OrderByDescending(r => r.TotalMatches))
-        {
-            body.AppendLine("???????????????????????????????????????");
-            body.AppendLine($"Position: {result.JobTitle}");
-            body.AppendLine($"Job Code: {result.JobCode}");
-            body.AppendLine($"Company: {result.CompanyCode}");
-            body.AppendLine($"Matching Candidates: {result.TotalMatches}");
-            body.AppendLine();
-
-            foreach (var candidate in result.Candidates.Take(10)) // Top 10 per position
-            {
-                body.AppendLine($"  ? {candidate.CandidateName} - {candidate.MatchPercentage}%");
-                body.AppendLine($"    Email: {candidate.CandidateEmail}");
-                if (!string.IsNullOrWhiteSpace(candidate.CandidatePhone))
-                {
-                    body.AppendLine($"    Phone: {candidate.CandidatePhone}");
-                }
-                body.AppendLine($"    Match Reason: {candidate.MatchReason}");
-                body.AppendLine();
-            }
-
-            if (result.TotalMatches > 10)
-            {
-                body.AppendLine($"  ... and {result.TotalMatches - 10} more candidates");
-                body.AppendLine();
-            }
-        }
-
-        body.AppendLine("???????????????????????????????????????");
-        body.AppendLine();
-        body.AppendLine("This is an automated notification from Hunter CV Analyzer.");
-        body.AppendLine("Contact candidates to schedule interviews.");
-
-        return body.ToString();
     }
 }
 

@@ -8,7 +8,7 @@ public class JobChangesDetectedNotification : INotification
     public int ClosedPositionsCount { get; set; }
     public int UpdatedPositionsCount { get; set; }
     public int TotalScraped { get; set; }
-    public List<string> NewJobTitles { get; set; } = new();
-    public List<string> ClosedJobTitles { get; set; } = new();
+    public List<string> NewJobTitles { get; set; } = [];
+    public List<string> ClosedJobTitles { get; set; } = [];
     public DateTime SyncTimestamp { get; set; }
 }

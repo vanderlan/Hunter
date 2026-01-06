@@ -60,7 +60,7 @@ public class AnalyzeCvRequestHandler(
                 {
                     TotalPositionsAnalyzed = 0,
                     MatchesFound = 0,
-                    Matches = new List<JobMatchDto>()
+                    Matches = []
                 };
             }
 

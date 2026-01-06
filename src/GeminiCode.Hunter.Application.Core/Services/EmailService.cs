@@ -40,8 +40,8 @@ public class EmailService : IEmailService
         {
             var singleEmail = emailConfig["ToEmail"];
             _toEmails = !string.IsNullOrEmpty(singleEmail) 
-                ? new List<string> { singleEmail } 
-                : new List<string> { _fromEmail };
+                ? [singleEmail] 
+                : [_fromEmail];
         }
         
         _password = emailConfig["Password"] ?? throw new InvalidOperationException("Email:Password is required");

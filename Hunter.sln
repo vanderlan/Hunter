@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33205.214
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeminiCode.Hunter.Api", "src\GeminiCode.Hunter.Api\GeminiCode.Hunter.Api.csproj", "{8C8470D6-0951-4B42-8935-779D8672F5B1}"
 EndProject
@@ -44,6 +44,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Crosscutting", "4 - Crosscutting", "{34D11C13-159D-47B0-A5B8-3DF32677792F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeminiCode.Hunter.Application.Core", "src\GeminiCode.Hunter.Application.Core\GeminiCode.Hunter.Application.Core.csproj", "{1F3FDF5B-999B-4D96-81F7-25F854EB40D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{A448E1AC-8699-40E0-A382-766A4061D497}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

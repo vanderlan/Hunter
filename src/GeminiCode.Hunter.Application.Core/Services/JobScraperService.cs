@@ -27,7 +27,7 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
             if (nodes == null)
             {
                 logger.LogWarning("No job links found");
-                return new List<ScrapedJobPosition>();
+                return [];
             }
 
             var positions = nodes
