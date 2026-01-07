@@ -21,14 +21,12 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Notifications.UserCr
 
             if (notification.SendWelcomeEmail)
             {
-                logger.LogInformation("Sending welcome email to new user: {Email}", notification.Entity.Email);
+                logger.LogInformation("Sending welcome email to new user");
                 await emailService.SendWelcomeEmailAsync(
                     notification.Entity.Name,
                     notification.Entity.Email,
                     notification.PlainPassword);
             }
-
-            await Task.CompletedTask;
         }
     }
 }

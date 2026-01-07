@@ -171,14 +171,15 @@ public class EmailService : IEmailService
     {
         try
         {
-            _logger.LogInformation("Sending welcome email to {Email}", userEmail);
+            _logger.LogInformation("Sending welcome email to new user");
 
             var templateData = new Dictionary<string, object>
             {
                 ["UserName"] = userName,
                 ["UserEmail"] = userEmail,
                 ["Password"] = password,
-                ["CurrentYear"] = DateTime.UtcNow.Year
+                ["CurrentYear"] = DateTime.UtcNow.Year,
+                ["LoginUrl"] = "https://hunter.geminicode.com.br"
             };
 
             var htmlBody = _templateService.RenderWelcomeEmailTemplate(templateData);
@@ -201,11 +202,11 @@ public class EmailService : IEmailService
 
             await smtp.SendMailAsync(mail);
 
-            _logger.LogInformation("Welcome email sent successfully to {Email}", userEmail);
+            _logger.LogInformation("Welcome email sent successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send welcome email to {Email}", userEmail);
+            _logger.LogError(ex, "Failed to send welcome email");
         }
     }
 
