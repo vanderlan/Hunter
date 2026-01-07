@@ -16,6 +16,7 @@ public class EmailService : IEmailService
     private readonly List<string> _toEmails;
     private readonly string _password;
     private readonly bool _enableSsl;
+    private readonly string _applicationUrl;
 
     public EmailService(
         IConfiguration configuration, 
@@ -46,6 +47,7 @@ public class EmailService : IEmailService
         
         _password = emailConfig["Password"] ?? throw new InvalidOperationException("Email:Password is required");
         _enableSsl = bool.Parse(emailConfig["EnableSsl"] ?? "true");
+        _applicationUrl = emailConfig["ApplicationUrl"] ?? "https://hunter.geminicode.com.br";
     }
 
     public async Task SendJobChangesNotificationAsync(
@@ -179,7 +181,7 @@ public class EmailService : IEmailService
                 ["UserEmail"] = userEmail,
                 ["Password"] = password,
                 ["CurrentYear"] = DateTime.UtcNow.Year,
-                ["LoginUrl"] = "https://hunter.geminicode.com.br"
+                ["LoginUrl"] = _applicationUrl
             };
 
             var htmlBody = _templateService.RenderWelcomeEmailTemplate(templateData);
