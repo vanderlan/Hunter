@@ -1,0 +1,31 @@
+using GeminiCode.Hunter.Domain.Core.Entities;
+
+namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
+
+public class CandidateGetPaginatedResponse
+{
+    public string PublicId { get; set; }
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
+    public DateTime AnalyzedAt { get; set; }
+    public string AnalyzedByUserName { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public static implicit operator CandidateGetPaginatedResponse(Candidate candidate)
+    {
+        if (candidate is null)
+            return default;
+
+        return new CandidateGetPaginatedResponse
+        {
+            PublicId = candidate.PublicId,
+            Name = candidate.Name,
+            Email = candidate.Email,
+            PhoneNumber = candidate.PhoneNumber,
+            AnalyzedAt = candidate.AnalyzedAt,
+            AnalyzedByUserName = candidate.User?.Name ?? "Unknown",
+            CreatedAt = candidate.CreatedAt
+        };
+    }
+}
