@@ -9,15 +9,15 @@ echo "?? Starting Hunter deployment..."
 
 # Pull latest images from DockerHub
 echo "?? Pulling latest Docker images..."
-docker-compose pull
+docker compose pull
 
 # Stop and remove old containers
 echo "?? Stopping old containers..."
-docker-compose down
+docker compose stop 
 
 # Start new containers in detached mode
 echo "? Starting new containers..."
-docker-compose up -d
+docker compose up fronted api --build -d
 
 # Wait for services to be healthy
 echo "? Waiting for services to start..."
