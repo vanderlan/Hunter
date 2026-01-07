@@ -30,4 +30,14 @@ public static class MessagesKeys
         public const string EmptyNewPasswordConfirmation = "User.EmptyNewPasswordConfirmation";
         public const string PasswordAndConfirmationDifferent = "User.PasswordConfirmationDifferent";
     }
+
+    public static class JobPositionMessages
+    {
+        public const string NullEntity = "JobPosition.NullEntity";
+        public const string EmptyTitle = "JobPosition.EmptyTitle";
+        public const string EmptyExternalUrl = "JobPosition.EmptyExternalUrl";
+        public const string EmptyCompanyCode = "JobPosition.EmptyCompanyCode";
+        public const string EmptyJobCode = "JobPosition.EmptyJobCode";
+        public const string JobCodeExists = "JobPosition.JobCodeExists";
+    }
 }

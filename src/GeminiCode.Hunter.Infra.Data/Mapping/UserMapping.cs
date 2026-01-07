@@ -4,7 +4,6 @@ using System;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Extensions;
-using System.Globalization;
 
 namespace GeminiCode.Hunter.Infra.Data.Mapping;
 
@@ -34,10 +33,10 @@ public class UserMapping : IEntityTypeConfiguration<User>
             {
                 UserId = 923165498765432123,
                 PublicId = "16537902-1ca7-49ca-82e5-0be137f9aeeb",
-                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0),
+                CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Unspecified),
                 Email = "adm@hunter.com",
                 Name = "Hunter Admin User",
-                LastUpdated = new DateTime(2025, 1, 1, 0, 0, 0),
+                LastUpdated = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Unspecified),
                 Profile = UserProfile.Admin,
                 Password =  "123".ToSha512()
             }

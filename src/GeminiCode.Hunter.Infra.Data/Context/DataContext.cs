@@ -15,6 +15,8 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     #region DBSet
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<JobPosition> JobPositions { get; set; }
+    public DbSet<Candidate> Candidates { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -28,6 +30,8 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     {
         modelBuilder.ApplyConfiguration(new UserMapping());
         modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
+        modelBuilder.ApplyConfiguration(new JobPositionMapping());
+        modelBuilder.ApplyConfiguration(new CandidateMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
@@ -50,15 +54,17 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
                 State: EntityState.Added or EntityState.Modified
             });
 
+        var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+
         foreach (var entity in entities)
         {
             if (entity.State == EntityState.Added)
             {
-                ((BaseEntity)entity.Entity).CreatedAt = DateTime.UtcNow;
+                ((BaseEntity)entity.Entity).CreatedAt = now;
                 ((BaseEntity)entity.Entity).PublicId = Guid.NewGuid().ToString();
             }
 
-            ((BaseEntity)entity.Entity).LastUpdated = DateTime.UtcNow;
+            ((BaseEntity)entity.Entity).LastUpdated = now;
         }
     }
 }

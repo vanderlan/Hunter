@@ -1,0 +1,162 @@
+<div class="user-management-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>people</mat-icon>
+        User Management
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Manage system users and their roles (Admin only)</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Search and Create Section -->
+  <mat-card class="actions-card" *ngIf="!isEditing">
+    <div class="actions-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by name or email">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="showCreateForm()">
+        <mat-icon>add</mat-icon>
+        New User
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Create/Edit Form -->
+  <mat-card class="form-card" *ngIf="isEditing">
+    <mat-card-header>
+      <mat-card-title>
+        {{ currentUserId ? 'Edit User' : 'Create New User' }}
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="userForm" class="user-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Name *</mat-label>
+            <input matInput formControlName="name" placeholder="Enter full name">
+            <mat-error *ngIf="userForm.get('name')?.hasError('required')">
+              Name is required
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Email *</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="user@example.com">
+            <mat-error *ngIf="userForm.get('email')?.hasError('required')">
+              Email is required
+            </mat-error>
+            <mat-error *ngIf="userForm.get('email')?.hasError('email')">
+              Please enter a valid email
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field" *ngIf="!currentUserId">
+            <mat-label>Password *</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Enter password">
+            <mat-error *ngIf="userForm.get('password')?.hasError('required')">
+              Password is required
+            </mat-error>
+            <mat-error *ngIf="userForm.get('password')?.hasError('minlength')">
+              Password must be at least 3 characters
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Profile *</mat-label>
+            <mat-select formControlName="profile">
+              <mat-option [value]="1">Admin</mat-option>
+              <mat-option [value]="2">Partner</mat-option>
+            </mat-select>
+            <mat-error *ngIf="userForm.get('profile')?.hasError('required')">
+              Profile is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button (click)="cancelEdit()" [disabled]="loading">Cancel</button>
+      <button mat-raised-button color="primary" (click)="saveUser()" [disabled]="loading">
+        <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+        <span *ngIf="!loading">{{ currentUserId ? 'Update' : 'Create' }}</span>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Users Table -->
+  <mat-card class="table-card" *ngIf="!isEditing">
+    <mat-card-content>
+      <div class="spinner-container" *ngIf="loading">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <table mat-table [dataSource]="dataSource" class="users-table" *ngIf="!loading">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+        </ng-container>
+
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let element">{{ element.email }}</td>
+        </ng-container>
+
+        <!-- Profile Column -->
+        <ng-container matColumnDef="profile">
+          <th mat-header-cell *matHeaderCellDef>Role</th>
+          <td mat-cell *matCellDef="let element">
+            <span [class.admin-badge]="element.profile === 1" [class.partner-badge]="element.profile === 2">
+              {{ getProfileLabel(element.profile) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="createdAt">
+          <th mat-header-cell *matHeaderCellDef>Created At</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.createdAt | date: 'short' }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button color="primary" (click)="editUser(element)" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteUser(element)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <!-- No Data Row -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="5" style="text-align: center; padding: 20px;">
+            No users found
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator 
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)"
+        *ngIf="!loading">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>
