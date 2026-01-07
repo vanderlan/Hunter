@@ -4,7 +4,7 @@ public class AnalyzeCvResponse
 {
     public int TotalPositionsAnalyzed { get; set; }
     public int MatchesFound { get; set; }
-    public List<JobMatchDto> Matches { get; set; } = new();
+    public List<JobMatchDto> Matches { get; set; } = [];
 }
 
 public class JobMatchDto
@@ -15,8 +15,8 @@ public class JobMatchDto
     public string ExternalUrl { get; set; } = string.Empty;
     public decimal MatchPercentage { get; set; }
     public string MatchReason { get; set; } = string.Empty;
-    public List<string> MatchingSkills { get; set; } = new();
-    public List<string> MissingSkills { get; set; } = new();
+    public List<string> MatchingSkills { get; set; } = [];
+    public List<string> MissingSkills { get; set; } = [];
     public string? Summary { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }

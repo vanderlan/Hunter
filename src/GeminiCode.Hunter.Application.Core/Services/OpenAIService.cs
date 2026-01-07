@@ -89,6 +89,36 @@ public class OpenAIService : IOpenAIService
         }
     }
 
+    public async Task<string> GetCompletionAsync(string prompt, int maxTokens = 100)
+    {
+        try
+        {
+            _logger.LogInformation("Getting OpenAI completion with max tokens: {MaxTokens}", maxTokens);
+
+            var messages = new List<ChatMessage>
+            {
+                new UserChatMessage(prompt)
+            };
+
+            var chatCompletion = await _chatClient.CompleteChatAsync(messages, new ChatCompletionOptions
+            {
+                Temperature = 0.3f,
+                MaxOutputTokenCount = maxTokens
+            });
+
+            var response = chatCompletion.Value.Content[0].Text.Trim();
+            
+            _logger.LogDebug("OpenAI Response: {Response}", response);
+
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting completion from OpenAI");
+            throw;
+        }
+    }
+
     private static string BuildAnalysisPrompt(string cvText, List<JobPositionSummary> jobPositions)
     {
         var sb = new StringBuilder();
@@ -151,7 +181,8 @@ public class OpenAIService : IOpenAIService
         sb.AppendLine("3. List specific matching skills found in the CV");
         sb.AppendLine("4. List skills required by the job but missing from the CV");
         sb.AppendLine();
-        sb.AppendLine("Return ONLY positions with match percentage > 20%, ordered by match percentage (highest first).");
+        sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
+        sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
         
         return sb.ToString();
     }

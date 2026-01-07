@@ -1,0 +1,89 @@
+<div class="candidates-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>folder_shared</mat-icon>
+        Candidates
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>View candidates analyzed in the system</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Search Section -->
+  <mat-card class="actions-card">
+    <div class="actions-row">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search</mat-label>
+        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by name or email">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </mat-card>
+
+  <!-- Candidates Table -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="spinner-container" *ngIf="loading">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <table mat-table [dataSource]="dataSource" class="candidates-table" *ngIf="!loading">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.name || 'N/A' }}</td>
+        </ng-container>
+
+        <!-- Email Column -->
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef>Email</th>
+          <td mat-cell *matCellDef="let element">{{ element.email || 'N/A' }}</td>
+        </ng-container>
+
+        <!-- Analyzed At Column -->
+        <ng-container matColumnDef="analyzedAt">
+          <th mat-header-cell *matHeaderCellDef>Analyzed At</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.analyzedAt | date: 'short' }}
+          </td>
+        </ng-container>
+
+        <!-- Analyzed By Column -->
+        <ng-container matColumnDef="analyzedByUserName">
+          <th mat-header-cell *matHeaderCellDef>Analyzed By</th>
+          <td mat-cell *matCellDef="let element">{{ element.analyzedByUserName }}</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button color="primary" (click)="viewCandidate(element)" matTooltip="View Details">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <!-- No Data Row -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="5" style="text-align: center; padding: 20px;">
+            No candidates found
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator 
+        [length]="totalCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 25, 50]"
+        (page)="onPageChange($event)"
+        *ngIf="!loading">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

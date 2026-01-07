@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using Swashbuckle.AspNetCore.Annotations;
@@ -79,6 +80,7 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     }
 
     [HttpPatch("Me/Password")]
+    [Authorize]
     [SwaggerResponse((int)HttpStatusCode.BadRequest, "A error response with the error description", typeof(ExceptionResponse))]
     [SwaggerResponse((int)HttpStatusCode.Accepted)]
     [SwaggerResponse((int)HttpStatusCode.NotFound)]

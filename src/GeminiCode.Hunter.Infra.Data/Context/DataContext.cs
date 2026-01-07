@@ -16,6 +16,7 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<User> Users { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<JobPosition> JobPositions { get; set; }
+    public DbSet<Candidate> Candidates { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -30,6 +31,7 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new UserMapping());
         modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
         modelBuilder.ApplyConfiguration(new JobPositionMapping());
+        modelBuilder.ApplyConfiguration(new CandidateMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

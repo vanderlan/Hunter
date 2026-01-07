@@ -2,7 +2,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Jobs.Queries.GetActiveJobs
 
 public class GetActiveJobsResponse
 {
-    public List<JobPositionDto> Jobs { get; set; } = new();
+    public List<JobPositionDto> Jobs { get; set; } = [];
     public int TotalCount { get; set; }
 }
 

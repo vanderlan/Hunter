@@ -1,14 +1,25 @@
 export interface JobPosition {
-  publicId: string;
+  publicId?: string;
+  jobPositionId?: number;
   title: string;
   externalUrl: string;
   companyCode: string;
   jobCode: string;
   summary?: string;
+  responsibilities?: string;
+  requirements?: string;
   mustHaveSkills?: string;
   niceToHaveSkills?: string;
-  createdAt: Date;
-  lastCheckedAt: Date;
+  isActive?: boolean;
+  closedAt?: Date;
+  lastCheckedAt?: Date;
+  createdAt?: Date;
+  lastUpdated?: Date;
+}
+
+export interface PagedList<T> {
+  items: T[];
+  count: number;
 }
 
 export interface JobMatch {
