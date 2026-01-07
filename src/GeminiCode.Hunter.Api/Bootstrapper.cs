@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using GeminiCode.Hunter.Api.Configuration;
 using GeminiCode.Hunter.Application.Core;
 using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Create;
+using GeminiCode.Hunter.Application.Core.BackgroundServices;
 using GeminiCode.Hunter.Crosscutting.Ioc.Dependencies;
 using GeminiCode.Hunter.Domain.Core.Authentication;
+using Microsoft.FeatureManagement;
 
 namespace GeminiCode.Hunter.Api;
 
@@ -74,10 +76,15 @@ public static class Bootstrapper
         services.AddUnitOfWork();
         services.AddJobServices();
         services.AddAIServices();
+        services.AddNotificationServices();
+        services.AddFeatureManagement();
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IApplicationAssembly).Assembly));
+
+        // Register background service for automatic job synchronization
+        services.AddHostedService<JobSyncBackgroundService>();
     }
 }

@@ -159,4 +159,22 @@
   <data name="User.PasswordConfirmationDifferent" xml:space="preserve">
     <value>A nova senha e a confiração da senha precisam ser iguais</value>
   </data>
+  <data name="JobPosition.NullEntity" xml:space="preserve">
+    <value>A Posição de Trabalho não pode ser nula</value>
+  </data>
+  <data name="JobPosition.EmptyTitle" xml:space="preserve">
+    <value>O Título é obrigatório</value>
+  </data>
+  <data name="JobPosition.EmptyExternalUrl" xml:space="preserve">
+    <value>A URL Externa é obrigatória</value>
+  </data>
+  <data name="JobPosition.EmptyCompanyCode" xml:space="preserve">
+    <value>O Código da Empresa é obrigatório</value>
+  </data>
+  <data name="JobPosition.EmptyJobCode" xml:space="preserve">
+    <value>O Código do Trabalho é obrigatório</value>
+  </data>
+  <data name="JobPosition.JobCodeExists" xml:space="preserve">
+    <value>Já existe uma posição de trabalho com este Código</value>
+  </data>
 </root>

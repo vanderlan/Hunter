@@ -25,6 +25,9 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private IJobPositionRepository _jobPositionRepository;
     public IJobPositionRepository JobPositionRepository => _jobPositionRepository ??= new JobPositionRepository(DbContext);
 
+    private ICandidateRepository _candidateRepository;
+    public ICandidateRepository CandidateRepository => _candidateRepository ??= new CandidateRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try

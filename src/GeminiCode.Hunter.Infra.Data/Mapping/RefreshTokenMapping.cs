@@ -14,5 +14,14 @@ public class RefreshTokenMapping : IEntityTypeConfiguration<RefreshToken>
         builder.HasIndex(x => x.Email).IsUnique();
         builder.HasIndex(x => x.PublicId).IsUnique();
         builder.HasKey(x => x.Refreshtoken);
+        
+        // Configure timestamp columns as 'timestamp without time zone' for consistency
+        builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
+            .IsRequired();
+        
+        builder.Property(x => x.LastUpdated)
+            .HasColumnType("timestamp without time zone")
+            .IsRequired();
     }
 }

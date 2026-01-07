@@ -16,7 +16,7 @@
       font-weight: 500;
 
       mat-icon {
-        color: #3f51b5;
+        color: #5f1f1f;
       }
     }
 
@@ -41,12 +41,12 @@
   justify-content: center;
 
   &.drag-over {
-    border-color: #3f51b5;
+    border-color: #5f1f1f;
     background-color: #e8eaf6;
   }
 
   &:hover {
-    border-color: #3f51b5;
+    border-color: #5f1f1f;
     background-color: #f5f5f5;
   }
 }
@@ -56,7 +56,7 @@
     font-size: 64px;
     width: 64px;
     height: 64px;
-    color: #3f51b5;
+    color: #5f1f1f;
     margin-bottom: 16px;
   }
 
@@ -88,7 +88,7 @@
   margin-top: 16px;
 
   mat-icon {
-    color: #3f51b5;
+    color: #5f1f1f;
   }
 
   .file-size {
@@ -113,15 +113,25 @@
   text-align: center;
   padding: 60px 20px;
 
-  mat-spinner {
+  .ai-loading {
     margin: 0 auto 24px;
+    
+    .ai-star {
+      font-size: 80px;
+      width: 80px;
+      height: 80px;
+      color: #5f1f1f;
+      animation: aiPulse 2s ease-in-out infinite;
+      display: block;
+      margin: 0 auto;
+    }
   }
 
   h3 {
     font-size: 20px;
     font-weight: 500;
     margin: 16px 0;
-    color: #3f51b5;
+    color: #5f1f1f;
   }
 
   p {
@@ -132,6 +142,25 @@
   mat-progress-bar {
     max-width: 400px;
     margin: 0 auto;
+  }
+}
+
+@keyframes aiPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.2) rotate(90deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.2) rotate(270deg);
+    opacity: 0.8;
   }
 }
 
@@ -179,10 +208,11 @@
 
 .match-card {
   mat-card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5f1f1f 0%, #b13a2f 100%);
     color: white;
     padding: 16px;
-    margin: -16px -16px 0;
+    margin: 10px;
+    border-radius: 10px;
 
     mat-card-title {
       color: white;
@@ -208,7 +238,7 @@
     font-size: 24px;
     font-weight: 600;
     margin: 0 0 12px;
-    color: #3f51b5;
+    color:#5f1f1f;
   }
 
   mat-progress-bar {
@@ -221,7 +251,7 @@
   padding: 16px;
   background-color: #f5f5f5;
   border-radius: 8px;
-  border-left: 4px solid #3f51b5;
+  border-left: 4px solid #5f1f1f;
   margin-bottom: 16px;
   line-height: 1.6;
   color: #333;

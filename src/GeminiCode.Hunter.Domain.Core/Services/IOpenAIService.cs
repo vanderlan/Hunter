@@ -7,4 +7,5 @@ namespace GeminiCode.Hunter.Domain.Core.Services;
 public interface IOpenAIService
 {
     Task<CvAnalysisResult> AnalyzeCvAgainstJobsAsync(string cvText, List<JobPositionSummary> jobPositions);
+    Task<string> GetCompletionAsync(string prompt, int maxTokens = 100);
 }

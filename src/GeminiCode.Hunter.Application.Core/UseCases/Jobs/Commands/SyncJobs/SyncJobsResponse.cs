@@ -6,6 +6,6 @@ public class SyncJobsResponse
     public int NewPositions { get; set; }
     public int UpdatedPositions { get; set; }
     public int ClosedPositions { get; set; }
-    public List<string> NewJobTitles { get; set; } = new();
-    public List<string> ClosedJobTitles { get; set; } = new();
+    public List<string> NewJobTitles { get; set; } = [];
+    public List<string> ClosedJobTitles { get; set; } = [];
 }

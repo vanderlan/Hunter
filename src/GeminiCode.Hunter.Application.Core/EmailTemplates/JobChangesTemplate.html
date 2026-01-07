@@ -1,0 +1,206 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunter Job Alert</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #5f1f1f 0%, #8a2c23 100%);
+            color: #ffffff;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .info-box {
+            background-color: #4caf50;
+            border-left: 4px solid green;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .info-box p {
+            margin: 5px 0;
+            color: #000;
+            font-size: 14px;
+        }
+        .info-box strong {
+            color: #fff;
+        }
+        .section {
+            margin-bottom: 35px;
+        }
+        .section-title {
+            color: #5f1f1f;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #5f1f1f;
+        }
+        .section-subtitle {
+            color: #8a2c23;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .job-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .job-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #b13a2f;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+        }
+        .job-item.new {
+            background-color: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        .job-item.closed {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+        .job-item::before {
+            content: '✓';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            background-color: #4caf50;
+            color: white;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .job-item.closed::before {
+            content: '✗';
+            background-color: #f44336;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-style: italic;
+        }
+        .footer {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer p {
+            margin: 5px 0;
+            opacity: 0.8;
+        }
+        .footer a {
+            color: #b13a2f;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #5f1f1f;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .cta-button:hover {
+            background-color: #8a2c23;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Hunter Job Alert</h1>
+            <p>Job Changes Detected</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <p><strong>New Positions:</strong> {{NewJobsCount}}</p>
+                <p><strong>Closed Positions:</strong> {{ClosedJobsCount}}</p>
+            </div>
+
+            {{#if HasNewJobs}}
+            <div class="section">
+                <div class="section-title">✓ New Positions Opened</div>
+                <div class="section-subtitle">Total: {{NewJobsCount}}</div>
+                <ul class="job-list">
+                    {{#each NewJobs}}
+                    <li class="job-item new">{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/if}}
+
+            {{#if HasClosedJobs}}
+            <div class="section">
+                <div class="section-title">✗ Positions Closed</div>
+                <div class="section-subtitle">Total: {{ClosedJobsCount}}</div>
+                <ul class="job-list">
+                    {{#each ClosedJobs}}
+                    <li class="job-item closed">{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/if}}
+
+            {{#unless HasChanges}}
+            <div class="empty-state">
+                No job changes detected during this sync.
+            </div>
+            {{/unless}}
+
+            <div style="text-align: center;">
+                <a href="https://hunter.geminicode.com.br" class="cta-button">Analyze CVs</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Hunter CV Analyzer</strong></p>
+            <p>Automated notification system for job position monitoring</p>
+            <p>This is an automated email. Please do not reply.</p>
+        </div>
+    </div>
+</body>
+</html>
