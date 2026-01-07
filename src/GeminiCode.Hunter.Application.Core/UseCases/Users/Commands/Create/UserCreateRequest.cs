@@ -10,6 +10,7 @@ public class UserCreateRequest : IRequest<UserCreateResponse>
     public string Password { get; set; }
     public string Email { get; set; }
     public UserProfile Profile { get; set; }
+    public bool SendWelcomeEmail { get; set; }
 
     public static explicit operator User(UserCreateRequest request)
     {

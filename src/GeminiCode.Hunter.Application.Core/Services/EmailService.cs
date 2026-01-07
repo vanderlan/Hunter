@@ -164,6 +164,51 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task SendWelcomeEmailAsync(
+        string userName,
+        string userEmail,
+        string password)
+    {
+        try
+        {
+            _logger.LogInformation("Sending welcome email to {Email}", userEmail);
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["UserName"] = userName,
+                ["UserEmail"] = userEmail,
+                ["Password"] = password,
+                ["CurrentYear"] = DateTime.UtcNow.Year
+            };
+
+            var htmlBody = _templateService.RenderWelcomeEmailTemplate(templateData);
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_fromEmail, "Hunter CV Analyzer"),
+                Subject = "Welcome to Hunter CV Analyzer! 🎯",
+                Body = htmlBody,
+                IsBodyHtml = true
+            };
+
+            mail.To.Add(userEmail);
+
+            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_fromEmail, _password),
+                EnableSsl = _enableSsl
+            };
+
+            await smtp.SendMailAsync(mail);
+
+            _logger.LogInformation("Welcome email sent successfully to {Email}", userEmail);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send welcome email to {Email}", userEmail);
+        }
+    }
+
     private List<Dictionary<string, object>> ConvertToPositionsList(object matchResults)
     {
         var positions = new List<Dictionary<string, object>>();

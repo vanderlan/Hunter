@@ -19,13 +19,14 @@ public class UserCreateRequestHandler(
     {
         await ValidateUser(request);
 
+        var plainPassword = request.Password;
         request.Password = request.Password.ToSha512();
 
         var added = await unitOfWork.UserRepository.AddAsync((User)request);
         await unitOfWork.CommitAsync();
 
 
-        await mediator.Publish(new UserCreatedNotification(added), cancellationToken);
+        await mediator.Publish(new UserCreatedNotification(added, plainPassword, request.SendWelcomeEmail), cancellationToken);
 
         return (UserCreateResponse)added;
     }

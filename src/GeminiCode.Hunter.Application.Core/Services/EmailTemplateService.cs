@@ -24,6 +24,15 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         return result;
     }
 
+    public string RenderWelcomeEmailTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering welcome email template");
+        var template = LoadTemplate("WelcomeEmailTemplate.html");
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, length: {Length}", result.Length);
+        return result;
+    }
+
     private string LoadTemplate(string templateName)
     {
         try
