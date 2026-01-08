@@ -6,4 +6,5 @@ public interface IEmailTemplateService
 {
     string RenderJobChangesTemplate(Dictionary<string, object> data);
     string RenderCandidateMatchesTemplate(Dictionary<string, object> data);
+    string RenderWelcomeEmailTemplate(Dictionary<string, object> data);
 }

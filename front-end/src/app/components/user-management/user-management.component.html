@@ -77,6 +77,15 @@
             </mat-error>
           </mat-form-field>
         </div>
+
+        <div class="form-row" *ngIf="!currentUserId">
+          <div class="checkbox-field">
+            <mat-checkbox formControlName="sendWelcomeEmail">
+              Send welcome email to user
+            </mat-checkbox>
+            <p class="checkbox-hint">If checked, the user will receive a welcome email with their login credentials and instructions.</p>
+          </div>
+        </div>
       </form>
     </mat-card-content>
     <mat-card-actions>

@@ -1,4 +1,5 @@
 ﻿using GeminiCode.Hunter.Domain.Core.Authentication;
+using GeminiCode.Hunter.Domain.Core.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -7,7 +8,8 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Notifications.UserCr
 {
     public class UserCreatedNotificationHandler(
         ILogger<UserCreatedNotificationHandler> logger,
-        ICurrentUser currentUser)
+        ICurrentUser currentUser,
+        IEmailService emailService)
         : INotificationHandler<UserCreatedNotification>
     {
         public async Task Handle(UserCreatedNotification notification, CancellationToken cancellationToken)
@@ -17,7 +19,14 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Notifications.UserCr
                 JsonConvert.SerializeObject(notification, Formatting.Indented),
                 currentUser.ToString());
 
-            await Task.CompletedTask;
+            if (notification.SendWelcomeEmail)
+            {
+                logger.LogInformation("Sending welcome email to new user");
+                await emailService.SendWelcomeEmailAsync(
+                    notification.Entity.Name,
+                    notification.Entity.Email,
+                    notification.PlainPassword);
+            }
         }
     }
 }

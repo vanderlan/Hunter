@@ -16,6 +16,7 @@ public class EmailService : IEmailService
     private readonly List<string> _toEmails;
     private readonly string _password;
     private readonly bool _enableSsl;
+    private readonly string _applicationUrl;
 
     public EmailService(
         IConfiguration configuration, 
@@ -46,6 +47,7 @@ public class EmailService : IEmailService
         
         _password = emailConfig["Password"] ?? throw new InvalidOperationException("Email:Password is required");
         _enableSsl = bool.Parse(emailConfig["EnableSsl"] ?? "true");
+        _applicationUrl = emailConfig["ApplicationUrl"] ?? "https://hunter.geminicode.com.br";
     }
 
     public async Task SendJobChangesNotificationAsync(
@@ -161,6 +163,52 @@ public class EmailService : IEmailService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send candidate matching notification email");
+        }
+    }
+
+    public async Task SendWelcomeEmailAsync(
+        string userName,
+        string userEmail,
+        string password)
+    {
+        try
+        {
+            _logger.LogInformation("Sending welcome email to new user");
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["UserName"] = userName,
+                ["UserEmail"] = userEmail,
+                ["Password"] = password,
+                ["CurrentYear"] = DateTime.UtcNow.Year,
+                ["LoginUrl"] = _applicationUrl
+            };
+
+            var htmlBody = _templateService.RenderWelcomeEmailTemplate(templateData);
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_fromEmail, "Hunter CV Analyzer"),
+                Subject = "Welcome to Hunter CV Analyzer! 🎯",
+                Body = htmlBody,
+                IsBodyHtml = true
+            };
+
+            mail.To.Add(userEmail);
+
+            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_fromEmail, _password),
+                EnableSsl = _enableSsl
+            };
+
+            await smtp.SendMailAsync(mail);
+
+            _logger.LogInformation("Welcome email sent successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send welcome email");
         }
     }
 

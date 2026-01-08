@@ -14,4 +14,9 @@ public interface IEmailService
     Task SendCandidateMatchingNotificationAsync(
         object matchResults,
         DateTime syncTime);
+    
+    Task SendWelcomeEmailAsync(
+        string userName,
+        string userEmail,
+        string password);
 }
