@@ -32,10 +32,10 @@ export class JobService {
 
   getActiveJobs(companyCode?: string): Observable<JobPosition[]> {
     const url = companyCode 
-      ? `${this.apiUrl}/jobs/active?companyCode=${companyCode}`
-      : `${this.apiUrl}/jobs/active`;
+      ? `${this.apiUrl}/JobPositions/Active?companyCode=${companyCode}`
+      : `${this.apiUrl}/JobPositions/Active`;
 
-    return this.http.get<ApiResponse<{ jobs: JobPosition[], totalCount: number }>>(
+    return this.http.get<{ jobs: JobPosition[], totalCount: number }>(
       url,
       {
         headers: new HttpHeaders({
@@ -43,21 +43,19 @@ export class JobService {
         })
       }
     ).pipe(
-      map(response => response.data.jobs)
+      map(response => response.jobs)
     );
   }
 
   syncJobs(): Observable<any> {
-    return this.http.post<ApiResponse<any>>(
-      `${this.apiUrl}/jobs/sync`,
+    return this.http.post<any>(
+      `${this.apiUrl}/JobPositions/Sync`,
       {},
       {
         headers: new HttpHeaders({
           'x-api-version': environment.apiVersion
         })
       }
-    ).pipe(
-      map(response => response.data)
     );
   }
 }

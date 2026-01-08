@@ -102,7 +102,7 @@ jobs:
     needs: deploy
     steps:
     - name: Wait for deployment
-      run: sleep 30
+      run: sleep 3
     
     - name: Health Check - API
       uses: jtalk/url-health-check-action@v4
