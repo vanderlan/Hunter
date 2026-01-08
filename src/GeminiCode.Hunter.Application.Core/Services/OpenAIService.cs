@@ -23,6 +23,63 @@ public class OpenAIService : IOpenAIService
         _logger = logger;
     }
 
+    public async Task<JobEnrichmentResult> EnrichJobDetailsAsync(string jobTitle, string rawHtmlContent)
+    {
+        try
+        {
+            _logger.LogInformation("Enriching job details for: {JobTitle}", jobTitle);
+
+            var prompt = BuildJobEnrichmentPrompt(jobTitle, rawHtmlContent);
+
+            var messages = new List<ChatMessage>
+            {
+                new SystemChatMessage(
+                    "You are an expert HR content analyzer. Your task is to extract structured information " +
+                    "from job posting HTML content. Be accurate, concise, and professional. " +
+                    "Extract only the information present in the content."
+                ),
+                new UserChatMessage(prompt)
+            };
+
+            var chatCompletion = await _chatClient.CompleteChatAsync(messages, new ChatCompletionOptions
+            {
+                Temperature = 0.2f,
+                ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                    jsonSchemaFormatName: "job_enrichment",
+                    jsonSchema: BinaryData.FromString(GetJobEnrichmentSchema()),
+                    jsonSchemaIsStrict: true
+                )
+            });
+
+            var responseContent = chatCompletion.Value.Content[0].Text;
+            
+            _logger.LogDebug("OpenAI Job Enrichment Response: {Response}", responseContent);
+
+            var result = JsonSerializer.Deserialize<OpenAIJobEnrichmentResponse>(responseContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (result == null)
+                throw new InvalidOperationException("Failed to deserialize OpenAI job enrichment response");
+
+            _logger.LogInformation("Successfully enriched job details for: {JobTitle}", jobTitle);
+
+            return new JobEnrichmentResult(
+                Summary: result.Summary ?? string.Empty,
+                Responsibilities: result.Responsibilities ?? string.Empty,
+                Skills: result.Skills ?? string.Empty,
+                MustHaveSkills: result.MustHaveSkills ?? string.Empty,
+                NiceToHaveSkills: result.NiceToHaveSkills ?? string.Empty
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error enriching job details for: {JobTitle}", jobTitle);
+            throw;
+        }
+    }
+
     public async Task<CvAnalysisResult> AnalyzeCvAgainstJobsAsync(
         string cvText, 
         List<JobPositionSummary> jobPositions)
@@ -119,6 +176,42 @@ public class OpenAIService : IOpenAIService
         }
     }
 
+    private static string BuildJobEnrichmentPrompt(string jobTitle, string rawHtmlContent)
+    {
+        var sb = new StringBuilder();
+        
+        sb.AppendLine("# TASK");
+        sb.AppendLine($"Extract structured information from the following job posting for: **{jobTitle}**");
+        sb.AppendLine();
+        
+        sb.AppendLine("# JOB POSTING HTML CONTENT");
+        sb.AppendLine("```html");
+        sb.AppendLine(rawHtmlContent);
+        sb.AppendLine("```");
+        sb.AppendLine();
+        
+        sb.AppendLine("# EXTRACTION INSTRUCTIONS");
+        sb.AppendLine();
+        sb.AppendLine("Extract and structure the following information:");
+        sb.AppendLine();
+        sb.AppendLine("1. **Summary**: A concise 2-3 sentence overview of the position");
+        sb.AppendLine("2. **Responsibilities**: Key duties and responsibilities (bullet points or paragraphs)");
+        sb.AppendLine("3. **Skills**: ALL technical and soft skills mentioned, comma-separated");
+        sb.AppendLine("   - Example: \"Java, C#, SQL Server, Kubernetes, Docker, Agile, Team Leadership\"");
+        sb.AppendLine("4. **Must-Have Skills**: Essential/required skills only, comma-separated");
+        sb.AppendLine("5. **Nice-to-Have Skills**: Preferred/optional skills, comma-separated");
+        sb.AppendLine();
+        sb.AppendLine("# IMPORTANT RULES");
+        sb.AppendLine("- Extract ONLY information present in the HTML content");
+        sb.AppendLine("- Do NOT invent or assume information");
+        sb.AppendLine("- If a section has no data, return empty string");
+        sb.AppendLine("- For Skills: include ALL skills mentioned (technical, soft, tools, technologies)");
+        sb.AppendLine("- Format skills as comma-separated values");
+        sb.AppendLine("- Keep text concise and professional");
+        
+        return sb.ToString();
+    }
+
     private static string BuildAnalysisPrompt(string cvText, List<JobPositionSummary> jobPositions)
     {
         var sb = new StringBuilder();
@@ -152,11 +245,6 @@ public class OpenAIService : IOpenAIService
                 sb.AppendLine($"**Responsibilities:** {job.Responsibilities}");
             }
             
-            if (!string.IsNullOrWhiteSpace(job.Requirements))
-            {
-                sb.AppendLine($"**Requirements:** {job.Requirements}");
-            }
-            
             if (!string.IsNullOrWhiteSpace(job.MustHaveSkills))
             {
                 sb.AppendLine($"**Must-Have Skills:** {job.MustHaveSkills}");
@@ -185,6 +273,24 @@ public class OpenAIService : IOpenAIService
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
         
         return sb.ToString();
+    }
+
+    private static string GetJobEnrichmentSchema()
+    {
+        return """
+        {
+          "type": "object",
+          "properties": {
+            "summary": { "type": "string" },
+            "responsibilities": { "type": "string" },
+            "skills": { "type": "string" },
+            "mustHaveSkills": { "type": "string" },
+            "niceToHaveSkills": { "type": "string" }
+          },
+          "required": ["summary", "responsibilities", "skills", "mustHaveSkills", "niceToHaveSkills"],
+          "additionalProperties": false
+        }
+        """;
     }
 
     private static string GetResponseSchema()
@@ -222,6 +328,14 @@ public class OpenAIService : IOpenAIService
         """;
     }
 
+    private record OpenAIJobEnrichmentResponse(
+        string? Summary,
+        string? Responsibilities,
+        string? Skills,
+        string? MustHaveSkills,
+        string? NiceToHaveSkills
+    );
+    
     private record OpenAICvAnalysisResponse(List<OpenAIJobMatch> Matches);
     
     private record OpenAIJobMatch(

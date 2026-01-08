@@ -8,4 +8,5 @@ public interface IOpenAIService
 {
     Task<CvAnalysisResult> AnalyzeCvAgainstJobsAsync(string cvText, List<JobPositionSummary> jobPositions);
     Task<string> GetCompletionAsync(string prompt, int maxTokens = 100);
+    Task<JobEnrichmentResult> EnrichJobDetailsAsync(string jobTitle, string rawHtmlContent);
 }

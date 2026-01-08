@@ -1,3 +1,4 @@
+
 export interface JobPosition {
   publicId?: string;
   jobPositionId?: number;
@@ -7,7 +8,7 @@ export interface JobPosition {
   jobCode: string;
   summary?: string;
   responsibilities?: string;
-  requirements?: string;
+  skills?: string;
   mustHaveSkills?: string;
   niceToHaveSkills?: string;
   isActive?: boolean;
