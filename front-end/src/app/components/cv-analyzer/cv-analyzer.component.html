@@ -1,4 +1,5 @@
 <div class="analyzer-container">
+  <!-- CV Analysis Card -->
   <mat-card class="upload-card">
     <mat-card-header>
       <mat-card-title>
@@ -133,6 +134,48 @@
               </a>
             </mat-card-actions>
           </mat-card>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Available Positions Card - Completely Separate Section -->
+  <mat-card class="positions-listing-card">
+    <mat-card-header>
+      <mat-card-title class="positions-listing-title">
+        <mat-icon>work_outline</mat-icon>
+        <span>Available Positions</span>
+      </mat-card-title>
+      <mat-card-subtitle class="positions-listing-subtitle">
+        {{ availablePositions.length }} open positions
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="positions-listing-content">
+      <!-- Loading State -->
+      <div *ngIf="loadingPositions" class="positions-loading-state">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p class="positions-loading-text">Loading available positions...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loadingPositions && availablePositions.length === 0" class="positions-empty-state">
+        <mat-icon class="positions-empty-icon">info_outline</mat-icon>
+        <p class="positions-empty-text">No positions available at the moment</p>
+      </div>
+
+      <!-- Positions List -->
+      <div *ngIf="!loadingPositions && availablePositions.length > 0" class="positions-list-wrapper">
+        <div 
+          *ngFor="let position of availablePositions" 
+          class="position-list-item"
+          (click)="openPositionDetails(position)">
+          <div class="position-item-header">
+            <h3 class="position-item-title">{{ position.title }}</h3>
+            <mat-icon class="position-item-arrow">chevron_right</mat-icon>
+          </div>
+          <p class="position-item-summary" *ngIf="position.summary">{{ position.summary }}</p>
+          <p class="position-item-summary" *ngIf="!position.summary">{{ position.companyCode }} - {{ position.jobCode }}</p>
         </div>
       </div>
     </mat-card-content>
