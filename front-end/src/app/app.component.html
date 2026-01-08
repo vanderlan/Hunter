@@ -15,6 +15,10 @@
         <span>Candidates</span>
       </button>
       @if (isAdmin()) {
+        <button mat-button routerLink="/admin" class="nav-button">
+          <mat-icon>admin_panel_settings</mat-icon>
+          <span>Admin</span>
+        </button>
         <button mat-button routerLink="/job-positions" class="nav-button">
           <mat-icon>settings</mat-icon>
           <span>Job Positions</span>
