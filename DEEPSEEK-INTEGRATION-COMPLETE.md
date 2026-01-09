@@ -2,7 +2,7 @@
 
 ## ?? Implementation Complete!
 
-The Hunter CV Analyzer now supports **both OpenAI and DeepSeek** with easy switching via configuration. OpenAI is the default provider for stability, but you can switch to DeepSeek to save **90% on AI costs**.
+The Hunter now supports **both OpenAI and DeepSeek** with easy switching via configuration. OpenAI is the default provider for stability, but you can switch to DeepSeek to save **90% on AI costs**.
 
 ---
 

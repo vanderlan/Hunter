@@ -1,7 +1,7 @@
 # Hunter Frontend Implementation Script
 # Run this script from C:\repos\vanderlan\Hunter\front-end directory
 
-Write-Host "Creating Hunter CV Analyzer Frontend Components..." -ForegroundColor Green
+Write-Host "Creating Hunter Frontend Components..." -ForegroundColor Green
 
 # Login Component HTML
 $loginHtml = @'
@@ -11,7 +11,7 @@ $loginHtml = @'
       <mat-card-title>
         <div class="logo-container">
           <mat-icon class="logo-icon">work</mat-icon>
-          <h1>Hunter CV Analyzer</h1>
+          <h1>Hunter</h1>
         </div>
       </mat-card-title>
       <mat-card-subtitle>Sign in to analyze CVs and match candidates</mat-card-subtitle>

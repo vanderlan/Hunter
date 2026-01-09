@@ -188,8 +188,8 @@ public class EmailService : IEmailService
 
             var mail = new MailMessage
             {
-                From = new MailAddress(_fromEmail, "Hunter CV Analyzer"),
-                Subject = "Welcome to Hunter CV Analyzer! 🎯",
+                From = new MailAddress(_fromEmail, "Hunter"),
+                Subject = "Welcome to Hunter! 🎯",
                 Body = htmlBody,
                 IsBodyHtml = true
             };

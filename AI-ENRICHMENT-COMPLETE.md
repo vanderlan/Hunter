@@ -179,8 +179,8 @@ LIMIT 3;
 
 **Monthly Estimate (50 new jobs/month):**
 ```
-Input:  50 × 3000 × $0.0025/1K = $0.375
-Output: 50 × 400  × $0.01/1K   = $0.20
+Input:  50 ï¿½ 3000 ï¿½ $0.0025/1K = $0.375
+Output: 50 ï¿½ 400  ï¿½ $0.01/1K   = $0.20
 Total: ~$0.58/month
 ```
 
@@ -320,7 +320,7 @@ JobScraper__CareersUrl=https://...
 
 ---
 
-**?? The Hunter CV Analyzer now has AI-powered job enrichment!**
+**?? The Hunter now has AI-powered job enrichment!**
 
 **Next Steps:**
 1. Run database migration
