@@ -1,25 +1,29 @@
-using System.Text;
-using System.Text.Json;
+using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
+using GeminiCode.Hunter.Domain.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OpenAI;
 using OpenAI.Chat;
-using GeminiCode.Hunter.Domain.Core.Services;
-using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
+using System.ClientModel;
+using System.Text;
+using System.Text.Json;
+using static GeminiCode.Hunter.Domain.Core.Constants.DomainConstants;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
 
-public class OpenAIService : IOpenAIService
+public class ArtificialnteligenceService : IArtificialnteligenceService
 {
-    private readonly ChatClient _chatClient;
-    private readonly ILogger<OpenAIService> _logger;
-    private const string Model = "gpt-4o";
+    private ChatClient _chatClient;
+    private readonly ILogger<ArtificialnteligenceService> _logger;
+    private readonly string _provider;
+    private string _model;
 
-    public OpenAIService(IConfiguration configuration, ILogger<OpenAIService> logger)
+    public ArtificialnteligenceService(IConfiguration configuration, ILogger<ArtificialnteligenceService> logger)
     {
-        var apiKey = configuration["OpenAI:ApiKey"] 
-            ?? throw new InvalidOperationException("OpenAI:ApiKey configuration is missing");
-        
-        _chatClient = new ChatClient(Model, apiKey);
+        _provider = configuration["AI:Provider"] ?? AIProviders.OpenAI;
+
+        SetupProvider(configuration, logger);
+
         _logger = logger;
     }
 
@@ -27,7 +31,7 @@ public class OpenAIService : IOpenAIService
     {
         try
         {
-            _logger.LogInformation("Enriching job details for: {JobTitle}", jobTitle);
+            _logger.LogInformation("Enriching job details for: {JobTitle} using {Provider}", jobTitle, _provider);
 
             var prompt = BuildJobEnrichmentPrompt(jobTitle, rawHtmlContent);
 
@@ -41,19 +45,34 @@ public class OpenAIService : IOpenAIService
                 new UserChatMessage(prompt)
             };
 
-            var chatCompletion = await _chatClient.CompleteChatAsync(messages, new ChatCompletionOptions
+            ChatCompletionOptions options;
+            
+            if (_provider.Equals(AIProviders.DeepSeek, StringComparison.OrdinalIgnoreCase))
             {
-                Temperature = 0.2f,
-                ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
-                    jsonSchemaFormatName: "job_enrichment",
-                    jsonSchema: BinaryData.FromString(GetJobEnrichmentSchema()),
-                    jsonSchemaIsStrict: true
-                )
-            });
+                options = new ChatCompletionOptions
+                {
+                    Temperature = 0.2f,
+                    ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()
+                };
+            }
+            else
+            {
+                options = new ChatCompletionOptions
+                {
+                    Temperature = 0.2f,
+                    ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                        jsonSchemaFormatName: "job_enrichment",
+                        jsonSchema: BinaryData.FromString(GetJobEnrichmentSchema()),
+                        jsonSchemaIsStrict: true
+                    )
+                };
+            }
+
+            var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
 
             var responseContent = chatCompletion.Value.Content[0].Text;
             
-            _logger.LogDebug("OpenAI Job Enrichment Response: {Response}", responseContent);
+            _logger.LogDebug("{Provider} Job Enrichment Response: {Response}", _provider, responseContent);
 
             var result = JsonSerializer.Deserialize<OpenAIJobEnrichmentResponse>(responseContent, new JsonSerializerOptions
             {
@@ -61,9 +80,9 @@ public class OpenAIService : IOpenAIService
             });
 
             if (result == null)
-                throw new InvalidOperationException("Failed to deserialize OpenAI job enrichment response");
+                throw new InvalidOperationException($"Failed to deserialize {_provider} job enrichment response");
 
-            _logger.LogInformation("Successfully enriched job details for: {JobTitle}", jobTitle);
+            _logger.LogInformation("Successfully enriched job details for: {JobTitle} using {Provider}", jobTitle, _provider);
 
             return new JobEnrichmentResult(
                 Summary: result.Summary ?? string.Empty,
@@ -75,7 +94,7 @@ public class OpenAIService : IOpenAIService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error enriching job details for: {JobTitle}", jobTitle);
+            _logger.LogError(ex, "Error enriching job details for: {JobTitle} using {Provider}", jobTitle, _provider);
             throw;
         }
     }
@@ -86,8 +105,8 @@ public class OpenAIService : IOpenAIService
     {
         try
         {
-            _logger.LogInformation("Starting CV analysis against {JobCount} positions using {Model}", 
-                jobPositions.Count, Model);
+            _logger.LogInformation("Starting CV analysis against {JobCount} positions using {Provider} ({Model})", 
+                jobPositions.Count, _provider, _model);
 
             var prompt = BuildAnalysisPrompt(cvText, jobPositions);
 
@@ -101,19 +120,34 @@ public class OpenAIService : IOpenAIService
                 new UserChatMessage(prompt)
             };
 
-            var chatCompletion = await _chatClient.CompleteChatAsync(messages, new ChatCompletionOptions
+            ChatCompletionOptions options;
+            
+            if (_provider.Equals(AIProviders.DeepSeek, StringComparison.OrdinalIgnoreCase))
             {
-                Temperature = 0.3f,
-                ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
-                    jsonSchemaFormatName: "cv_analysis",
-                    jsonSchema: BinaryData.FromString(GetResponseSchema()),
-                    jsonSchemaIsStrict: true
-                )
-            });
+                options = new ChatCompletionOptions
+                {
+                    Temperature = 0.3f,
+                    ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()
+                };
+            }
+            else
+            {
+                options = new ChatCompletionOptions
+                {
+                    Temperature = 0.3f,
+                    ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                        jsonSchemaFormatName: "cv_analysis",
+                        jsonSchema: BinaryData.FromString(GetResponseSchema()),
+                        jsonSchemaIsStrict: true
+                    )
+                };
+            }
+
+            var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
 
             var responseContent = chatCompletion.Value.Content[0].Text;
             
-            _logger.LogDebug("OpenAI Response: {Response}", responseContent);
+            _logger.LogDebug("{Provider} CV Analysis Response: {Response}", _provider, responseContent);
 
             var result = JsonSerializer.Deserialize<OpenAICvAnalysisResponse>(responseContent, new JsonSerializerOptions
             {
@@ -121,7 +155,7 @@ public class OpenAIService : IOpenAIService
             });
 
             if (result == null)
-                throw new InvalidOperationException("Failed to deserialize OpenAI response");
+                throw new InvalidOperationException($"Failed to deserialize {_provider} response");
 
             var cvAnalysisResult = new CvAnalysisResult(
                 result.Matches.Select(m => new JobMatchResult(
@@ -134,14 +168,14 @@ public class OpenAIService : IOpenAIService
                 )).ToList()
             );
 
-            _logger.LogInformation("CV analysis completed. Found {MatchCount} matches", 
-                cvAnalysisResult.Matches.Count);
+            _logger.LogInformation("CV analysis completed using {Provider}. Found {MatchCount} matches", 
+                _provider, cvAnalysisResult.Matches.Count);
 
             return cvAnalysisResult;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error analyzing CV with OpenAI");
+            _logger.LogError(ex, "Error analyzing CV with {Provider}", _provider);
             throw;
         }
     }
@@ -150,7 +184,7 @@ public class OpenAIService : IOpenAIService
     {
         try
         {
-            _logger.LogInformation("Getting OpenAI completion with max tokens: {MaxTokens}", maxTokens);
+            _logger.LogInformation("Getting {Provider} completion with max tokens: {MaxTokens}", _provider, maxTokens);
 
             var messages = new List<ChatMessage>
             {
@@ -165,13 +199,13 @@ public class OpenAIService : IOpenAIService
 
             var response = chatCompletion.Value.Content[0].Text.Trim();
             
-            _logger.LogDebug("OpenAI Response: {Response}", response);
+            _logger.LogDebug("{Provider} Response: {Response}", _provider, response);
 
             return response;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting completion from OpenAI");
+            _logger.LogError(ex, "Error getting completion from {Provider}", _provider);
             throw;
         }
     }
@@ -208,6 +242,18 @@ public class OpenAIService : IOpenAIService
         sb.AppendLine("- For Skills: include ALL skills mentioned (technical, soft, tools, technologies)");
         sb.AppendLine("- Format skills as comma-separated values");
         sb.AppendLine("- Keep text concise and professional");
+        sb.AppendLine();
+        sb.AppendLine("# OUTPUT FORMAT");
+        sb.AppendLine("Return a JSON object with this exact structure:");
+        sb.AppendLine("```json");
+        sb.AppendLine("{");
+        sb.AppendLine("  \"summary\": \"string\",");
+        sb.AppendLine("  \"responsibilities\": \"string\",");
+        sb.AppendLine("  \"skills\": \"string\",");
+        sb.AppendLine("  \"mustHaveSkills\": \"string\",");
+        sb.AppendLine("  \"niceToHaveSkills\": \"string\"");
+        sb.AppendLine("}");
+        sb.AppendLine("```");
         
         return sb.ToString();
     }
@@ -271,6 +317,23 @@ public class OpenAIService : IOpenAIService
         sb.AppendLine();
         sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
+        sb.AppendLine();
+        sb.AppendLine("# OUTPUT FORMAT");
+        sb.AppendLine("Return a JSON object with this exact structure:");
+        sb.AppendLine("```json");
+        sb.AppendLine("{");
+        sb.AppendLine("  \"matches\": [");
+        sb.AppendLine("    {");
+        sb.AppendLine("      \"jobCode\": \"string\",");
+        sb.AppendLine("      \"jobTitle\": \"string\",");
+        sb.AppendLine("      \"matchPercentage\": 85.5,");
+        sb.AppendLine("      \"matchReason\": \"string\",");
+        sb.AppendLine("      \"matchingSkills\": [\"skill1\", \"skill2\"],");
+        sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"]");
+        sb.AppendLine("    }");
+        sb.AppendLine("  ]");
+        sb.AppendLine("}");
+        sb.AppendLine("```");
         
         return sb.ToString();
     }
@@ -346,4 +409,42 @@ public class OpenAIService : IOpenAIService
         List<string> MatchingSkills,
         List<string> MissingSkills
     );
+
+    private void SetupProvider(IConfiguration configuration, ILogger<ArtificialnteligenceService> logger)
+    {
+        string apiKey;
+        string baseUrl = null;
+
+        if (_provider.Equals(AIProviders.DeepSeek, StringComparison.OrdinalIgnoreCase))
+        {
+            apiKey = configuration["DeepSeek:ApiKey"];
+            _model = configuration["DeepSeek:Model"];
+            baseUrl = AIProviders.DeepSeekUrl;
+
+            logger.LogInformation("Using DeepSeek AI provider with model: {Model}", _model);
+        }
+        else
+        {
+            apiKey = configuration["OpenAI:ApiKey"];
+            _model = configuration["OpenAI:Model"];
+
+            logger.LogInformation("Using OpenAI provider with model: {Model}", _model);
+        }
+
+        if (!string.IsNullOrEmpty(baseUrl))
+        {
+            var options = new OpenAIClientOptions
+            {
+                Endpoint = new Uri(baseUrl)
+            };
+
+            var apiKeyCredential = new ApiKeyCredential(apiKey);
+            var client = new OpenAIClient(apiKeyCredential, options);
+            _chatClient = client.GetChatClient(_model);
+        }
+        else
+        {
+            _chatClient = new ChatClient(_model, apiKey);
+        }
+    }
 }
