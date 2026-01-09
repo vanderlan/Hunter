@@ -12,7 +12,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Notifications.C
 
 public class CandidateMatchingNotificationHandler(
     IUnitOfWork unitOfWork,
-    IArtificialnteligenceService openAIService,
+    IAIService openAIService,
     IEmailService emailService,
     IFeatureManager featureManager,
     ILogger<CandidateMatchingNotificationHandler> logger)

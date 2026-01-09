@@ -12,7 +12,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Analyz
 public class AnalyzeCvRequestHandler(
     IUnitOfWork unitOfWork,
     IPdfService pdfService,
-    IArtificialnteligenceService openAIService,
+    IAIService openAIService,
     ICvInfoExtractionService cvInfoExtractionService,
     ICurrentUser currentUser,
     ILogger<AnalyzeCvRequestHandler> logger)

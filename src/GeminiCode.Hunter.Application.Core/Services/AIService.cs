@@ -11,14 +11,14 @@ using static GeminiCode.Hunter.Domain.Core.Constants.DomainConstants;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
 
-public class ArtificialnteligenceService : IArtificialnteligenceService
+public class AIService : IAIService
 {
     private ChatClient _chatClient;
-    private readonly ILogger<ArtificialnteligenceService> _logger;
+    private readonly ILogger<AIService> _logger;
     private readonly string _provider;
     private string _model;
 
-    public ArtificialnteligenceService(IConfiguration configuration, ILogger<ArtificialnteligenceService> logger)
+    public AIService(IConfiguration configuration, ILogger<AIService> logger)
     {
         _provider = configuration["AI:Provider"] ?? AIProviders.OpenAI;
 
@@ -410,7 +410,7 @@ public class ArtificialnteligenceService : IArtificialnteligenceService
         List<string> MissingSkills
     );
 
-    private void SetupProvider(IConfiguration configuration, ILogger<ArtificialnteligenceService> logger)
+    private void SetupProvider(IConfiguration configuration, ILogger<AIService> logger)
     {
         string apiKey;
         string baseUrl = null;

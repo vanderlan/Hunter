@@ -26,7 +26,7 @@ public static class DependenciesInjectionConfiguration
 
     public static void AddAIServices(this IServiceCollection services)
     {
-        services.AddScoped<IArtificialnteligenceService, ArtificialnteligenceService>();
+        services.AddScoped<IAIService, AIService>();
         services.AddScoped<IPdfService, PdfService>();
         services.AddScoped<ICvInfoExtractionService, CvInfoExtractionService>();
     }

@@ -6,7 +6,7 @@ namespace GeminiCode.Hunter.Application.Core.Services;
 
 public class CvInfoExtractionService(
     ILogger<CvInfoExtractionService> logger,
-    IArtificialnteligenceService openAIService) : ICvInfoExtractionService
+    IAIService openAIService) : ICvInfoExtractionService
 {
     public (string? name, string? email, string? phone) ExtractBasicInfo(string cvText)
     {

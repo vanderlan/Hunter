@@ -10,7 +10,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Jobs.Commands.SyncJobs;
 public class SyncJobsRequestHandler(
     IUnitOfWork unitOfWork,
     IJobScraperService scraperService,
-    IArtificialnteligenceService openAIService,
+    IAIService openAIService,
     IPublisher publisher,
     ILogger<SyncJobsRequestHandler> logger)
     : IRequestHandler<SyncJobsRequest, SyncJobsResponse>
