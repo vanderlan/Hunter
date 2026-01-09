@@ -14,6 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../models/candidate.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-candidates',
@@ -44,12 +46,22 @@ export class CandidatesComponent implements OnInit {
   pageIndex = 0;
   searchQuery = '';
   loading = false;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private candidateService: CandidateService,
     private snackBar: MatSnackBar,
     public dialog: MatDialog
-  ) {}
+  ) {
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.pageIndex = 0;
+      this.loadCandidates();
+    });
+  }
 
   ngOnInit(): void {
     this.loadCandidates();
@@ -77,23 +89,9 @@ export class CandidatesComponent implements OnInit {
     this.loadCandidates();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadCandidates();
-  }
-
-  viewCandidate(candidate: Candidate): void {
-    this.loading = true;
-    this.candidateService.getCandidateById(candidate.publicId).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.openCandidateDialog(data);
-      },
-      error: (error) => {
-        this.loading = false;
-        this.snackBar.open('Error loading candidate details', 'Close', { duration: 3000 });
-      }
-    });
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   editCandidate(candidate: Candidate): void {
@@ -119,15 +117,6 @@ export class CandidatesComponent implements OnInit {
             }
           });
         }
-      });
-    });
-  }
-
-  openCandidateDialog(candidate: Candidate): void {
-    import('./candidate-detail-dialog.component').then(m => {
-      this.dialog.open(m.CandidateDetailDialogComponent, {
-        data: candidate,
-        width: '500px'
       });
     });
   }

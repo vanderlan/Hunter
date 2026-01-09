@@ -23,23 +23,18 @@ import { Candidate } from '../../models/candidate.model';
     MatIconModule
   ],
   template: `
-    <h2 mat-dialog-title>
-      <mat-icon>edit</mat-icon>
-      Edit Candidate
-    </h2>
+    <h2 mat-dialog-title>Edit Candidate</h2>
 
     <mat-dialog-content>
       <form [formGroup]="candidateForm" class="candidate-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" placeholder="Enter candidate name">
-          <mat-icon matSuffix>person</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput formControlName="email" type="email" placeholder="candidate@example.com">
-          <mat-icon matSuffix>email</mat-icon>
           <mat-error *ngIf="candidateForm.get('email')?.hasError('email')">
             Please enter a valid email address
           </mat-error>
@@ -48,15 +43,7 @@ import { Candidate } from '../../models/candidate.model';
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Phone Number</mat-label>
           <input matInput formControlName="phoneNumber" placeholder="Enter phone number">
-          <mat-icon matSuffix>phone</mat-icon>
         </mat-form-field>
-
-        <div class="info-section">
-          <p class="info-text">
-            <mat-icon class="info-icon">info</mat-icon>
-            <strong>Note:</strong> CV content cannot be edited. To update the CV, please re-upload and analyze.
-          </p>
-        </div>
       </form>
     </mat-dialog-content>
 
@@ -69,8 +56,8 @@ import { Candidate } from '../../models/candidate.model';
         color="primary" 
         (click)="onSave()" 
         [disabled]="!candidateForm.valid || saving">
-        <mat-spinner *ngIf="saving" diameter="20" class="button-spinner"></mat-spinner>
-        <span *ngIf="!saving">Save Changes</span>
+        <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
+        <span *ngIf="!saving">Save</span>
       </button>
     </mat-dialog-actions>
   `,
@@ -87,41 +74,19 @@ import { Candidate } from '../../models/candidate.model';
       width: 100%;
     }
 
-    .info-section {
-      background-color: #e3f2fd;
-      border-left: 4px solid #2196f3;
-      padding: 12px;
-      border-radius: 4px;
-      margin-top: 8px;
-    }
-
-    .info-text {
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      color: #1976d2;
-    }
-
-    .info-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .button-spinner {
-      display: inline-block;
-      margin-right: 8px;
-    }
-
     mat-dialog-content {
       overflow: visible;
     }
 
-    mat-form-field {
-      mat-icon {
-        color: rgba(0, 0, 0, 0.54);
+    mat-dialog-actions {
+      padding: 16px;
+      border-top: 1px solid #e0e0e0;
+
+      button {
+        mat-spinner {
+          display: inline-block;
+          margin-right: 8px;
+        }
       }
     }
   `]

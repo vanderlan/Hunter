@@ -1,3 +1,4 @@
+using GeminiCode.Hunter.Application.Core.Helpers;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
@@ -22,14 +23,15 @@ public class CandidateUpdateRequestHandler(
             throw new NotFoundException(request.PublicId);
         }
 
-        // Update fields
-        candidate.Name = request.Name;
-        candidate.Email = request.Email;
-        candidate.PhoneNumber = request.PhoneNumber;
+        // Update fields with formatted name (Title Case)
+        candidate.Name = StringHelper.FormatName(request.Name);
+        candidate.Email = request.Email?.Trim();
+        candidate.PhoneNumber = request.PhoneNumber?.Trim();
 
         unitOfWork.CandidateRepository.Update(candidate);
         await unitOfWork.CommitAsync();
 
-        logger.LogInformation("Candidate updated successfully: {PublicId}", request.PublicId);
+        logger.LogInformation("Candidate updated successfully: {PublicId}, Name: {Name}", 
+            request.PublicId, candidate.Name);
     }
 }

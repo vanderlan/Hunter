@@ -69,9 +69,10 @@ public class CandidateRepository(DataContext dataContext) : BaseEntityRepository
     {
         if (!string.IsNullOrWhiteSpace(filter.Query))
         {
+            var searchTerm = filter.Query.ToLower();
             query = query.Where(x => 
-                x.Name!.Contains(filter.Query) || 
-                x.Email!.Contains(filter.Query));
+                x.Name!.ToLower().Contains(searchTerm) || 
+                x.Email!.ToLower().Contains(searchTerm));
         }
 
         if (filter.UserId.HasValue)
