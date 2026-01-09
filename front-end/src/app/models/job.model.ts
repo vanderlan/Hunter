@@ -1,4 +1,3 @@
-
 export interface JobPosition {
   publicId?: string;
   jobPositionId?: number;
@@ -37,10 +36,18 @@ export interface JobMatch {
   niceToHaveSkills?: string;
 }
 
+export interface CandidateInfo {
+  candidateId: string;
+  name?: string;
+  email?: string;
+  hasResume: boolean;
+}
+
 export interface AnalyzeCvResponse {
   totalPositionsAnalyzed: number;
   matchesFound: number;
   matches: JobMatch[];
+  candidateInfo?: CandidateInfo;
 }
 
 export interface ApiResponse<T> {

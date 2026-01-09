@@ -70,10 +70,16 @@
             Found {{ matches.length }} Matching Positions
           </h2>
           <p>Out of {{ totalPositions }} analyzed positions</p>
-          <button mat-raised-button (click)="clearFile()">
-            <mat-icon>upload_file</mat-icon>
-            Analyze Another CV
-          </button>
+          <div class="header-actions">
+            <button mat-raised-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume">
+              <mat-icon>description</mat-icon>
+              View Uploaded Resume
+            </button>
+            <button mat-raised-button (click)="clearFile()">
+              <mat-icon>upload_file</mat-icon>
+              Analyze Another CV
+            </button>
+          </div>
         </div>
 
         <div class="matches-grid">

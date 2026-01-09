@@ -2,11 +2,14 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Application.Core.Helpers;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
+using System.IO;
+using FileEntity = GeminiCode.Hunter.Domain.Core.Entities.File;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
 
@@ -57,7 +60,7 @@ public class AnalyzeCvRequestHandler(
             var name = await cvInfoExtractionService.ExtractNameWithAIAsync(cvText);
 
             // Store or update candidate information BEFORE analysis
-            await StoreCandidateAsync(name, email, phone, cvText, user.UserId);
+            var candidate = await StoreCandidateAsync(name, email, phone, cvText, user.UserId);
 
             // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
@@ -97,11 +100,21 @@ public class AnalyzeCvRequestHandler(
 
             logger.LogInformation("Found {Count} matches with >60% adherence", filteredMatches.Count);
 
+            // Store the PDF file after successful analysis
+            await StoreCvPdfAsync(request.CvFile, candidate.CandidateId);
+
             // Map to response DTOs with full job details
             var response = new AnalyzeCvResponse
             {
                 TotalPositionsAnalyzed = jobPositions.Count,
                 MatchesFound = filteredMatches.Count,
+                CandidateInfo = new CandidateInfoDto
+                {
+                    CandidateId = candidate.PublicId,
+                    Name = candidate.Name,
+                    Email = candidate.Email,
+                    HasResume = true
+                },
                 Matches = filteredMatches.Select(match =>
                 {
                     var job = jobPositions.First(j => j.JobCode == match.JobCode);
@@ -133,7 +146,7 @@ public class AnalyzeCvRequestHandler(
         }
     }
 
-    private async Task StoreCandidateAsync(string? name, string? email, string? phone, string cvText, long userId)
+    private async Task<Candidate> StoreCandidateAsync(string? name, string? email, string? phone, string cvText, long userId)
     {
         var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
@@ -161,6 +174,10 @@ public class AnalyzeCvRequestHandler(
             existingCandidate.UserId = userId;
             
             unitOfWork.CandidateRepository.Update(existingCandidate);
+            await unitOfWork.CommitAsync();
+            
+            logger.LogInformation("Candidate information updated successfully with name: {Name}", formattedName);
+            return existingCandidate;
         }
         else
         {
@@ -178,10 +195,69 @@ public class AnalyzeCvRequestHandler(
             };
 
             await unitOfWork.CandidateRepository.AddAsync(candidate);
+            await unitOfWork.CommitAsync();
+            
+            logger.LogInformation("Candidate information stored successfully with name: {Name}", formattedName);
+            return candidate;
         }
+    }
 
-        await unitOfWork.CommitAsync();
-        
-        logger.LogInformation("Candidate information stored successfully with name: {Name}", formattedName);
+    private async Task StoreCvPdfAsync(Microsoft.AspNetCore.Http.IFormFile cvFile, long candidateId)
+    {
+        try
+        {
+            logger.LogInformation("Storing CV PDF for candidate {CandidateId}", candidateId);
+
+            // Delete existing resume if any
+            var existingCandidateFile = await unitOfWork.CandidateFileRepository
+                .GetByCandidateAndFileTypeAsync(candidateId, "Resume");
+
+            if (existingCandidateFile != null)
+            {
+                logger.LogInformation("Deleting existing resume for candidate {CandidateId}", candidateId);
+                await unitOfWork.CandidateFileRepository.DeleteAsync(existingCandidateFile.PublicId);
+                await unitOfWork.FileRepository.DeleteAsync(existingCandidateFile.File.PublicId);
+            }
+
+            // Read file data
+            byte[] fileData;
+            using (var memoryStream = new MemoryStream())
+            {
+                await cvFile.CopyToAsync(memoryStream);
+                fileData = memoryStream.ToArray();
+            }
+
+            // Create File entity
+            var file = new FileEntity
+            {
+                FileName = cvFile.FileName,
+                ContentType = cvFile.ContentType,
+                FileSize = cvFile.Length,
+                StorageType = StorageType.Database,
+                FileData = fileData
+            };
+
+            await unitOfWork.FileRepository.AddAsync(file);
+
+            // Create CandidateFile relationship
+            var candidateFile = new CandidateFile
+            {
+                CandidateId = candidateId,
+                File = file,
+                FileType = "Resume"
+            };
+
+            await unitOfWork.CandidateFileRepository.AddAsync(candidateFile);
+            await unitOfWork.CommitAsync();
+
+            logger.LogInformation("CV PDF stored successfully for candidate {CandidateId}, File ID: {FileId}", 
+                candidateId, file.PublicId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error storing CV PDF for candidate {CandidateId}", candidateId);
+            // Don't throw - we don't want to fail the entire analysis if file storage fails
+            // The CV text and analysis results are already stored
+        }
     }
 }

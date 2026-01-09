@@ -193,8 +193,17 @@
       margin: 8px 0 24px;
     }
 
-    button {
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
       margin-top: 16px;
+
+      button {
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
     }
   }
 }

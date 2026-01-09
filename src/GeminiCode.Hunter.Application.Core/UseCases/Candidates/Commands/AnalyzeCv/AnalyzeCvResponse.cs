@@ -5,6 +5,15 @@ public class AnalyzeCvResponse
     public int TotalPositionsAnalyzed { get; set; }
     public int MatchesFound { get; set; }
     public List<JobMatchDto> Matches { get; set; } = [];
+    public CandidateInfoDto? CandidateInfo { get; set; }
+}
+
+public class CandidateInfoDto
+{
+    public string CandidateId { get; set; } = string.Empty;
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public bool HasResume { get; set; }
 }
 
 public class JobMatchDto

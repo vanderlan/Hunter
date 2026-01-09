@@ -12,7 +12,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-file-drop';
 import { JobService } from '../../services/job.service';
-import { JobMatch, JobPosition } from '../../models/job.model';
+import { JobMatch, JobPosition, CandidateInfo } from '../../models/job.model';
 
 @Component({
   selector: 'app-cv-analyzer',
@@ -40,6 +40,7 @@ export class CvAnalyzerComponent implements OnInit {
   matches: JobMatch[] = [];
   totalPositions = 0;
   dragOver = false;
+  candidateInfo: CandidateInfo | null = null;
 
   // Available positions section
   availablePositions: JobPosition[] = [];
@@ -128,12 +129,14 @@ export class CvAnalyzerComponent implements OnInit {
 
     this.analyzing = true;
     this.matches = [];
+    this.candidateInfo = null;
 
     this.jobService.analyzeCv(this.selectedFile).subscribe({
       next: (response) => {
         this.analyzing = false;
         this.matches = response.matches;
         this.totalPositions = response.totalPositionsAnalyzed;
+        this.candidateInfo = response.candidateInfo || null;
         this.snackBar.open(
           `Found ${response.matchesFound} matches out of ${response.totalPositionsAnalyzed} positions`,
           'Close',
@@ -154,6 +157,26 @@ export class CvAnalyzerComponent implements OnInit {
   clearFile(): void {
     this.selectedFile = null;
     this.matches = [];
+    this.candidateInfo = null;
+  }
+
+  viewResume(): void {
+    if (!this.candidateInfo) {
+      return;
+    }
+
+    import('../resume-viewer/resume-viewer-dialog.component').then(m => {
+      this.dialog.open(m.ResumeViewerDialogComponent, {
+        data: {
+          candidateId: this.candidateInfo!.candidateId,
+          candidateName: this.candidateInfo!.name || 'Candidate'
+        },
+        width: '90vw',
+        height: '90vh',
+        maxWidth: '1200px',
+        panelClass: 'resume-viewer-dialog'
+      });
+    });
   }
 
   getMatchColor(percentage: number): string {
