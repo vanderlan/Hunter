@@ -137,13 +137,12 @@ public class AnalyzeCvRequestHandler(
     {
         var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
-        // Format name to Title Case and trim fields
-        var formattedName = StringHelper.FormatName(name);
+        var formattedName = name.FormatName();
         var trimmedEmail = email?.Trim();
         var trimmedPhone = phone?.Trim();
 
-        // Check if candidate already exists by email
         Candidate? existingCandidate = null;
+        
         if (!string.IsNullOrWhiteSpace(trimmedEmail))
         {
             existingCandidate = await unitOfWork.CandidateRepository.GetByEmailAsync(trimmedEmail);

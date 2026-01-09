@@ -18,7 +18,11 @@
 
         <!-- Navigation Menu -->
         <nav class="sidenav-nav">
-          <button mat-button routerLink="/" routerLinkActive="active" class="nav-item">
+          <button mat-button 
+                  routerLink="/" 
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="nav-item">
             <mat-icon>analytics</mat-icon>
             <span *ngIf="sidenavExpanded">Analyze CV</span>
           </button>

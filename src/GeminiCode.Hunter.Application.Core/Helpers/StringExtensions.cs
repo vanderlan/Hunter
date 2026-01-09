@@ -1,28 +1,14 @@
 using System.Globalization;
-using System.Text;
 
 namespace GeminiCode.Hunter.Application.Core.Helpers;
 
-public static class StringHelper
+public static class StringExtensions
 {
-    /// <summary>
-    /// Converts a string to Title Case (each word capitalized)
-    /// Example: "JOHN DOE" -> "John Doe", "john doe" -> "John Doe"
-    /// </summary>
-    public static string ToTitleCase(string? input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            return input ?? string.Empty;
-
-        var textInfo = CultureInfo.CurrentCulture.TextInfo;
-        return textInfo.ToTitleCase(input.ToLower());
-    }
-
     /// <summary>
     /// Converts a full name to proper Title Case
     /// Handles multiple spaces and special cases
     /// </summary>
-    public static string FormatName(string? name)
+    public static string FormatName(this string name)
     {
         if (string.IsNullOrWhiteSpace(name))
             return string.Empty;

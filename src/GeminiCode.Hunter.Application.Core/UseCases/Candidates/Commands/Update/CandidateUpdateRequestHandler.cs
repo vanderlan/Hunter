@@ -23,8 +23,7 @@ public class CandidateUpdateRequestHandler(
             throw new NotFoundException(request.PublicId);
         }
 
-        // Update fields with formatted name (Title Case)
-        candidate.Name = StringHelper.FormatName(request.Name);
+        candidate.Name = request.Name.FormatName();
         candidate.Email = request.Email?.Trim();
         candidate.PhoneNumber = request.PhoneNumber?.Trim();
 
