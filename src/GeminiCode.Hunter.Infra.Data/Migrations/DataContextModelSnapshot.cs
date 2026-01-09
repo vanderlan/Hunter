@@ -77,6 +77,104 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.ToTable("Candidate", (string)null);
                 });
 
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CandidateFile", b =>
+                {
+                    b.Property<long>("CandidateFileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("CandidateFileId"));
+
+                    b.Property<long>("CandidateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("FileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("CandidateFileId");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.ToTable("CandidateFile", (string)null);
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.File", b =>
+                {
+                    b.Property<long>("FileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("FileId"));
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<byte[]>("FileData")
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("S3Bucket")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("S3Key")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("StorageType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("FileId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.HasIndex("S3Key");
+
+                    b.ToTable("File", (string)null);
+                });
+
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.JobPosition", b =>
                 {
                     b.Property<long>("JobPositionId")
@@ -268,6 +366,25 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CandidateFile", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.File", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("File");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,6 +9,8 @@ public interface IUnitOfWork: IDisposable
     IRefreshTokenRepository RefreshTokenRepository { get; }
     IJobPositionRepository JobPositionRepository { get; }
     ICandidateRepository CandidateRepository { get; }
+    IFileRepository FileRepository { get; }
+    ICandidateFileRepository CandidateFileRepository { get; }
     Task CommitAsync();
     void DiscardChanges();
 }

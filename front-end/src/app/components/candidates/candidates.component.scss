@@ -80,10 +80,22 @@
         margin-right: 0;
       }
     }
+
+    .inline-spinner {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
   }
 
   mat-paginator {
     border-top: 1px solid #e0e0e0;
+  }
+}
+
+::ng-deep .resume-viewer-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0;
   }
 }
 

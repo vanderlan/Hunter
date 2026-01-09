@@ -3,6 +3,8 @@ using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Update;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.UploadResume;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.DownloadResume;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetById;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
@@ -80,5 +82,44 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
             message = "CV analysis completed successfully",
             data = response
         });
+    }
+
+    /// <summary>
+    /// Uploads a resume (PDF) for a candidate
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <param name="file">The resume file in PDF format (max 10MB)</param>
+    /// <returns>File upload response with file ID and details</returns>
+    [HttpPost("{id}/Resume")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(CandidateUploadResumeResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UploadResume(string id, IFormFile file)
+    {
+        var request = new CandidateUploadResumeRequest 
+        { 
+            CandidateId = id, 
+            File = file 
+        };
+        
+        var response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Downloads the resume for a candidate
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <returns>The resume PDF file</returns>
+    [HttpGet("{id}/Resume")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DownloadResume(string id)
+    {
+        var response = await Mediator.Send(new CandidateDownloadResumeRequest(id));
+        return File(response.FileData, response.ContentType, response.FileName);
     }
 }

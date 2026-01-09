@@ -17,6 +17,8 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<JobPosition> JobPositions { get; set; }
     public DbSet<Candidate> Candidates { get; set; }
+    public DbSet<File> Files { get; set; }
+    public DbSet<CandidateFile> CandidateFiles { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -32,6 +34,8 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
         modelBuilder.ApplyConfiguration(new JobPositionMapping());
         modelBuilder.ApplyConfiguration(new CandidateMapping());
+        modelBuilder.ApplyConfiguration(new FileMapping());
+        modelBuilder.ApplyConfiguration(new CandidateFileMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

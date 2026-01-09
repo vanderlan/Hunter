@@ -28,6 +28,12 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private ICandidateRepository _candidateRepository;
     public ICandidateRepository CandidateRepository => _candidateRepository ??= new CandidateRepository(DbContext);
 
+    private IFileRepository _fileRepository;
+    public IFileRepository FileRepository => _fileRepository ??= new FileRepository(DbContext);
+
+    private ICandidateFileRepository _candidateFileRepository;
+    public ICandidateFileRepository CandidateFileRepository => _candidateFileRepository ??= new CandidateFileRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try

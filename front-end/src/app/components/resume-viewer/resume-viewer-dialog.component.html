@@ -1,0 +1,35 @@
+<div class="resume-viewer-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Resume - {{ data.candidateName }}</h2>
+    <div class="actions">
+      <button mat-icon-button (click)="download()" matTooltip="Download PDF" *ngIf="!loading && !error">
+        <mat-icon>download</mat-icon>
+      </button>
+      <button mat-icon-button (click)="close()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    <div class="spinner-container" *ngIf="loading">
+      <mat-spinner></mat-spinner>
+      <p>Loading resume...</p>
+    </div>
+
+    <div class="error-container" *ngIf="error && !loading">
+      <mat-icon>error</mat-icon>
+      <p>Failed to load resume</p>
+      <button mat-raised-button color="primary" (click)="loadResume()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+
+    <iframe 
+      *ngIf="!loading && !error && resumeUrl" 
+      [src]="resumeUrl" 
+      class="pdf-viewer">
+    </iframe>
+  </mat-dialog-content>
+</div>
