@@ -29,17 +29,11 @@
   }
 }
 
-.actions-card {
+.search-container {
   margin-bottom: 24px;
 
-  .actions-row {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-
-    .search-field {
-      flex: 1;
-    }
+  .search-field {
+    width: 100%;
   }
 }
 
@@ -87,14 +81,9 @@
     padding: 16px;
   }
 
-  .actions-card {
-    .actions-row {
-      flex-direction: column;
-      align-items: stretch;
-
-      .search-field {
-        width: 100%;
-      }
+  .search-container {
+    .search-field {
+      width: 100%;
     }
   }
 

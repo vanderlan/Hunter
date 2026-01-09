@@ -11,19 +11,17 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Search Section -->
-  <mat-card class="actions-card">
-    <div class="actions-row">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Search</mat-label>
-        <input matInput 
-               [(ngModel)]="searchQuery" 
-               (ngModelChange)="onSearchChange($event)"
-               placeholder="Search by name or email">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </div>
-  </mat-card>
+  <!-- Search Section (No Card) -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput 
+             [(ngModel)]="searchQuery" 
+             (ngModelChange)="onSearchChange($event)"
+             placeholder="Search by name or email">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
 
   <!-- Candidates Table -->
   <mat-card class="table-card">
