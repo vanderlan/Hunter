@@ -9,4 +9,5 @@ public class User : BaseEntity
     public required string Email { get; set; }
     public required UserProfile Profile { get; set; }
     public string Password { get; set; }
+    public bool ReceiveJobChangeNotifications { get; set; } = true;
 }

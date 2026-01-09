@@ -51,6 +51,7 @@ public class EmailService : IEmailService
     }
 
     public async Task SendJobChangesNotificationAsync(
+        List<string> toEmails,
         List<string> newJobs,
         List<string> closedJobs,
         DateTime syncTime)
@@ -63,7 +64,13 @@ public class EmailService : IEmailService
                 return;
             }
 
-            _logger.LogInformation("Sending job changes notification email to {Count} recipients", _toEmails.Count);
+            if (!toEmails.Any())
+            {
+                _logger.LogInformation("No users to notify (all notifications disabled)");
+                return;
+            }
+
+            _logger.LogInformation("Sending job changes notification email to {Count} recipients", toEmails.Count);
 
             var templateData = new Dictionary<string, object>
             {
@@ -87,7 +94,7 @@ public class EmailService : IEmailService
                 IsBodyHtml = true
             };
 
-            foreach (var email in _toEmails)
+            foreach (var email in toEmails)
             {
                 mail.To.Add(email);
             }
@@ -100,7 +107,7 @@ public class EmailService : IEmailService
 
             await smtp.SendMailAsync(mail);
 
-            _logger.LogInformation("Job changes notification email sent successfully to {Emails}", string.Join(", ", _toEmails));
+            _logger.LogInformation("Job changes notification email sent successfully to {Emails}", string.Join(", ", toEmails));
         }
         catch (Exception ex)
         {

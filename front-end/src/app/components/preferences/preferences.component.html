@@ -1,0 +1,41 @@
+<div class="preferences-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>settings</mat-icon>
+        User Preferences
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Manage your notification preferences and settings</p>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="preferences-card">
+    <mat-card-header>
+      <mat-card-title>Email Notifications</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="spinner-container" *ngIf="loading">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <form [formGroup]="preferencesForm" *ngIf="!loading">
+        <div class="preference-item">
+          <mat-checkbox formControlName="receiveJobChangeNotifications">
+            Receive job change notifications
+          </mat-checkbox>
+          <p class="preference-description">
+            Get notified via email when new job positions are posted or existing positions are closed.
+          </p>
+        </div>
+      </form>
+    </mat-card-content>
+    <mat-card-actions *ngIf="!loading">
+      <button mat-raised-button color="primary" (click)="savePreferences()" [disabled]="saving">
+        <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
+        <span *ngIf="!saving">Save Preferences</span>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

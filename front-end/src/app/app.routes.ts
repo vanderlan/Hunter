@@ -38,6 +38,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'preferences',
+    loadComponent: () => import('./components/preferences/preferences.component').then(m => m.PreferencesComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }

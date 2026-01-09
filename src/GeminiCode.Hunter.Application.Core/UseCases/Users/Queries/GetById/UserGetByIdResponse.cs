@@ -11,6 +11,7 @@ public class UserGetByIdResponse
     public UserProfile Profile { get; set; }
     public DateTime LastUpdated { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool ReceiveJobChangeNotifications { get; set; }
 
     public static explicit operator UserGetByIdResponse(User user)
     {
@@ -24,7 +25,8 @@ public class UserGetByIdResponse
             Email = user.Email,
             LastUpdated = user.LastUpdated,
             CreatedAt = user.CreatedAt,
-            Profile = user.Profile
+            Profile = user.Profile,
+            ReceiveJobChangeNotifications = user.ReceiveJobChangeNotifications
         };
     }
 

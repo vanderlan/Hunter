@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Repositories;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GeminiCode.Hunter.Domain.Core.Filters;
@@ -49,5 +50,13 @@ public sealed class UserRepository(DataContext context) : BaseEntityRepository<U
             .ToListAsync();
 
         return new PagedList<User>(entityList, await query.CountAsync());
+    }
+    
+    public async Task<List<User>> GetUsersWithJobNotificationsEnabledAsync()
+    {
+        return await DataContext.Users
+            .AsNoTracking()
+            .Where(u => u.ReceiveJobChangeNotifications)
+            .ToListAsync();
     }
 }

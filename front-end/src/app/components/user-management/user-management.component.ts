@@ -65,7 +65,8 @@ export class UserManagementComponent implements OnInit {
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       profile: [UserProfile.Partner, Validators.required],
-      sendWelcomeEmail: [true]
+      sendWelcomeEmail: [true],
+      receiveJobChangeNotifications: [true]
     });
   }
 
@@ -102,7 +103,7 @@ export class UserManagementComponent implements OnInit {
   showCreateForm(): void {
     this.isEditing = true;
     this.currentUserId = null;
-    this.userForm.reset({ profile: UserProfile.Partner, sendWelcomeEmail: true });
+    this.userForm.reset({ profile: UserProfile.Partner, sendWelcomeEmail: true, receiveJobChangeNotifications: true });
     // Add password field for create
     if (!this.userForm.get('password')) {
       this.userForm.addControl('password', this.fb.control('', [Validators.required, Validators.minLength(3)]));
@@ -110,6 +111,10 @@ export class UserManagementComponent implements OnInit {
     // Ensure sendWelcomeEmail control exists
     if (!this.userForm.get('sendWelcomeEmail')) {
       this.userForm.addControl('sendWelcomeEmail', this.fb.control(true));
+    }
+    // Ensure receiveJobChangeNotifications control exists
+    if (!this.userForm.get('receiveJobChangeNotifications')) {
+      this.userForm.addControl('receiveJobChangeNotifications', this.fb.control(true));
     }
   }
 
@@ -124,17 +129,22 @@ export class UserManagementComponent implements OnInit {
     if (this.userForm.get('sendWelcomeEmail')) {
       this.userForm.removeControl('sendWelcomeEmail');
     }
+    // Ensure receiveJobChangeNotifications control exists
+    if (!this.userForm.get('receiveJobChangeNotifications')) {
+      this.userForm.addControl('receiveJobChangeNotifications', this.fb.control(true));
+    }
     this.userForm.patchValue({
       name: user.name,
       email: user.email,
-      profile: user.profile
+      profile: user.profile,
+      receiveJobChangeNotifications: user.receiveJobChangeNotifications ?? true
     });
   }
 
   cancelEdit(): void {
     this.isEditing = false;
     this.currentUserId = null;
-    this.userForm.reset({ profile: UserProfile.Partner, sendWelcomeEmail: true });
+    this.userForm.reset({ profile: UserProfile.Partner, sendWelcomeEmail: true, receiveJobChangeNotifications: true });
     if (this.userForm.get('password')) {
       this.userForm.removeControl('password');
     }

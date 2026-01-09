@@ -10,6 +10,7 @@ export interface User {
   profile: UserProfile;
   createdAt?: Date;
   lastUpdated?: Date;
+  receiveJobChangeNotifications?: boolean;
 }
 
 export interface UserCreateRequest {
@@ -18,6 +19,7 @@ export interface UserCreateRequest {
   password: string;
   profile: UserProfile;
   sendWelcomeEmail?: boolean;
+  receiveJobChangeNotifications?: boolean;
 }
 
 export interface UserUpdateRequest {
@@ -25,6 +27,11 @@ export interface UserUpdateRequest {
   name: string;
   email: string;
   profile: UserProfile;
+  receiveJobChangeNotifications?: boolean;
+}
+
+export interface UserPreferences {
+  receiveJobChangeNotifications: boolean;
 }
 
 export interface PagedUsers {

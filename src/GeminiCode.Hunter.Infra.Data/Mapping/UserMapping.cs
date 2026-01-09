@@ -17,6 +17,7 @@ public class UserMapping : IEntityTypeConfiguration<User>
         builder.HasIndex(x => x.Email).IsUnique();
         builder.HasIndex(x => x.PublicId).IsUnique();
         builder.Property(x => x.Password).HasMaxLength(300).IsRequired();
+        builder.Property(x => x.ReceiveJobChangeNotifications).HasDefaultValue(true).IsRequired();
 
         // Configure DateTime properties to use 'timestamp without time zone'
         builder.Property(x => x.CreatedAt)
@@ -38,7 +39,8 @@ public class UserMapping : IEntityTypeConfiguration<User>
                 Name = "Hunter Admin User",
                 LastUpdated = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Unspecified),
                 Profile = UserProfile.Admin,
-                Password =  "123".ToSha512()
+                Password =  "123".ToSha512(),
+                ReceiveJobChangeNotifications = true
             }
         );
     }

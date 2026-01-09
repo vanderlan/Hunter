@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { User, UserCreateRequest, UserUpdateRequest, PagedUsers } from '../models/user.model';
+import { User, UserCreateRequest, UserUpdateRequest, PagedUsers, UserPreferences } from '../models/user.model';
 
 export interface ChangePasswordRequest {
   currentPassword: string;
@@ -65,6 +65,18 @@ export class UserService {
 
   changePassword(request: ChangePasswordRequest): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/Me/Password`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getPreferences(): Observable<UserPreferences> {
+    return this.http.get<UserPreferences>(`${this.apiUrl}/Me/Preferences`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  updatePreferences(preferences: UserPreferences): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/Me/Preferences`, preferences, {
       headers: this.getHeaders()
     });
   }

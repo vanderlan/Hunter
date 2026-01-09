@@ -2,12 +2,14 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using GeminiCode.Hunter.Domain.Core.Services;
+using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
 
 public class JobChangesDetectedNotificationHandler(
     ILogger<JobChangesDetectedNotificationHandler> logger,
-    IEmailService emailService)
+    IEmailService emailService,
+    IUnitOfWork unitOfWork)
     : INotificationHandler<JobChangesDetectedNotification>
 {
     public async Task Handle(JobChangesDetectedNotification notification, CancellationToken cancellationToken)
@@ -26,10 +28,23 @@ public class JobChangesDetectedNotificationHandler(
         // Send email notification if there are changes
         if (notification.NewPositionsCount > 0 || notification.ClosedPositionsCount > 0)
         {
-            await emailService.SendJobChangesNotificationAsync(
-                [.. notification.NewJobTitles],
-                [.. notification.ClosedJobTitles],
-                DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
+            var usersWithNotifications = await unitOfWork.UserRepository.GetUsersWithJobNotificationsEnabledAsync();
+            var emailAddresses = usersWithNotifications.Select(u => u.Email).ToList();
+
+            if (emailAddresses.Any())
+            {
+                logger.LogInformation("Sending job change notifications to {Count} users", emailAddresses.Count);
+
+                await emailService.SendJobChangesNotificationAsync(
+                    emailAddresses,
+                    [.. notification.NewJobTitles],
+                    [.. notification.ClosedJobTitles],
+                    DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
+            }
+            else
+            {
+                logger.LogInformation("No users have job change notifications enabled");
+            }
         }
         else
         {

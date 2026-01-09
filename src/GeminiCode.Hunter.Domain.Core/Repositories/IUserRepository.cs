@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Filters;
@@ -11,4 +12,5 @@ public interface IUserRepository : IBaseEntityRepository<User>
     Task<User> LoginAsync(string email, string password);
     Task<PagedList<User>> ListPaginateAsync(UserFilter filter);
     Task<User> FindByEmailAsync(string email);
+    Task<List<User>> GetUsersWithJobNotificationsEnabledAsync();
 }

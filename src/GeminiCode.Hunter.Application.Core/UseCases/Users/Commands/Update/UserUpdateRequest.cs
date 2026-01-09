@@ -10,6 +10,7 @@ public class UserUpdateRequest : IRequest
     public string Name { get; set; }
     public string Email { get; set; }
     public UserProfile Profile { get; set; }
+    public bool? ReceiveJobChangeNotifications { get; set; }
 
     public static explicit operator User(UserUpdateRequest request)
     {
@@ -21,7 +22,8 @@ public class UserUpdateRequest : IRequest
             PublicId = request.PublicId,
             Name = request.Name,
             Email = request.Email,
-            Profile = request.Profile
+            Profile = request.Profile,
+            ReceiveJobChangeNotifications = request.ReceiveJobChangeNotifications ?? true
         };
     }
 }

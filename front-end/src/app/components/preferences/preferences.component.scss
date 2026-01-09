@@ -1,0 +1,79 @@
+.preferences-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-card {
+  margin-bottom: 20px;
+  
+  mat-card-header {
+    margin-bottom: 10px;
+  }
+  
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 500;
+    
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
+.preferences-card {
+  margin-bottom: 20px;
+  
+  mat-card-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.preference-item {
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  mat-checkbox {
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .preference-description {
+    margin: 8px 0 0 32px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 1.5;
+  }
+}
+
+mat-card-actions {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+  
+  button {
+    min-width: 120px;
+    
+    mat-spinner {
+      display: inline-block;
+      margin-right: 8px;
+    }
+  }
+}

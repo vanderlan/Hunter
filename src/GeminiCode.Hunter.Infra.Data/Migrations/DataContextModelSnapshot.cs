@@ -229,6 +229,11 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<bool>("ReceiveJobChangeNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
                     b.HasKey("UserId");
 
                     b.HasIndex("Email")
@@ -249,7 +254,8 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                             Name = "Hunter Admin User",
                             Password = "3c9909afec25354d551dae21590bb26e38d53f2173b8d3dc3eee4c047e7ab1c1eb8b85103e3be7ba613b31bb5c9c36214dc9f14a42fd7a2fdb84856bca5c44c2",
                             Profile = 1,
-                            PublicId = "16537902-1ca7-49ca-82e5-0be137f9aeeb"
+                            PublicId = "16537902-1ca7-49ca-82e5-0be137f9aeeb",
+                            ReceiveJobChangeNotifications = true
                         });
                 });
 

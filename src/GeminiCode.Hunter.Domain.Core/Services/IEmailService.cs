@@ -7,6 +7,7 @@ namespace GeminiCode.Hunter.Domain.Core.Services;
 public interface IEmailService
 {
     Task SendJobChangesNotificationAsync(
+        List<string> toEmails,
         List<string> newJobs,
         List<string> closedJobs,
         DateTime syncTime);

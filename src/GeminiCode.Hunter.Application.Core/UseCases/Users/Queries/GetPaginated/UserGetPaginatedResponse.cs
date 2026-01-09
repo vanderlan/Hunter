@@ -11,6 +11,7 @@ public class UserGetPaginatedResponse
     public UserProfile Profile { get; set; }
     public DateTime LastUpdated { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool ReceiveJobChangeNotifications { get; set; }
 
     public static implicit operator UserGetPaginatedResponse(User user)
     {
@@ -24,7 +25,8 @@ public class UserGetPaginatedResponse
             Email = user.Email,
             Profile = user.Profile,
             LastUpdated = user.LastUpdated,
-            CreatedAt = user.CreatedAt
+            CreatedAt = user.CreatedAt,
+            ReceiveJobChangeNotifications = user.ReceiveJobChangeNotifications
         };
     }
 }

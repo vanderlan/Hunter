@@ -18,6 +18,11 @@ public class UserUpdateRequestHandler(IUnitOfWork unitOfWork, IStringLocalizer<H
         user.Email = request.Email;
         user.Name = request.Name;
         user.Profile = request.Profile;
+        
+        if (request.ReceiveJobChangeNotifications.HasValue)
+        {
+            user.ReceiveJobChangeNotifications = request.ReceiveJobChangeNotifications.Value;
+        }
 
         unitOfWork.UserRepository.Update(user);
 

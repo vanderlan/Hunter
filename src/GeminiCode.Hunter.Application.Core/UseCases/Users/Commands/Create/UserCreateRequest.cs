@@ -11,6 +11,7 @@ public class UserCreateRequest : IRequest<UserCreateResponse>
     public string Email { get; set; }
     public UserProfile Profile { get; set; }
     public bool SendWelcomeEmail { get; set; }
+    public bool ReceiveJobChangeNotifications { get; set; } = true;
 
     public static explicit operator User(UserCreateRequest request)
     {
@@ -22,7 +23,8 @@ public class UserCreateRequest : IRequest<UserCreateResponse>
             Name = request.Name,
             Password = request.Password,
             Email = request.Email,
-            Profile = request.Profile
+            Profile = request.Profile,
+            ReceiveJobChangeNotifications = request.ReceiveJobChangeNotifications
         };
     }
 }

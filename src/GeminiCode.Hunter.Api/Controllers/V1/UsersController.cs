@@ -12,8 +12,10 @@ using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.ChangePassword;
 using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Create;
 using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Delete;
 using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Update;
+using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.UpdatePreferences;
 using GeminiCode.Hunter.Application.Core.UseCases.Users.Queries.GetById;
 using GeminiCode.Hunter.Application.Core.UseCases.Users.Queries.GetPaginated;
+using GeminiCode.Hunter.Application.Core.UseCases.Users.Queries.GetPreferences;
 using static GeminiCode.Hunter.Domain.Core.Authentication.AuthorizationConfiguration;
 
 namespace GeminiCode.Hunter.Api.Controllers.V1;
@@ -88,6 +90,27 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     public async Task<IActionResult> PatchChangePassword([FromBody] UserChangePasswordRequest userChangePasswordRequest)
     {
         await Mediator.Send(userChangePasswordRequest);
+
+        return Accepted();
+    }
+
+    [HttpGet("Me/Preferences")]
+    [Authorize]
+    [SwaggerResponse((int)HttpStatusCode.OK, "A success response with user preferences", typeof(UserGetPreferencesResponse))]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> GetPreferences()
+    {
+        return Ok(await Mediator.Send(new UserGetPreferencesRequest()));
+    }
+
+    [HttpPut("Me/Preferences")]
+    [Authorize]
+    [SwaggerResponse((int)HttpStatusCode.BadRequest, "A error response with the error description", typeof(ExceptionResponse))]
+    [SwaggerResponse((int)HttpStatusCode.Accepted)]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> PutPreferences([FromBody] UserUpdatePreferencesRequest userUpdatePreferencesRequest)
+    {
+        await Mediator.Send(userUpdatePreferencesRequest);
 
         return Accepted();
     }
