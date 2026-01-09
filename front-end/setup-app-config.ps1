@@ -1,7 +1,7 @@
 # Hunter Frontend - Complete Setup Script
 # Run this from: C:\repos\vanderlan\Hunter\front-end
 
-Write-Host "Setting up Hunter CV Analyzer Frontend..." -ForegroundColor Cyan
+Write-Host "Setting up Hunter Frontend..." -ForegroundColor Cyan
 
 # App Routes
 Write-Host "`nCreating app.routes.ts..." -ForegroundColor Yellow

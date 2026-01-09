@@ -11,14 +11,40 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
 
     public string RenderJobChangesTemplate(Dictionary<string, object> data)
     {
+        logger.LogInformation("Rendering job changes template with data keys: {Keys}", 
+            string.Join(", ", data.Keys));
+        logger.LogInformation("HasNewJobs: {HasNewJobs}, HasClosedJobs: {HasClosedJobs}", 
+            data.GetValueOrDefault("HasNewJobs"), 
+            data.GetValueOrDefault("HasClosedJobs"));
+        logger.LogInformation("NewJobs count: {Count}", 
+            (data.GetValueOrDefault("NewJobs") as IEnumerable<object>)?.Count() ?? 0);
+        logger.LogInformation("ClosedJobs count: {Count}", 
+            (data.GetValueOrDefault("ClosedJobs") as IEnumerable<object>)?.Count() ?? 0);
+        
         var template = LoadTemplate("JobChangesTemplate.html");
-        return RenderTemplate(template, data);
+        logger.LogInformation("Template loaded, length: {Length}", template.Length);
+        
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, result length: {Length}", result.Length);
+        logger.LogDebug("Rendered template preview: {Preview}", 
+            result.Length > 500 ? result.Substring(0, 500) + "..." : result);
+        
+        return result;
     }
 
     public string RenderCandidateMatchesTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering candidate matches template");
         var template = LoadTemplate("CandidateMatchesTemplate.html");
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, length: {Length}", result.Length);
+        return result;
+    }
+
+    public string RenderWelcomeEmailTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering welcome email template");
+        var template = LoadTemplate("WelcomeEmailTemplate.html");
         var result = RenderTemplate(template, data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
@@ -59,13 +85,14 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     {
         var result = template;
 
+        // IMPORTANT: Process conditionals BEFORE loops
+        // This ensures {{#if}} blocks are evaluated first, then loops inside them can be processed
+        result = ProcessConditionals(result, data);
+        
         // Process all loops (including nested ones) recursively
         result = ProcessLoopsRecursive(result, data, isTopLevel: true);
         
-        // Process conditionals
-        result = ProcessConditionals(result, data);
-        
-        // Replace simple variables
+        // Replace simple variables (after loops and conditionals)
         result = ReplaceVariables(result, data);
 
         return result;

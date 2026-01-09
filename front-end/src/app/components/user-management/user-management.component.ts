@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { UserService } from '../../services/user.service';
 import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../models/user.model';
 
@@ -32,7 +33,8 @@ import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../m
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatCheckboxModule
   ],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.scss'
@@ -62,7 +64,8 @@ export class UserManagementComponent implements OnInit {
     this.userForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      profile: [UserProfile.Partner, Validators.required]
+      profile: [UserProfile.Partner, Validators.required],
+      sendWelcomeEmail: [true]
     });
   }
 
@@ -99,10 +102,14 @@ export class UserManagementComponent implements OnInit {
   showCreateForm(): void {
     this.isEditing = true;
     this.currentUserId = null;
-    this.userForm.reset({ profile: UserProfile.Partner });
+    this.userForm.reset({ profile: UserProfile.Partner, sendWelcomeEmail: true });
     // Add password field for create
     if (!this.userForm.get('password')) {
       this.userForm.addControl('password', this.fb.control('', [Validators.required, Validators.minLength(3)]));
+    }
+    // Ensure sendWelcomeEmail control exists
+    if (!this.userForm.get('sendWelcomeEmail')) {
+      this.userForm.addControl('sendWelcomeEmail', this.fb.control(true));
     }
   }
 
@@ -112,6 +119,10 @@ export class UserManagementComponent implements OnInit {
     // Remove password field for edit
     if (this.userForm.get('password')) {
       this.userForm.removeControl('password');
+    }
+    // Remove sendWelcomeEmail for edit (only for create)
+    if (this.userForm.get('sendWelcomeEmail')) {
+      this.userForm.removeControl('sendWelcomeEmail');
     }
     this.userForm.patchValue({
       name: user.name,
@@ -123,9 +134,12 @@ export class UserManagementComponent implements OnInit {
   cancelEdit(): void {
     this.isEditing = false;
     this.currentUserId = null;
-    this.userForm.reset({ profile: UserProfile.Partner });
+    this.userForm.reset({ profile: UserProfile.Partner, sendWelcomeEmail: true });
     if (this.userForm.get('password')) {
       this.userForm.removeControl('password');
+    }
+    if (this.userForm.get('sendWelcomeEmail')) {
+      this.userForm.removeControl('sendWelcomeEmail');
     }
   }
 

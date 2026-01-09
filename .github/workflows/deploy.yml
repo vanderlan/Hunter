@@ -6,9 +6,9 @@ on:
     tags:
       - "v*.*.*"
 jobs:
-  docker:
+  docker-backend:
     runs-on: ubuntu-latest
-    name: Docker Build and Push
+    name: Docker Build and Push - Backend API
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,9 +34,86 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push backend
         uses: docker/build-push-action@v5
         with:
+          context: .
+          file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  docker-frontend:
+    runs-on: ubuntu-latest
+    name: Docker Build and Push - Frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            vanderlangs/hunter-frontend
+          tags: |
+            type=raw,value=latest
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./front-end
+          file: ./front-end/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker-backend, docker-frontend]
+    steps:
+    - name: Deploy to production server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HUNTER_PROD_HOST }}
+        username: ${{ secrets.HUNTER_PROD_USER }}
+        password: ${{ secrets.HUNTER_PROD_PASSWORD }}
+        port: ${{ secrets.HUNTER_PROD_SSH_PORT }}
+        script: |
+          cd ~/projects/hunter
+          ./deploy.sh
+
+  healthcheck:  
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: Wait for deployment
+      run: sleep 3
+    
+    - name: Health Check - API
+      uses: jtalk/url-health-check-action@v4
+      with:
+        url: https://hunter.geminicode.com.br/api/health
+        max-attempts: 5 
+        retry-delay: 10s
+    
+    - name: Health Check - Frontend
+      uses: jtalk/url-health-check-action@v4
+      with:
+        url: https://hunter.geminicode.com.br/
+        max-attempts: 5 
+        retry-delay: 10s

@@ -128,10 +128,10 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("Requirements")
+                    b.Property<string>("Responsibilities")
                         .HasColumnType("text");
 
-                    b.Property<string>("Responsibilities")
+                    b.Property<string>("Skills")
                         .HasColumnType("text");
 
                     b.Property<string>("Summary")

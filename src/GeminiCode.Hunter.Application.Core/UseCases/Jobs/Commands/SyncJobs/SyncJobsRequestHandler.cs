@@ -10,6 +10,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Jobs.Commands.SyncJobs;
 public class SyncJobsRequestHandler(
     IUnitOfWork unitOfWork,
     IJobScraperService scraperService,
+    IAIService openAIService,
     IPublisher publisher,
     ILogger<SyncJobsRequestHandler> logger)
     : IRequestHandler<SyncJobsRequest, SyncJobsResponse>
@@ -34,10 +35,13 @@ public class SyncJobsRequestHandler(
 
             // Get all existing active positions
             var existingPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
-            var existingUrls = existingPositions.Select(p => p.ExternalUrl).ToHashSet();
+            var existingUrlsAndTitles = existingPositions
+                .ToDictionary(p => p.ExternalUrl, p => p.Title);
 
             // Identify new positions
-            var newJobs = scrapedJobs.Where(s => !existingUrls.Contains(s.Url)).ToList();
+            var newJobs = scrapedJobs
+                .Where(s => !existingUrlsAndTitles.ContainsKey(s.Url))
+                .ToList();
 
             // Process new positions
             foreach (var newJob in newJobs)
@@ -54,8 +58,15 @@ public class SyncJobsRequestHandler(
                         continue;
                     }
 
-                    // Scrape full details
-                    var details = await scraperService.ScrapeJobDetailsAsync(newJob.Url);
+                    // Scrape raw HTML content
+                    var scrapedDetails = await scraperService.ScrapeJobDetailsAsync(newJob.Url);
+
+                    // Use OpenAI to extract and enrich job details
+                    logger.LogInformation("Enriching job details with AI for: {Title}", newJob.Title);
+                    var enrichedDetails = await openAIService.EnrichJobDetailsAsync(
+                        newJob.Title,
+                        scrapedDetails.RawHtmlContent
+                    );
 
                     // Create new position
                     var position = new JobPosition
@@ -64,11 +75,11 @@ public class SyncJobsRequestHandler(
                         ExternalUrl = newJob.Url,
                         CompanyCode = newJob.CompanyCode,
                         JobCode = newJob.JobCode,
-                        Summary = details.Summary,
-                        Responsibilities = details.Responsibilities,
-                        Requirements = details.Requirements,
-                        MustHaveSkills = details.MustHaveSkills,
-                        NiceToHaveSkills = details.NiceToHaveSkills,
+                        Summary = enrichedDetails.Summary,
+                        Responsibilities = enrichedDetails.Responsibilities,
+                        Skills = enrichedDetails.Skills,
+                        MustHaveSkills = enrichedDetails.MustHaveSkills,
+                        NiceToHaveSkills = enrichedDetails.NiceToHaveSkills,
                         IsActive = true,
                         LastCheckedAt = now
                     };
@@ -101,16 +112,39 @@ public class SyncJobsRequestHandler(
                 logger.LogInformation("Marked job as closed: {Title}", position.Title);
             }
 
-            // Update LastCheckedAt for existing active positions
+            // Update LastCheckedAt ONLY for active positions with same title
             var stillActivePositions = existingPositions
                 .Where(p => scrapedUrls.Contains(p.ExternalUrl))
                 .ToList();
 
             foreach (var position in stillActivePositions)
             {
-                position.LastCheckedAt = now;
-                unitOfWork.JobPositionRepository.Update(position);
-                response.UpdatedPositions++;
+                // Find the scraped job with same URL
+                var scrapedJob = scrapedJobs.FirstOrDefault(s => s.Url == position.ExternalUrl);
+
+                if (scrapedJob != null && scrapedJob.Title == position.Title)
+                {
+                    // Title hasn't changed, just update LastCheckedAt
+                    position.LastCheckedAt = now;
+                    unitOfWork.JobPositionRepository.Update(position);
+                    response.UpdatedPositions++;
+
+                    logger.LogDebug("Updated LastCheckedAt for: {Title}", position.Title);
+                }
+                else if (scrapedJob != null && scrapedJob.Title != position.Title)
+                {
+                    // Title changed - treat as closed and new position
+                    logger.LogInformation(
+                        "Job title changed from '{OldTitle}' to '{NewTitle}'. Treating as closed and new.",
+                        position.Title, scrapedJob.Title
+                    );
+
+                    await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
+                    response.ClosedPositions++;
+                    response.ClosedJobTitles.Add(position.Title);
+
+                    // Will be picked up as new in next sync
+                }
             }
 
             // Commit all changes

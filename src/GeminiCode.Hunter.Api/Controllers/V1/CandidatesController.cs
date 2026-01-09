@@ -2,6 +2,7 @@ using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetById;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
@@ -39,6 +40,24 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
             return NotFound();
 
         return Ok(candidate);
+    }
+
+    /// <summary>
+    /// Updates a candidate's information (Name, Email, Phone Number)
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <param name="request">The updated candidate information</param>
+    /// <returns>No content on success</returns>
+    [HttpPut("{id}")]
+    [SwaggerResponse((int)HttpStatusCode.NoContent, "Candidate updated successfully")]
+    [SwaggerResponse((int)HttpStatusCode.NotFound, "Candidate not found")]
+    [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid request")]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Update(string id, [FromBody] CandidateUpdateRequest request)
+    {
+        request.PublicId = id;
+        await Mediator.Send(request);
+        return NoContent();
     }
 
     /// <summary>

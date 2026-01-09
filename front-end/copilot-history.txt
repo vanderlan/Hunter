@@ -1,7 +1,7 @@
-# COPILOT CONVERSATION HISTORY - HUNTER CV ANALYZER FRONTEND
+# COPILOT CONVERSATION HISTORY - Hunter FRONTEND
 
 ## PROJECT CONTEXT
-**Project Name:** Hunter CV Analyzer - Angular Frontend
+**Project Name:** Hunter - Angular Frontend
 **Backend:** .NET 10 Web API with JWT Authentication, OpenAI Integration, PostgreSQL
 **Frontend:** Angular 17 with Standalone Components, Material Design
 **Primary Feature:** CV Analysis with AI-powered job matching
@@ -623,7 +623,7 @@ ng build --configuration=production
 
 ### CONCLUSION
 
-Successfully created a complete, production-ready Angular frontend for the Hunter CV Analyzer API with:
+Successfully created a complete, production-ready Angular frontend for the Hunter API with:
 - Modern Angular 17 architecture (standalone components)
 - Full JWT authentication with refresh token
 - Beautiful Material Design UI

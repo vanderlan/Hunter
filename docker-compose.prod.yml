@@ -1,0 +1,69 @@
+services:
+  api:
+    image: vanderlangs/hunter-api:latest
+    ports:
+      - "5010:80"
+    container_name: hunter-api
+    restart: unless-stopped
+    depends_on:
+      - postgresql
+    networks:
+      - backend-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__PostgreSql=Host=postgresql;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - JwtOptions__SymmetricSecurityKey=${JWT_SECRET_KEY}
+      - JwtOptions__Issuer=${JWT_ISSUER}
+      - JwtOptions__Audience=${JWT_AUDIENCE}
+      - JwtOptions__TokenExpirationMinutes=${JWT_EXPIRATION_MINUTES}
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - Email__SmtpHost=${EMAIL_SMTP_HOST}
+      - Email__SmtpPort=${EMAIL_SMTP_PORT}
+      - Email__FromEmail=${EMAIL_FROM}
+      - Email__ToEmails__0=${EMAIL_TO}
+      - Email__Password=${EMAIL_PASSWORD}
+      - Email__EnableSsl=${EMAIL_ENABLE_SSL}
+      - ElasticConfiguration__Uri=${ELASTICSEARCH_URI}
+      - JobScraper__CareersUrl=${JOB_SCRAPER_URL}
+      - FeatureManagement__AutoCandidateMatching=${FEATURE_AUTO_CANDIDATE_MATCHING}
+      - AllowedHosts=${ALLOWED_HOSTS}
+
+  frontend:
+    image: vanderlangs/hunter-frontend:latest
+    ports:
+      - "5200:80"
+    container_name: hunter-frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    networks:
+      - backend-network
+
+  postgresql:
+    container_name: postgresql
+    image: postgres:16.3
+    restart: unless-stopped
+    hostname: postgresql
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    networks:
+        - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+    backend-network:
+        driver: bridge
+
+volumes:
+    elasticsearch-data:
+    postgresql-data:

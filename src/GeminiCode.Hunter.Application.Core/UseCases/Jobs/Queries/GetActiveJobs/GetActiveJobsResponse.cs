@@ -14,6 +14,8 @@ public class JobPositionDto
     public string CompanyCode { get; set; } = string.Empty;
     public string JobCode { get; set; } = string.Empty;
     public string? Summary { get; set; }
+    public string? Responsibilities { get; set; }
+    public string? Skills { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
     public DateTime CreatedAt { get; set; }

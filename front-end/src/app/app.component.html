@@ -1,51 +1,107 @@
-<div class="app-container">
+<div class="app-container" [class.sidenav-expanded]="sidenavExpanded">
   @if (isAuthenticated$ | async) {
-    <mat-toolbar color="primary" class="app-toolbar">
-      <span class="toolbar-brand">
-        <mat-icon>work</mat-icon>
-        <span class="brand-text">Hunter CV Analyzer</span>
-      </span>
-      <span class="toolbar-spacer"></span>
-      <button mat-button routerLink="/" class="nav-button">
-        <mat-icon>analytics</mat-icon>
-        <span>Analyze CV</span>
-      </button>
-      <button mat-button routerLink="/candidates" class="nav-button">
-        <mat-icon>folder_shared</mat-icon>
-        <span>Candidates</span>
-      </button>
-      @if (isAdmin()) {
-        <button mat-button routerLink="/job-positions" class="nav-button">
-          <mat-icon>settings</mat-icon>
-          <span>Job Positions</span>
-        </button>
-        <button mat-button routerLink="/users" class="nav-button">
-          <mat-icon>people</mat-icon>
-          <span>Users</span>
-        </button>
-      }
-      <button mat-icon-button [matMenuTriggerFor]="menu" class="user-menu">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <mat-menu #menu="matMenu">
-        <div class="menu-user-info">
-          <mat-icon>person</mat-icon>
-          <span>{{ getUserName() }}</span>
+    <!-- Left Sidebar -->
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav 
+        #sidenav 
+        mode="side" 
+        [opened]="sidenavExpanded"
+        class="app-sidenav">
+        
+        <!-- Brand/Logo -->
+        <div class="sidenav-header">
+          <div class="brand-container">
+            <mat-icon class="brand-icon">work</mat-icon>
+            <span class="brand-text" *ngIf="sidenavExpanded">Hunter</span>
+          </div>
         </div>
-        <mat-divider></mat-divider>
-        <button mat-menu-item (click)="changePassword()">
-          <mat-icon>lock</mat-icon>
-          <span>Change Password</span>
-        </button>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
-    </mat-toolbar>
+
+        <!-- Navigation Menu -->
+        <nav class="sidenav-nav">
+          <button mat-button 
+                  routerLink="/" 
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  class="nav-item">
+            <mat-icon>analytics</mat-icon>
+            <span *ngIf="sidenavExpanded">Analyze CV</span>
+          </button>
+
+          <button mat-button routerLink="/candidates" routerLinkActive="active" class="nav-item">
+            <mat-icon>folder_shared</mat-icon>
+            <span *ngIf="sidenavExpanded">Candidates</span>
+          </button>
+
+          @if (isAdmin()) {
+            <mat-divider *ngIf="sidenavExpanded"></mat-divider>
+            <div class="section-label" *ngIf="sidenavExpanded">ADMIN</div>
+
+            <button mat-button routerLink="/admin" routerLinkActive="active" class="nav-item">
+              <mat-icon>admin_panel_settings</mat-icon>
+              <span *ngIf="sidenavExpanded">Admin Panel</span>
+            </button>
+
+            <button mat-button routerLink="/job-positions" routerLinkActive="active" class="nav-item">
+              <mat-icon>work</mat-icon>
+              <span *ngIf="sidenavExpanded">Job Positions</span>
+            </button>
+
+            <button mat-button routerLink="/users" routerLinkActive="active" class="nav-item">
+              <mat-icon>people</mat-icon>
+              <span *ngIf="sidenavExpanded">Users</span>
+            </button>
+          }
+        </nav>
+
+        <!-- Spacer to push user menu to bottom when expanded -->
+        <div class="sidenav-spacer" *ngIf="sidenavExpanded"></div>
+      </mat-sidenav>
+
+      <!-- Main Content Area -->
+      <mat-sidenav-content class="main-content">
+        <!-- Top Bar with Toggle Button and User Menu -->
+        <div class="top-bar">
+          <button mat-icon-button (click)="toggleSidenav()" class="toggle-button">
+            <mat-icon>{{ sidenavExpanded ? 'menu_open' : 'menu' }}</mat-icon>
+          </button>
+          <span class="page-title">{{ getPageTitle() }}</span>
+          
+          <!-- Spacer -->
+          <span class="toolbar-spacer"></span>
+          
+          <!-- User Menu (Top Right) -->
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="user-menu-button">
+            <mat-icon>account_circle</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <div class="menu-user-info">
+              <mat-icon>person</mat-icon>
+              <span>{{ getUserName() }}</span>
+            </div>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="changePassword()">
+              <mat-icon>lock</mat-icon>
+              <span>Change Password</span>
+            </button>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
+        </div>
+
+        <!-- Router Content -->
+        <main class="app-content">
+          <router-outlet></router-outlet>
+        </main>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
   }
   
-  <main class="app-content">
-    <router-outlet></router-outlet>
-  </main>
+  @else {
+    <!-- Login/Unauthenticated Content (Centered) -->
+    <div class="unauthenticated-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  }
 </div>

@@ -265,3 +265,26 @@ __pycache__/
 /.sonarqube
 /tests/Hunter.Test/coverage
 *.bak
+
+# ============================================
+# HUNTER PROJECT SPECIFIC
+# ============================================
+
+# Environment files with secrets
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Keep only example files
+!.env.production.example
+
+# Angular / Frontend
+front-end/.angular/
+front-end/dist/
+front-end/.env
+
+# Coverage reports
+opencover.xml
+coverage.opencover.xml
+tests/**/coverage/

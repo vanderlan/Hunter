@@ -20,16 +20,6 @@ jobs:
           POSTGRES_PASSWORD: 123PgSql
         ports:
           - "5432:5432"
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.4
-        ports:
-          - "9200:9200"
-        env:
-          CLI_JAVA_OPTS: -Xms2g -Xmx2g
-          bootstrap.memory_lock: true
-          discovery.type: single-node
-          xpack.security.enabled: false
-          xpack.security.enrollment.enabled: false
     steps:
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v3
@@ -43,19 +33,31 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install SonarCloud scanner
-        run: |
-           dotnet tool install --global dotnet-sonarscanner --version 9.0.2
       - name: Install EF Core Tools
         run: |
           dotnet tool install --global dotnet-ef --version 10.0.0
-      - name: Build and test
+      - name: Build and test backend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet restore Hunter.sln
           dotnet ef database update -p src/GeminiCode.Hunter.Infra.Data -s src/GeminiCode.Hunter.Api --verbose
-          dotnet build Hunter.sln --no-restore
-          dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover  /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* Hunter.sln
+          dotnet build Hunter.sln
+          dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* Hunter.sln
           cp tests/GeminiCode.Hunter.Test/coverage.opencover.xml opencover.xml
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: front-end/package-lock.json
+      
+      - name: Install frontend dependencies
+        working-directory: ./front-end
+        run: npm install --legacy-peer-deps
+      
+      - name: Build frontend
+        working-directory: ./front-end
+        run: npm run build -- --configuration=production
+      

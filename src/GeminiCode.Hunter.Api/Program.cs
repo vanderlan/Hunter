@@ -15,15 +15,15 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<AutoValidationActionFilter>();
 });
 
-builder.Configuration.ConfigureLogging();
-
-builder.Host.UseSerilog();
+//TODO: Temp disabled due server resource limits
+//builder.Configuration.ConfigureLogging();
+//builder.Host.UseSerilog();
 
 builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseSerilogRequestLogging();
+// app.UseSerilogRequestLogging();
 
 app.UseMiddleware<ExceptionMiddleware>();
 

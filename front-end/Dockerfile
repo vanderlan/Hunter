@@ -6,14 +6,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies with legacy peer deps to handle Angular Material compatibility
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
 
-# Build Angular app for beta environment
-RUN npm run build -- --configuration=beta
+# Build Angular app for production environment
+RUN npm run build -- --configuration=production
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine

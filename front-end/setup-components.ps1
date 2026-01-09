@@ -2,7 +2,7 @@
 # This script creates ALL component files with full implementation
 # Run from: C:\repos\vanderlan\Hunter\front-end
 
-Write-Host "Creating Hunter CV Analyzer Components..." -ForegroundColor Cyan
+Write-Host "Creating Hunter Components..." -ForegroundColor Cyan
 
 # ============================================================================
 # LOGIN COMPONENT SCSS

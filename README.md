@@ -1,4 +1,4 @@
-# **Hunter CV Analyzer**
+# **Hunter**
 
 [![Build and Test](https://github.com/vanderlan/Hunter-Api/actions/workflows/build.yml/badge.svg)](https://github.com/vanderlan/Hunter-Api/actions/workflows/build.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vanderlan_Hunter-Api&metric=coverage)](https://sonarcloud.io/summary/overall?id=vanderlan_Hunter-Api) 
@@ -8,7 +8,7 @@
 
 ## About this Project
 
-**Hunter CV Analyzer** is a comprehensive AI-powered system for analyzing CVs against job positions. It uses OpenAI GPT-4o to intelligently match candidates with available jobs, providing match percentages, skills analysis, and detailed recommendations.
+**Hunter** is a comprehensive AI-powered system for analyzing CVs against job positions. It uses OpenAI GPT-4o to intelligently match candidates with available jobs, providing match percentages, skills analysis, and detailed recommendations.
 
 ### Key Features
 

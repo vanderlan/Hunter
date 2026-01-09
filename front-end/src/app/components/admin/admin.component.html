@@ -1,0 +1,129 @@
+<div class="admin-container">
+  <!-- Header Card -->
+  <mat-card class="admin-header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>admin_panel_settings</mat-icon>
+        Admin Area
+      </mat-card-title>
+      <mat-card-subtitle>
+        Administrative tools and system management
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Job Synchronization Card -->
+  <mat-card class="admin-action-card">
+    <mat-card-header>
+      <mat-card-title class="card-title">
+        <mat-icon>sync</mat-icon>
+        <span>Job Synchronization</span>
+      </mat-card-title>
+      <mat-card-subtitle>
+        Manually trigger job position synchronization from external sources
+      </mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="sync-description">
+        <p>
+          <mat-icon class="info-icon">info</mat-icon>
+          This will scrape job positions from the external careers page, detect new and closed positions,
+          and update the database. The process may take 30-60 seconds depending on the number of positions.
+        </p>
+      </div>
+
+      <div class="sync-info" *ngIf="lastSyncResult">
+        <h4>Last Sync Results:</h4>
+        <div class="sync-stats">
+          <div class="stat-item">
+            <mat-icon class="stat-icon new">fiber_new</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ lastSyncResult.newPositions }}</span>
+              <span class="stat-label">New Positions</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <mat-icon class="stat-icon updated">update</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ lastSyncResult.updatedPositions }}</span>
+              <span class="stat-label">Updated</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <mat-icon class="stat-icon closed">cancel</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ lastSyncResult.closedPositions }}</span>
+              <span class="stat-label">Closed</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <mat-icon class="stat-icon total">inventory</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ lastSyncResult.totalScraped }}</span>
+              <span class="stat-label">Total Scraped</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="new-jobs-list" *ngIf="lastSyncResult.newJobTitles && lastSyncResult.newJobTitles.length > 0">
+          <h5>New Jobs Added:</h5>
+          <ul>
+            <li *ngFor="let title of lastSyncResult.newJobTitles">{{ title }}</li>
+          </ul>
+        </div>
+
+        <div class="closed-jobs-list" *ngIf="lastSyncResult.closedJobTitles && lastSyncResult.closedJobTitles.length > 0">
+          <h5>Jobs Closed:</h5>
+          <ul>
+            <li *ngFor="let title of lastSyncResult.closedJobTitles">{{ title }}</li>
+          </ul>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        class="sync-button"
+        (click)="syncJobs()"
+        [disabled]="isSyncing">
+        <mat-spinner *ngIf="isSyncing" diameter="20" class="button-spinner"></mat-spinner>
+        <mat-icon *ngIf="!isSyncing">sync</mat-icon>
+        <span>{{ isSyncing ? 'Synchronizing...' : 'Sync Jobs Now' }}</span>
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Quick Actions Card -->
+  <mat-card class="admin-quick-actions">
+    <mat-card-header>
+      <mat-card-title class="card-title">
+        <mat-icon>bolt</mat-icon>
+        <span>Quick Actions</span>
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="quick-actions-grid">
+        <button mat-raised-button class="action-button" routerLink="/job-positions">
+          <mat-icon>work</mat-icon>
+          <span>Manage Job Positions</span>
+        </button>
+        <button mat-raised-button class="action-button" routerLink="/users">
+          <mat-icon>people</mat-icon>
+          <span>Manage Users</span>
+        </button>
+        <button mat-raised-button class="action-button" routerLink="/candidates">
+          <mat-icon>folder_shared</mat-icon>
+          <span>View Candidates</span>
+        </button>
+        <button mat-raised-button class="action-button" routerLink="/">
+          <mat-icon>analytics</mat-icon>
+          <span>Analyze CV</span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

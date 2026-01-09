@@ -17,6 +17,7 @@ export interface UserCreateRequest {
   email: string;
   password: string;
   profile: UserProfile;
+  sendWelcomeEmail?: boolean;
 }
 
 export interface UserUpdateRequest {

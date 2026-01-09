@@ -22,6 +22,8 @@ public class GetActiveJobsRequestHandler(IUnitOfWork unitOfWork)
                 CompanyCode = j.CompanyCode,
                 JobCode = j.JobCode,
                 Summary = j.Summary,
+                Responsibilities = j.Responsibilities,
+                Skills = j.Skills,
                 MustHaveSkills = j.MustHaveSkills,
                 NiceToHaveSkills = j.NiceToHaveSkills,
                 CreatedAt = j.CreatedAt,

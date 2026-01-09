@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,9 +8,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-file-drop';
 import { JobService } from '../../services/job.service';
-import { JobMatch } from '../../models/job.model';
+import { JobMatch, JobPosition } from '../../models/job.model';
 
 @Component({
   selector: 'app-cv-analyzer',
@@ -25,22 +27,58 @@ import { JobMatch } from '../../models/job.model';
     MatChipsModule,
     MatExpansionModule,
     MatSnackBarModule,
+    MatDialogModule,
+    MatDividerModule,
     NgxFileDropModule
   ],
   templateUrl: './cv-analyzer.component.html',
   styleUrl: './cv-analyzer.component.scss'
 })
-export class CvAnalyzerComponent {
+export class CvAnalyzerComponent implements OnInit {
   selectedFile: File | null = null;
   analyzing = false;
   matches: JobMatch[] = [];
   totalPositions = 0;
   dragOver = false;
 
+  // Available positions section
+  availablePositions: JobPosition[] = [];
+  loadingPositions = false;
+
   constructor(
     private jobService: JobService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public dialog: MatDialog
   ) {}
+
+  ngOnInit(): void {
+    this.fetchAvailablePositions();
+  }
+
+  fetchAvailablePositions(): void {
+    this.loadingPositions = true;
+    this.jobService.getActiveJobs().subscribe({
+      next: (positions) => {
+        this.availablePositions = positions;
+        this.loadingPositions = false;
+      },
+      error: (error) => {
+        this.loadingPositions = false;
+        console.error('Error loading positions:', error);
+      }
+    });
+  }
+
+  openPositionDetails(position: JobPosition): void {
+    import('./position-details-dialog.component').then(m => {
+      this.dialog.open(m.PositionDetailsDialogComponent, {
+        data: position,
+        width: '800px',
+        maxWidth: '95vw',
+        panelClass: 'position-details-dialog-container'
+      });
+    });
+  }
 
   dropped(files: NgxFileDropEntry[]): void {
     this.dragOver = false;

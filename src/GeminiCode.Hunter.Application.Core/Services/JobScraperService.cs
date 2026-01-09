@@ -1,5 +1,4 @@
 using System.Net;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
@@ -62,24 +61,21 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
     {
         try
         {
-            logger.LogInformation("Scraping job details from {Url}", url);
+            logger.LogInformation("Scraping raw HTML content from {Url}", url);
 
             var web = new HtmlWeb();
             var doc = await web.LoadFromWebAsync(url);
 
-            var root = doc.DocumentNode;
+            // Extract the main content body (usually the job description container)
+            var bodyNode = doc.DocumentNode.SelectSingleNode("//body") 
+                ?? doc.DocumentNode;
 
-            var details = new ScrapedJobDetails(
-                Summary: ExtractSection(root, "Summary"),
-                Responsibilities: ExtractSection(root, "Responsibilities"),
-                Requirements: ExtractSection(root, "Requirements"),
-                MustHaveSkills: ExtractSection(root, "Must-Have Skills"),
-                NiceToHaveSkills: ExtractSection(root, "Nice-to-Have Skills")
-            );
+            var rawHtml = bodyNode.InnerHtml;
 
-            logger.LogInformation("Successfully scraped job details from {Url}", url);
+            logger.LogInformation("Successfully scraped {CharCount} characters from {Url}", 
+                rawHtml.Length, url);
 
-            return details;
+            return new ScrapedJobDetails(RawHtmlContent: rawHtml);
         }
         catch (Exception ex)
         {
@@ -121,77 +117,6 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
         catch
         {
             return null;
-        }
-    }
-
-    private string ExtractSection(HtmlNode root, string title)
-    {
-        try
-        {
-            var header = root.Descendants()
-                .FirstOrDefault(n => n.InnerText.Trim().Equals(title, StringComparison.OrdinalIgnoreCase));
-
-            if (header == null)
-            {
-                logger.LogDebug("Section not found: {Title}", title);
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder();
-            var node = header.NextSibling;
-
-            // List of known section headers to stop at
-            var sectionHeaders = new[] { "Summary", "Responsibilities", "Requirements", "Must-Have Skills", "Nice-to-Have Skills", "Nice to Have" };
-
-            while (node != null)
-            {
-                var text = node.InnerText.Trim();
-
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    // Stop if we hit another major section header (h2)
-                    if (node.Name.Equals("h2", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var nodeText = WebUtility.HtmlDecode(text);
-                        if (sectionHeaders.Any(h => nodeText.Equals(h, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            break;
-                        }
-                      }
-                    
-
-                    // Include h3 subsection headers as part of the content
-                    if (node.Name.Equals("h3", StringComparison.OrdinalIgnoreCase))
-                    {
-                        sb.AppendLine();
-                        sb.AppendLine($"## {WebUtility.HtmlDecode(text)}");
-                        sb.AppendLine();
-                    }
-                    // Stop at short uppercase text that looks like a new section (but not h3)
-                    else if (text.Length < 40 && char.IsUpper(text[0]) && !node.Name.Equals("li", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Check if it's a known section header
-                        if (sectionHeaders.Any(h => text.Equals(h, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            break;
-                        }
-                        sb.AppendLine(WebUtility.HtmlDecode(text));
-                    }
-                    else
-                    {
-                        sb.AppendLine(WebUtility.HtmlDecode(text));
-                    }
-                }
-
-                node = node.NextSibling;
-            }
-
-            return sb.ToString().Trim();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error extracting section: {Title}", title);
-            return string.Empty;
         }
     }
 }

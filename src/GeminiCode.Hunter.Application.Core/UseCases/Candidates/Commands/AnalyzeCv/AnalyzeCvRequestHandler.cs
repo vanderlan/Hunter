@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using GeminiCode.Hunter.Application.Core.Helpers;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
@@ -12,7 +13,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Analyz
 public class AnalyzeCvRequestHandler(
     IUnitOfWork unitOfWork,
     IPdfService pdfService,
-    IOpenAIService openAIService,
+    IAIService openAIService,
     ICvInfoExtractionService cvInfoExtractionService,
     ICurrentUser currentUser,
     ILogger<AnalyzeCvRequestHandler> logger)
@@ -81,7 +82,6 @@ public class AnalyzeCvRequestHandler(
                 j.CompanyCode,
                 j.Summary,
                 j.Responsibilities,
-                j.Requirements,
                 j.MustHaveSkills,
                 j.NiceToHaveSkills
             )).ToList();
@@ -137,21 +137,25 @@ public class AnalyzeCvRequestHandler(
     {
         var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
-        // Check if candidate already exists by email
+        var formattedName = name.FormatName();
+        var trimmedEmail = email?.Trim();
+        var trimmedPhone = phone?.Trim();
+
         Candidate? existingCandidate = null;
-        if (!string.IsNullOrWhiteSpace(email))
+        
+        if (!string.IsNullOrWhiteSpace(trimmedEmail))
         {
-            existingCandidate = await unitOfWork.CandidateRepository.GetByEmailAsync(email);
+            existingCandidate = await unitOfWork.CandidateRepository.GetByEmailAsync(trimmedEmail);
         }
 
         if (existingCandidate != null)
         {
             // Update existing candidate with latest CV
             logger.LogInformation("Updating existing candidate with email: {Email}, analyzed by user: {UserId}", 
-                email, userId);
+                trimmedEmail, userId);
             
-            existingCandidate.Name = name;
-            existingCandidate.PhoneNumber = phone;
+            existingCandidate.Name = formattedName;
+            existingCandidate.PhoneNumber = trimmedPhone;
             existingCandidate.CvText = cvText;
             existingCandidate.AnalyzedAt = now;
             existingCandidate.UserId = userId;
@@ -166,9 +170,9 @@ public class AnalyzeCvRequestHandler(
             var candidate = new Candidate
             {
                 UserId = userId,
-                Name = name,
-                Email = email,
-                PhoneNumber = phone,
+                Name = formattedName,
+                Email = trimmedEmail,
+                PhoneNumber = trimmedPhone,
                 CvText = cvText,
                 AnalyzedAt = now
             };
@@ -178,6 +182,6 @@ public class AnalyzeCvRequestHandler(
 
         await unitOfWork.CommitAsync();
         
-        logger.LogInformation("Candidate information stored successfully");
+        logger.LogInformation("Candidate information stored successfully with name: {Name}", formattedName);
     }
 }

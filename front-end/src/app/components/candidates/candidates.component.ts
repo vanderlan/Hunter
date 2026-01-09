@@ -14,6 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CandidateService } from '../../services/candidate.service';
 import { Candidate } from '../../models/candidate.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-candidates',
@@ -37,19 +39,29 @@ import { Candidate } from '../../models/candidate.model';
   styleUrl: './candidates.component.scss'
 })
 export class CandidatesComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'email', 'analyzedAt', 'analyzedByUserName', 'actions'];
+  displayedColumns: string[] = ['name', 'email', 'phoneNumber', 'analyzedAt', 'analyzedByUserName', 'actions'];
   dataSource: Candidate[] = [];
   totalCount = 0;
   pageSize = 10;
   pageIndex = 0;
   searchQuery = '';
   loading = false;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private candidateService: CandidateService,
     private snackBar: MatSnackBar,
     public dialog: MatDialog
-  ) {}
+  ) {
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.pageIndex = 0;
+      this.loadCandidates();
+    });
+  }
 
   ngOnInit(): void {
     this.loadCandidates();
@@ -77,30 +89,34 @@ export class CandidatesComponent implements OnInit {
     this.loadCandidates();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadCandidates();
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
-  viewCandidate(candidate: Candidate): void {
-    this.loading = true;
-    this.candidateService.getCandidateById(candidate.publicId).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.openCandidateDialog(data);
-      },
-      error: (error) => {
-        this.loading = false;
-        this.snackBar.open('Error loading candidate details', 'Close', { duration: 3000 });
-      }
-    });
-  }
-
-  openCandidateDialog(candidate: Candidate): void {
-    import('./candidate-detail-dialog.component').then(m => {
-      this.dialog.open(m.CandidateDetailDialogComponent, {
+  editCandidate(candidate: Candidate): void {
+    import('./candidate-edit-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.CandidateEditDialogComponent, {
         data: candidate,
-        width: '500px'
+        width: '500px',
+        disableClose: false
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.loading = true;
+          this.candidateService.updateCandidate(result.publicId, result).subscribe({
+            next: () => {
+              this.loading = false;
+              this.snackBar.open('Candidate updated successfully', 'Close', { duration: 3000 });
+              this.loadCandidates();
+            },
+            error: (error) => {
+              this.loading = false;
+              this.snackBar.open(error.error?.message || 'Error updating candidate', 'Close', { duration: 3000 });
+            }
+          });
+        }
       });
     });
   }

@@ -21,7 +21,7 @@ public class JobPositionUpdateRequestHandler(IUnitOfWork unitOfWork, IStringLoca
         jobPosition.CompanyCode = request.CompanyCode;
         jobPosition.Summary = request.Summary;
         jobPosition.Responsibilities = request.Responsibilities;
-        jobPosition.Requirements = request.Requirements;
+        jobPosition.Skills = request.Skills;
         jobPosition.MustHaveSkills = request.MustHaveSkills;
         jobPosition.NiceToHaveSkills = request.NiceToHaveSkills;
         jobPosition.IsActive = request.IsActive;
