@@ -11,8 +11,8 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Search and Create Section -->
-  <mat-card class="actions-card" *ngIf="!isEditing">
+  <!-- Search and Create Section (No Card) -->
+  <div class="search-container" *ngIf="!isEditing">
     <div class="actions-row">
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Search</mat-label>
@@ -24,7 +24,7 @@
         New User
       </button>
     </div>
-  </mat-card>
+  </div>
 
   <!-- Create/Edit Form -->
   <mat-card class="form-card" *ngIf="isEditing">

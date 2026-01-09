@@ -35,15 +35,22 @@
   .actions-row {
     display: flex;
     gap: 16px;
-    align-items: center;
+    align-items: flex-start;
 
     .search-field {
       flex: 1;
+      background: white;
+      border-radius: 4px;
+
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        background: white !important;
+      }
     }
 
     button {
-      height: 48px;
+      height: 56px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
   }
 }
@@ -172,6 +179,7 @@
 
       button {
         width: 100%;
+        height: 48px;
       }
     }
   }

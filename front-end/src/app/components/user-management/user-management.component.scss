@@ -29,21 +29,28 @@
   }
 }
 
-.actions-card {
+.search-container {
   margin-bottom: 24px;
 
   .actions-row {
     display: flex;
     gap: 16px;
-    align-items: center;
+    align-items: flex-start;
 
     .search-field {
       flex: 1;
+      background: white;
+      border-radius: 4px;
+
+      ::ng-deep .mat-mdc-text-field-wrapper {
+        background: white !important;
+      }
     }
 
     button {
-      height: 48px;
+      height: 56px;
       white-space: nowrap;
+      flex-shrink: 0;
     }
   }
 }
@@ -177,7 +184,7 @@
     padding: 16px;
   }
 
-  .actions-card {
+  .search-container {
     .actions-row {
       flex-direction: column;
       align-items: stretch;
@@ -188,6 +195,7 @@
 
       button {
         width: 100%;
+        height: 48px;
       }
     }
   }
