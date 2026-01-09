@@ -37,7 +37,7 @@ import { Candidate } from '../../models/candidate.model';
   styleUrl: './candidates.component.scss'
 })
 export class CandidatesComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'email', 'analyzedAt', 'analyzedByUserName', 'actions'];
+  displayedColumns: string[] = ['name', 'email', 'phoneNumber', 'analyzedAt', 'analyzedByUserName', 'actions'];
   dataSource: Candidate[] = [];
   totalCount = 0;
   pageSize = 10;
@@ -93,6 +93,33 @@ export class CandidatesComponent implements OnInit {
         this.loading = false;
         this.snackBar.open('Error loading candidate details', 'Close', { duration: 3000 });
       }
+    });
+  }
+
+  editCandidate(candidate: Candidate): void {
+    import('./candidate-edit-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.CandidateEditDialogComponent, {
+        data: candidate,
+        width: '500px',
+        disableClose: false
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.loading = true;
+          this.candidateService.updateCandidate(result.publicId, result).subscribe({
+            next: () => {
+              this.loading = false;
+              this.snackBar.open('Candidate updated successfully', 'Close', { duration: 3000 });
+              this.loadCandidates();
+            },
+            error: (error) => {
+              this.loading = false;
+              this.snackBar.open(error.error?.message || 'Error updating candidate', 'Close', { duration: 3000 });
+            }
+          });
+        }
+      });
     });
   }
 

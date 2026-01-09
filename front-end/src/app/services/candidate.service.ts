@@ -38,4 +38,10 @@ export class CandidateService {
       headers: this.getHeaders()
     });
   }
+
+  updateCandidate(id: string, candidate: Candidate): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, candidate, {
+      headers: this.getHeaders()
+    });
+  }
 }
