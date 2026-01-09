@@ -8,7 +8,8 @@
 }
 
 .login-card {
-  max-width: 450px;
+  max-width: 500px;
+  min-width: 400px;
   width: 100%;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   border-radius: 16px !important;
@@ -41,30 +42,62 @@
     mat-card-subtitle {
       color: rgba(255, 255, 255, 0.9);
       margin-top: 8px;
+      font-size: 15px;
     }
   }
 
   mat-card-content {
-    padding: 32px 24px;
+    padding: 36px 28px;
 
     form {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
 
       .full-width {
         width: 100%;
+
+        mat-form-field {
+          width: 100%;
+        }
+      }
+
+      mat-form-field {
+        width: 100%;
+        font-size: 16px;
+
+        ::ng-deep {
+          .mat-mdc-text-field-wrapper {
+            padding-top: 8px;
+          }
+
+          .mat-mdc-form-field-infix {
+            min-height: 56px;
+            padding-top: 16px;
+            padding-bottom: 8px;
+          }
+
+          input {
+            font-size: 16px;
+          }
+
+          .mat-mdc-form-field-icon-prefix,
+          .mat-mdc-form-field-icon-suffix {
+            padding: 0 12px;
+          }
+        }
       }
 
       .error-message {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 12px;
+        padding: 12px 16px;
         background-color: #ffebee;
         color: #c62828;
         border-radius: 8px;
         font-size: 14px;
+        margin: -8px 0 0 0;
 
         mat-icon {
           font-size: 20px;
@@ -108,12 +141,33 @@
 @media (max-width: 600px) {
   .login-card {
     max-width: 100%;
-    
+    min-width: 0;
+
     mat-card-header {
       padding: 20px 16px;
-      
+
       .logo-container h1 {
         font-size: 20px;
+      }
+    }
+
+    mat-card-content {
+      padding: 24px 20px;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .login-container {
+    padding: 10px;
+  }
+
+  .login-card {
+    mat-card-content {
+      padding: 20px 16px;
+
+      form {
+        gap: 16px;
       }
     }
   }

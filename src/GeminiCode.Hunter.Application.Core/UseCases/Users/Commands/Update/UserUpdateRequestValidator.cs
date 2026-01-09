@@ -18,8 +18,5 @@ public class UserUpdateRequestValidator : AbstractValidator<UserUpdateRequest>
 
         RuleFor(c => c.Email)
             .NotEmpty().WithMessage(stringLocalizer[MessagesKeys.UserMessages.EmptyEmail]);
-
-        RuleFor(c => c.PublicId)
-            .NotEmpty().WithMessage(stringLocalizer[MessagesKeys.UserMessages.EmptyId]);
     }
 }
