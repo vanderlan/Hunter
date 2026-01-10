@@ -175,6 +175,153 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.ToTable("File", (string)null);
                 });
 
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcess", b =>
+                {
+                    b.Property<long>("HiringProcessId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("HiringProcessId"));
+
+                    b.Property<long>("CandidateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("JobPositionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("LastUpdatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("HiringProcessId");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("JobPositionId");
+
+                    b.HasIndex("LastUpdatedByUserId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("CandidateId", "JobPositionId");
+
+                    b.ToTable("HiringProcess", (string)null);
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcessNote", b =>
+                {
+                    b.Property<long>("HiringProcessNoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("HiringProcessNoteId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("HiringProcessId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("HiringProcessNoteId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("HiringProcessId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HiringProcessNote", (string)null);
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcessStatusHistory", b =>
+                {
+                    b.Property<long>("HiringProcessStatusHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("HiringProcessStatusHistoryId"));
+
+                    b.Property<long>("ChangedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("FromStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("HiringProcessId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("ToStatus")
+                        .HasColumnType("integer");
+
+                    b.HasKey("HiringProcessStatusHistoryId");
+
+                    b.HasIndex("ChangedByUserId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("HiringProcessId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.ToTable("HiringProcessStatusHistory", (string)null);
+                });
+
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.JobPosition", b =>
                 {
                     b.Property<long>("JobPositionId")
@@ -385,6 +532,78 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Navigation("Candidate");
 
                     b.Navigation("File");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcess", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.JobPosition", "JobPosition")
+                        .WithMany()
+                        .HasForeignKey("JobPositionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "LastUpdatedByUser")
+                        .WithMany()
+                        .HasForeignKey("LastUpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("CreatedByUser");
+
+                    b.Navigation("JobPosition");
+
+                    b.Navigation("LastUpdatedByUser");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcessNote", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.HiringProcess", "HiringProcess")
+                        .WithMany()
+                        .HasForeignKey("HiringProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("HiringProcess");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcessStatusHistory", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "ChangedByUser")
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.HiringProcess", "HiringProcess")
+                        .WithMany()
+                        .HasForeignKey("HiringProcessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChangedByUser");
+
+                    b.Navigation("HiringProcess");
                 });
 #pragma warning restore 612, 618
         }

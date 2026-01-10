@@ -34,6 +34,15 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private ICandidateFileRepository _candidateFileRepository;
     public ICandidateFileRepository CandidateFileRepository => _candidateFileRepository ??= new CandidateFileRepository(DbContext);
 
+    private IHiringProcessRepository _hiringProcessRepository;
+    public IHiringProcessRepository HiringProcessRepository => _hiringProcessRepository ??= new HiringProcessRepository(DbContext);
+
+    private IHiringProcessNoteRepository _hiringProcessNoteRepository;
+    public IHiringProcessNoteRepository HiringProcessNoteRepository => _hiringProcessNoteRepository ??= new HiringProcessNoteRepository(DbContext);
+
+    private IHiringProcessStatusHistoryRepository _hiringProcessStatusHistoryRepository;
+    public IHiringProcessStatusHistoryRepository HiringProcessStatusHistoryRepository => _hiringProcessStatusHistoryRepository ??= new HiringProcessStatusHistoryRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try

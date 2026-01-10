@@ -19,6 +19,9 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<Candidate> Candidates { get; set; }
     public DbSet<File> Files { get; set; }
     public DbSet<CandidateFile> CandidateFiles { get; set; }
+    public DbSet<HiringProcess> HiringProcesses { get; set; }
+    public DbSet<HiringProcessStatusHistory> HiringProcessStatusHistories { get; set; }
+    public DbSet<HiringProcessNote> HiringProcessNotes { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -36,6 +39,9 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new CandidateMapping());
         modelBuilder.ApplyConfiguration(new FileMapping());
         modelBuilder.ApplyConfiguration(new CandidateFileMapping());
+        modelBuilder.ApplyConfiguration(new HiringProcessMapping());
+        modelBuilder.ApplyConfiguration(new HiringProcessStatusHistoryMapping());
+        modelBuilder.ApplyConfiguration(new HiringProcessNoteMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
