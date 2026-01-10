@@ -1,0 +1,131 @@
+<div class="hiring-process-container">
+  <!-- Dashboard Stats Card -->
+  <mat-card class="dashboard-card" *ngIf="dashboard">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>dashboard</mat-icon>
+        Hiring Process Dashboard
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ dashboard.totalProcesses }}</div>
+          <div class="stat-label">Total Processes</div>
+        </div>
+        <div class="stat-item accent">
+          <div class="stat-value">{{ dashboard.activeProcesses }}</div>
+          <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-item primary">
+          <div class="stat-value">{{ dashboard.hiredCount }}</div>
+          <div class="stat-label">Hired</div>
+        </div>
+        <div class="stat-item warn">
+          <div class="stat-value">{{ dashboard.reprovedCount }}</div>
+          <div class="stat-label">Reproved</div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Processes List Card -->
+  <mat-card class="processes-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>business_center</mat-icon>
+        Hiring Processes
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Search -->
+      <div class="search-bar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search</mat-label>
+          <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by candidate or job...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="onSearch()">
+          Search
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!loading && processes.length > 0" class="table-container">
+        <table mat-table [dataSource]="processes" class="processes-table">
+          
+          <ng-container matColumnDef="candidateName">
+            <th mat-header-cell *matHeaderCellDef>Candidate</th>
+            <td mat-cell *matCellDef="let process">
+              <div class="candidate-info">
+                <strong>{{ process.candidateName }}</strong>
+                <small>{{ process.candidateEmail }}</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="jobTitle">
+            <th mat-header-cell *matHeaderCellDef>Position</th>
+            <td mat-cell *matCellDef="let process">
+              <div class="job-info">
+                <strong>{{ process.jobTitle }}</strong>
+                <small>{{ process.companyCode }} - {{ process.jobCode }}</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let process">
+              <mat-chip [color]="getStatusColor(process.status)" selected>
+                {{ getStatusLabel(process.status) }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdByUserName">
+            <th mat-header-cell *matHeaderCellDef>Created By</th>
+            <td mat-cell *matCellDef="let process">{{ process.createdByUserName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Created</th>
+            <td mat-cell *matCellDef="let process">{{ process.createdAt | date:'short' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let process">
+              <button mat-icon-button (click)="viewProcess(process)" matTooltip="View Details">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="process-row"></tr>
+        </table>
+
+        <mat-paginator 
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && processes.length === 0" class="empty-state">
+        <mat-icon>info_outline</mat-icon>
+        <p>No hiring processes found</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

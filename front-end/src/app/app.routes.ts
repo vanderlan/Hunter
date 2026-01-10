@@ -33,6 +33,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'hiring-process',
+    loadComponent: () => import('./components/hiring-process/hiring-process.component').then(m => m.HiringProcessComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'change-password',
     loadComponent: () => import('./components/change-password/change-password.component').then(m => m.ChangePasswordComponent),
     canActivate: [AuthGuard]

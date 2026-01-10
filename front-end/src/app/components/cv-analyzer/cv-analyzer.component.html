@@ -138,6 +138,10 @@
                 <mat-icon>open_in_new</mat-icon>
                 View Job Details
               </a>
+              <button mat-raised-button color="primary" (click)="startHiringProcess(match)" *ngIf="candidateInfo">
+                <mat-icon>play_arrow</mat-icon>
+                Start Hiring Process
+              </button>
             </mat-card-actions>
           </mat-card>
         </div>

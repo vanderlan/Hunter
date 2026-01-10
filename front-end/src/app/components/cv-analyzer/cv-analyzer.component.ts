@@ -12,6 +12,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-file-drop';
 import { JobService } from '../../services/job.service';
+import { HiringProcessService } from '../../services/hiring-process.service';
 import { JobMatch, JobPosition, CandidateInfo } from '../../models/job.model';
 
 @Component({
@@ -48,6 +49,7 @@ export class CvAnalyzerComponent implements OnInit {
 
   constructor(
     private jobService: JobService,
+    private hiringProcessService: HiringProcessService,
     private snackBar: MatSnackBar,
     public dialog: MatDialog
   ) {}
@@ -184,5 +186,37 @@ export class CvAnalyzerComponent implements OnInit {
     if (percentage >= 60) return 'accent';
     if (percentage >= 40) return 'warn';
     return '';
+  }
+
+  startHiringProcess(match: JobMatch): void {
+    if (!this.candidateInfo) {
+      this.snackBar.open('Candidate information not available', 'Close', { duration: 3000 });
+      return;
+    }
+
+    // Find the job position ID based on the job code
+    const jobPosition = this.availablePositions.find(p => p.jobCode === match.jobCode);
+    
+    if (!jobPosition || !jobPosition.publicId) {
+      this.snackBar.open('Job position not found', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.hiringProcessService.startHiringProcess({
+      candidateId: this.candidateInfo.candidateId,
+      jobPositionId: jobPosition.publicId
+    }).subscribe({
+      next: (response) => {
+        this.snackBar.open(
+          `Hiring process started successfully! Admin users have been notified.`,
+          'Close',
+          { duration: 5000 }
+        );
+      },
+      error: (error) => {
+        const message = error.error?.message || 'Error starting hiring process. It may already exist.';
+        this.snackBar.open(message, 'Close', { duration: 5000 });
+      }
+    });
   }
 }
