@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
-using GeminiCode.Hunter.Api.Configuration;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.CvAnalysis.Queries.GetById;
 using GeminiCode.Hunter.Application.Core.UseCases.CvAnalysis.Queries.GetHistory;
