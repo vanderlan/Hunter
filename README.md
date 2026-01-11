@@ -50,7 +50,7 @@
 	+ Elasticsearch 8.17.4 + Kibana 8.10.2 for logging
 	+ Docker Compose for full-stack orchestration
 
-## ?? Quick Start with Docker
+## 🚀 Quick Start with Docker
 
 **Start the entire system with one command:**
 
@@ -390,10 +390,10 @@ CHANGED Title → Mark as closed + Create as new job
 
 **Daily Schedule Example:**
 ```
-08:00 AM ? Sync #1
-09:00 AM ? Sync #2
+08:00 AM → Sync #1
+09:00 AM → Sync #2
 ...
-06:00 PM ? Sync #11 (last of the day)
+06:00 PM → Sync #11 (last of the day)
 ```
 
 ## Email Notifications
@@ -533,14 +533,14 @@ dotnet ef migrations add MigrationName -p GeminiCode.Hunter.Infra.Data -s Gemini
 dotnet ef database update -p GeminiCode.Hunter.Infra.Data -s GeminiCode.Hunter.Api --verbose
 ```
 
-### ?? PostgreSQL DateTime Note
+### ⚠️ PostgreSQL DateTime Note
 When using PostgreSQL with `timestamp without time zone`, ensure DateTime values use `DateTimeKind.Unspecified`:
 
 ```csharp
-// ? Correct
+// ✅ Correct
 var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
-// ? Wrong
+// ❌ Wrong
 var now = DateTime.UtcNow; // DateTimeKind.Utc causes errors
 ```
 
@@ -684,7 +684,7 @@ docker-compose up --build         # Rebuild and start
 ### Stop Services
 ```bash
 docker-compose down               # Stop all services
-docker-compose down -v            # Stop and remove volumes (?? deletes data)
+docker-compose down -v            # Stop and remove volumes (⚠️ deletes data)
 ```
 
 ### View Logs
@@ -741,14 +741,14 @@ services:
 
 ## Security
 
-- ? JWT authentication with refresh tokens
-- ? Role-based authorization
-- ? CORS configuration
-- ? Password hashing (SHA-512)
-- ? SQL injection prevention (EF Core)
-- ? XSS protection
-- ? CSRF protection
-- ? Rate limiting (recommended for production)
+- ✅ JWT authentication with refresh tokens
+- ✅ Role-based authorization (Admin/Partner)
+- ✅ CORS configuration
+- ✅ Password hashing (SHA-512)
+- ✅ SQL injection prevention (EF Core)
+- ✅ XSS protection
+- ✅ CSRF protection
+- 🔒 Rate limiting (recommended for production)
 
 ## Performance
 
@@ -758,7 +758,7 @@ services:
 - Reduces OpenAI API costs by ~95%
 
 **Frontend Optimization:**
-- Production build: 676 KB ? 141 KB (gzipped)
+- Production build: 676 KB → 141 KB (gzipped)
 - Lazy loading routes
 - Code splitting
 - Asset caching
@@ -774,7 +774,7 @@ dotnet new hunter-api --companyName "MyCompany" --output "MyProject" --systemDat
 
 ## Default Credentials
 
-?? **Change these in production!**
+⚠️ **Change these in production!**
 
 **Application:**
 - Email: `adm@hunter.com`
