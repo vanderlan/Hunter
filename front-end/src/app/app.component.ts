@@ -80,6 +80,7 @@ export class AppComponent {
   getPageTitle(): string {
     const route = this.currentRoute;
     if (route === '/' || route === '') return 'Analyze CV';
+    if (route.includes('/hiring-process')) return this.getReferralsLabel();
     if (route.includes('/candidates')) return 'Candidates';
     if (route.includes('/admin')) return 'Admin Panel';
     if (route.includes('/job-positions')) return 'Job Positions';
@@ -87,5 +88,9 @@ export class AppComponent {
     if (route.includes('/change-password')) return 'Change Password';
     if (route.includes('/preferences')) return 'Preferences';
     return 'Hunter';
+  }
+
+  getReferralsLabel(): string {
+    return this.isAdmin() ? 'Referrals' : 'My Referrals';
   }
 }

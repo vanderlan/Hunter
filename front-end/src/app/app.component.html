@@ -32,6 +32,11 @@
             <span *ngIf="sidenavExpanded">Candidates</span>
           </button>
 
+          <button mat-button routerLink="/hiring-process" routerLinkActive="active" class="nav-item">
+            <mat-icon>track_changes</mat-icon>
+            <span *ngIf="sidenavExpanded">{{ getReferralsLabel() }}</span>
+          </button>
+
           @if (isAdmin()) {
             <mat-divider *ngIf="sidenavExpanded"></mat-divider>
             <div class="section-label" *ngIf="sidenavExpanded">ADMIN</div>

@@ -1,0 +1,189 @@
+<div class="detail-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && process" class="content">
+    <!-- Header Card -->
+    <mat-card class="header-card">
+      <mat-card-header>
+        <div class="header-content">
+          <button mat-icon-button (click)="goBack()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div class="header-text">
+            <mat-card-title>Referral Details</mat-card-title>
+            <mat-card-subtitle>
+              {{ process.candidate.name }} - {{ process.jobPosition.title }}
+            </mat-card-subtitle>
+          </div>
+          <mat-chip [color]="getStatusColor(process.status)" selected class="status-chip">
+            {{ getStatusLabel(process.status) }}
+          </mat-chip>
+        </div>
+      </mat-card-header>
+    </mat-card>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+      <!-- Left Column -->
+      <div class="left-column">
+        <!-- Candidate & Job Info -->
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>person</mat-icon>
+              Candidate Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-item">
+              <span class="label">Name:</span>
+              <span class="value">{{ process.candidate.name || 'N/A' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Email:</span>
+              <span class="value">{{ process.candidate.email || 'N/A' }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>work</mat-icon>
+              Position Information
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-item">
+              <span class="label">Title:</span>
+              <span class="value">{{ process.jobPosition.title }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Company:</span>
+              <span class="value">{{ process.jobPosition.companyCode }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Job Code:</span>
+              <span class="value">{{ process.jobPosition.jobCode }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Update Status (Admin Only) -->
+        <mat-card class="status-update-card" *ngIf="isAdmin">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>update</mat-icon>
+              Update Status
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>New Status</mat-label>
+              <mat-select [(ngModel)]="selectedStatus">
+                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Notes (Optional)</mat-label>
+              <textarea matInput [(ngModel)]="statusNotes" rows="3" maxlength="1000"></textarea>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" (click)="updateStatus()" class="full-width">
+              <mat-icon>check</mat-icon>
+              Update Status
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+        <!-- Status History Timeline -->
+        <mat-card class="timeline-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>timeline</mat-icon>
+              Status History
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="timeline">
+              <div *ngFor="let history of process.statusHistory; let last = last" class="timeline-item">
+                <div class="timeline-marker" [class.active]="last"></div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <span class="status-change">
+                      <mat-chip [color]="getStatusColor(history.fromStatus)" selected>
+                        {{ getStatusLabel(history.fromStatus) }}
+                      </mat-chip>
+                      <mat-icon>arrow_forward</mat-icon>
+                      <mat-chip [color]="getStatusColor(history.toStatus)" selected>
+                        {{ getStatusLabel(history.toStatus) }}
+                      </mat-chip>
+                    </span>
+                  </div>
+                  <div class="timeline-meta">
+                    <span class="user">{{ history.changedByUserName }}</span>
+                    <span class="date">{{ history.createdAt | date:'medium' }}</span>
+                  </div>
+                  <div class="timeline-notes" *ngIf="history.notes">
+                    <p>{{ history.notes }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Notes Section -->
+        <mat-card class="notes-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>note</mat-icon>
+              Notes
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- Add Note Form -->
+            <div class="add-note">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Add a note...</mat-label>
+                <textarea matInput [(ngModel)]="newNote" rows="3" maxlength="2000"></textarea>
+              </mat-form-field>
+              <button mat-raised-button color="accent" (click)="addNote()" [disabled]="!newNote.trim()">
+                <mat-icon>add</mat-icon>
+                Add Note
+              </button>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Notes List -->
+            <div class="notes-list">
+              <div *ngFor="let note of process.notes" class="note-item">
+                <div class="note-header">
+                  <span class="note-user">{{ note.userName }}</span>
+                  <span class="note-date">{{ note.createdAt | date:'medium' }}</span>
+                </div>
+                <p class="note-text">{{ note.note }}</p>
+              </div>
+
+              <div *ngIf="process.notes.length === 0" class="no-notes">
+                <mat-icon>info_outline</mat-icon>
+                <p>No notes yet</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
