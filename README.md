@@ -279,7 +279,7 @@ POST /api/Candidates/Analyze  # Legacy endpoint (deprecated)
     "Model": "gpt-4o"
   },
   "DeepSeek": {
-    "ApiKey": "sk-your-deepseek-api-key",  // Optional: only if using DeepSeek
+    "ApiKey": "sk-your-deepseek-api-key",  // Required when using DeepSeek provider
     "Model": "deepseek-chat"
   },
   "JobScraper": {
@@ -334,11 +334,14 @@ POST /api/Candidates/Analyze  # Legacy endpoint (deprecated)
 }
 ```
 
-**Cost Comparison:**
+**Cost Comparison (Pricing as of January 2026):**
+
 | Provider | Cost per 1M tokens | Typical Monthly Cost |
 |----------|-------------------|---------------------|
 | OpenAI GPT-4o | $2.50 / $10.00 (in/out) | ~$15.60 |
 | DeepSeek | $0.27 / $1.10 (in/out) | ~$1.56 |
+
+*Note: AI provider pricing may change. Please check provider websites for current rates.*
 
 ## AI Job Enrichment
 
