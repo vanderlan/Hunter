@@ -171,18 +171,14 @@
             <mat-icon matListItemIcon>assignment</mat-icon>
             <div matListItemTitle class="history-item-title">
               {{ item.candidateName }}
-            </div>
-            <div matListItemLine class="history-item-subtitle">
-              {{ item.candidateEmail }}
-            </div>
-            <div matListItemLine class="history-item-meta">
-              <span class="history-item-matches">
-                <mat-icon class="small-icon">check_circle</mat-icon>
-                {{ item.matchesFound }} matches
+              <span class="inline-matches">
+                <mat-icon class="inline-icon">check_circle</mat-icon>
+                {{ item.matchesFound }}
               </span>
-              <span class="history-item-date">
-                {{ item.analyzedAt | date:'short' }}
-              </span>
+            </div>
+
+            <div matListItemLine class="history-item-date">
+              {{ item.analyzedAt | date:'short' }}
             </div>
           </mat-list-item>
         </mat-list>
