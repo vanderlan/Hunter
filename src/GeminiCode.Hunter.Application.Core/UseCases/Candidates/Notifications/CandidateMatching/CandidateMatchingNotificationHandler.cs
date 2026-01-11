@@ -136,8 +136,8 @@ public class CandidateMatchingNotificationHandler(
             // Send email with matching results
             if (matchResults.Any())
             {
-                await SendMatchingEmailAsync(matchResults, notification.SyncTimestamp);
-                logger.LogInformation("Candidate matching email sent successfully");
+                SendMatchingEmailAsync(matchResults, notification.SyncTimestamp);
+                logger.LogInformation("Candidate matching email sending initiated asynchronously");
             }
             else
             {
@@ -150,20 +150,21 @@ public class CandidateMatchingNotificationHandler(
         }
     }
 
-    private async Task SendMatchingEmailAsync(List<PositionMatchResult> matchResults, DateTime syncTime)
+    private void SendMatchingEmailAsync(List<PositionMatchResult> matchResults, DateTime syncTime)
     {
-        try
+        _ = Task.Run(async () =>
         {
-            logger.LogInformation("Sending candidate matching notification email");
-
-            await emailService.SendCandidateMatchingNotificationAsync(matchResults, syncTime);
-
-            logger.LogInformation("Candidate matching notification email sent successfully");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to send candidate matching notification email");
-        }
+            try
+            {
+                logger.LogInformation("Sending candidate matching notification email asynchronously");
+                await emailService.SendCandidateMatchingNotificationAsync(matchResults, syncTime);
+                logger.LogInformation("Candidate matching notification email sent successfully");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to send candidate matching notification email asynchronously");
+            }
+        });
     }
 }
 

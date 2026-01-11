@@ -57,6 +57,8 @@ public class UserCreatedNotificationHandlerTests
 
         // Act
         await _handler.Handle(notification, CancellationToken.None);
+        // Wait for async task to complete
+        await Task.Delay(100);
 
         // Assert
         _emailServiceMock.Verify(
@@ -74,6 +76,8 @@ public class UserCreatedNotificationHandlerTests
 
         // Act
         await _handler.Handle(notification, CancellationToken.None);
+        // Wait for async task to complete
+        await Task.Delay(100);
 
         // Assert
         _emailServiceMock.Verify(
