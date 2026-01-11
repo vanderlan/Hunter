@@ -68,10 +68,12 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     /// <param name="cvFile">The CV file in PDF format (max 10MB)</param>
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("Analyze")]
+    [RateLimit(10, 600)] // Max 10 requests per 10 minutes (600 seconds)
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> AnalyzeCv(IFormFile cvFile)
     {
         var request = new AnalyzeCvRequest { CvFile = cvFile };
