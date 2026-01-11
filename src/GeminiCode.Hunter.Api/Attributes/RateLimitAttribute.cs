@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Collections.Concurrent;
 using System.Net;
 
 namespace GeminiCode.Hunter.Api.Attributes;
@@ -10,8 +11,9 @@ namespace GeminiCode.Hunter.Api.Attributes;
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
 public class RateLimitAttribute : Attribute, IAsyncActionFilter
 {
-    private static readonly Dictionary<string, Queue<DateTime>> _requestHistory = new();
-    private static readonly object _lock = new();
+    private static readonly ConcurrentDictionary<string, Queue<DateTime>> _requestHistory = new();
+    private static DateTime _lastCleanup = DateTime.UtcNow;
+    private static readonly object _cleanupLock = new();
     
     private readonly int _maxRequests;
     private readonly TimeSpan _timeWindow;
@@ -37,18 +39,17 @@ public class RateLimitAttribute : Attribute, IAsyncActionFilter
             return;
         }
 
+        // Periodic cleanup of stale entries (every 5 minutes)
+        CleanupStaleEntries();
+
         var key = $"{ipAddress}:{context.ActionDescriptor.DisplayName}";
         var now = DateTime.UtcNow;
 
-        lock (_lock)
+        // Get or create the queue for this key
+        var requestTimes = _requestHistory.GetOrAdd(key, _ => new Queue<DateTime>());
+
+        lock (requestTimes)
         {
-            if (!_requestHistory.ContainsKey(key))
-            {
-                _requestHistory[key] = new Queue<DateTime>();
-            }
-
-            var requestTimes = _requestHistory[key];
-
             // Remove old requests outside the time window
             while (requestTimes.Count > 0 && (now - requestTimes.Peek()) > _timeWindow)
             {
@@ -77,6 +78,48 @@ public class RateLimitAttribute : Attribute, IAsyncActionFilter
         }
 
         await next();
+    }
+
+    private void CleanupStaleEntries()
+    {
+        var now = DateTime.UtcNow;
+        
+        // Only cleanup if 5 minutes have passed since last cleanup
+        if ((now - _lastCleanup).TotalMinutes < 5)
+        {
+            return;
+        }
+
+        lock (_cleanupLock)
+        {
+            // Double-check after acquiring lock
+            if ((now - _lastCleanup).TotalMinutes < 5)
+            {
+                return;
+            }
+
+            // Remove entries that have no requests in the last hour
+            var keysToRemove = new List<string>();
+            foreach (var kvp in _requestHistory)
+            {
+                lock (kvp.Value)
+                {
+                    // If queue is empty or all requests are older than 1 hour, mark for removal
+                    if (kvp.Value.Count == 0 || 
+                        (kvp.Value.Count > 0 && (now - kvp.Value.Last()) > TimeSpan.FromHours(1)))
+                    {
+                        keysToRemove.Add(kvp.Key);
+                    }
+                }
+            }
+
+            foreach (var key in keysToRemove)
+            {
+                _requestHistory.TryRemove(key, out _);
+            }
+
+            _lastCleanup = now;
+        }
     }
 
     private string GetClientIpAddress(HttpContext context)
