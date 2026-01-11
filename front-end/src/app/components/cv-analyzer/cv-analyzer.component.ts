@@ -10,9 +10,11 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-file-drop';
 import { JobService } from '../../services/job.service';
 import { HiringProcessService } from '../../services/hiring-process.service';
+import { CvAnalysisService, CvAnalysisHistoryItem } from '../../services/cv-analysis.service';
 import { JobMatch, JobPosition, CandidateInfo } from '../../models/job.model';
 
 @Component({
@@ -30,6 +32,7 @@ import { JobMatch, JobPosition, CandidateInfo } from '../../models/job.model';
     MatSnackBarModule,
     MatDialogModule,
     MatDividerModule,
+    MatListModule,
     NgxFileDropModule
   ],
   templateUrl: './cv-analyzer.component.html',
@@ -47,15 +50,65 @@ export class CvAnalyzerComponent implements OnInit {
   availablePositions: JobPosition[] = [];
   loadingPositions = false;
 
+  // Analysis history section
+  analysisHistory: CvAnalysisHistoryItem[] = [];
+  loadingHistory = false;
+  historyPage = 1;
+  historyPageSize = 10;
+  historyTotalCount = 0;
+
   constructor(
     private jobService: JobService,
     private hiringProcessService: HiringProcessService,
+    private cvAnalysisService: CvAnalysisService,
     private snackBar: MatSnackBar,
     public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.fetchAvailablePositions();
+    this.loadAnalysisHistory();
+  }
+
+  loadAnalysisHistory(): void {
+    this.loadingHistory = true;
+    this.cvAnalysisService.getHistory(this.historyPage, this.historyPageSize).subscribe({
+      next: (response) => {
+        this.analysisHistory = response.items;
+        this.historyTotalCount = response.count;
+        this.loadingHistory = false;
+      },
+      error: (error) => {
+        this.loadingHistory = false;
+        console.error('Error loading analysis history:', error);
+      }
+    });
+  }
+
+  viewHistoricalAnalysis(historyItem: CvAnalysisHistoryItem): void {
+    this.analyzing = true;
+    this.cvAnalysisService.getAnalysisDetail(historyItem.analysisId).subscribe({
+      next: (response) => {
+        this.analyzing = false;
+        this.matches = response.matches;
+        this.totalPositions = response.totalPositionsAnalyzed;
+        this.candidateInfo = response.candidateInfo;
+        this.selectedFile = null;
+        this.snackBar.open(
+          `Loaded analysis from ${new Date(response.analyzedAt).toLocaleDateString()}`,
+          'Close',
+          { duration: 3000 }
+        );
+      },
+      error: (error) => {
+        this.analyzing = false;
+        this.snackBar.open(
+          error.error?.message || 'Error loading analysis',
+          'Close',
+          { duration: 5000 }
+        );
+      }
+    });
   }
 
   fetchAvailablePositions(): void {
@@ -144,6 +197,8 @@ export class CvAnalyzerComponent implements OnInit {
           'Close',
           { duration: 5000 }
         );
+        // Reload history to show new analysis
+        this.loadAnalysisHistory();
       },
       error: (error) => {
         this.analyzing = false;

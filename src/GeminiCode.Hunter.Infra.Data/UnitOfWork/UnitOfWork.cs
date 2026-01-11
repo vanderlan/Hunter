@@ -43,6 +43,9 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private IHiringProcessStatusHistoryRepository _hiringProcessStatusHistoryRepository;
     public IHiringProcessStatusHistoryRepository HiringProcessStatusHistoryRepository => _hiringProcessStatusHistoryRepository ??= new HiringProcessStatusHistoryRepository(DbContext);
 
+    private ICvAnalysisRepository _cvAnalysisRepository;
+    public ICvAnalysisRepository CvAnalysisRepository => _cvAnalysisRepository ??= new CvAnalysisRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try

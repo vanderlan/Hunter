@@ -10,6 +10,8 @@ using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using System.IO;
 using FileEntity = GeminiCode.Hunter.Domain.Core.Entities.File;
+using CvAnalysisEntity = GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis;
+using CvAnalysisMatchEntity = GeminiCode.Hunter.Domain.Core.Entities.CvAnalysisMatch;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
 
@@ -102,6 +104,9 @@ public class AnalyzeCvRequestHandler(
 
             // Store the PDF file after successful analysis
             await StoreCvPdfAsync(request.CvFile, candidate.CandidateId);
+
+            // Save analysis history
+            await SaveAnalysisHistoryAsync(candidate.CandidateId, user.UserId, jobPositions.Count, filteredMatches, jobPositions);
 
             // Map to response DTOs with full job details
             var response = new AnalyzeCvResponse
@@ -258,6 +263,64 @@ public class AnalyzeCvRequestHandler(
             logger.LogError(ex, "Error storing CV PDF for candidate {CandidateId}", candidateId);
             // Don't throw - we don't want to fail the entire analysis if file storage fails
             // The CV text and analysis results are already stored
+        }
+    }
+
+    private async Task SaveAnalysisHistoryAsync(
+        long candidateId, 
+        long userId, 
+        int totalPositions, 
+        List<JobMatchResult> matches,
+        List<JobPosition> jobPositions)
+    {
+        try
+        {
+            logger.LogInformation("Saving CV analysis history for candidate {CandidateId}", candidateId);
+
+            var cvAnalysis = new CvAnalysisEntity
+            {
+                CandidateId = candidateId,
+                UserId = userId,
+                AnalyzedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified),
+                TotalPositionsAnalyzed = totalPositions,
+                MatchesFound = matches.Count
+            };
+
+            await unitOfWork.CvAnalysisRepository.AddAsync(cvAnalysis);
+            await unitOfWork.CommitAsync();
+
+            // Save matches
+            foreach (var match in matches)
+            {
+                var job = jobPositions.First(j => j.JobCode == match.JobCode);
+                
+                var analysisMatch = new CvAnalysisMatchEntity
+                {
+                    CvAnalysisId = cvAnalysis.CvAnalysisId,
+                    JobPositionId = job.JobPositionId,
+                    MatchPercentage = match.MatchPercentage,
+                    MatchReason = match.MatchReason,
+                    MatchingSkills = System.Text.Json.JsonSerializer.Serialize(match.MatchingSkills),
+                    MissingSkills = System.Text.Json.JsonSerializer.Serialize(match.MissingSkills),
+                    JobTitle = job.Title,
+                    JobCode = job.JobCode,
+                    CompanyCode = job.CompanyCode,
+                    JobSummary = job.Summary,
+                    MustHaveSkills = job.MustHaveSkills,
+                    NiceToHaveSkills = job.NiceToHaveSkills
+                };
+
+                cvAnalysis.Matches.Add(analysisMatch);
+            }
+
+            await unitOfWork.CommitAsync();
+
+            logger.LogInformation("CV analysis history saved successfully. Analysis ID: {AnalysisId}", cvAnalysis.PublicId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error saving CV analysis history for candidate {CandidateId}", candidateId);
+            // Don't throw - we don't want to fail the entire analysis if history save fails
         }
     }
 }

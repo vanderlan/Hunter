@@ -14,6 +14,7 @@ public interface IUnitOfWork: IDisposable
     IHiringProcessRepository HiringProcessRepository { get; }
     IHiringProcessNoteRepository HiringProcessNoteRepository { get; }
     IHiringProcessStatusHistoryRepository HiringProcessStatusHistoryRepository { get; }
+    ICvAnalysisRepository CvAnalysisRepository { get; }
     Task CommitAsync();
     void DiscardChanges();
 }

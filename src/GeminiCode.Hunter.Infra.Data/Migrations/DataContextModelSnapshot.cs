@@ -119,6 +119,132 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.ToTable("CandidateFile", (string)null);
                 });
 
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis", b =>
+                {
+                    b.Property<long>("CvAnalysisId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("CvAnalysisId"));
+
+                    b.Property<DateTime>("AnalyzedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("CandidateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("MatchesFound")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("TotalPositionsAnalyzed")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CvAnalysisId");
+
+                    b.HasIndex("AnalyzedAt")
+                        .IsDescending();
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CvAnalysis", (string)null);
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysisMatch", b =>
+                {
+                    b.Property<long>("CvAnalysisMatchId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("CvAnalysisMatchId"));
+
+                    b.Property<string>("CompanyCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("CvAnalysisId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<long>("JobPositionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("JobSummary")
+                        .HasColumnType("text");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal>("MatchPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<string>("MatchReason")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MatchingSkills")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MissingSkills")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MustHaveSkills")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NiceToHaveSkills")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("CvAnalysisMatchId");
+
+                    b.HasIndex("CvAnalysisId");
+
+                    b.HasIndex("JobPositionId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.ToTable("CvAnalysisMatch", (string)null);
+                });
+
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.File", b =>
                 {
                     b.Property<long>("FileId")
@@ -534,6 +660,44 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Navigation("File");
                 });
 
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysisMatch", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis", "CvAnalysis")
+                        .WithMany("Matches")
+                        .HasForeignKey("CvAnalysisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.JobPosition", "JobPosition")
+                        .WithMany()
+                        .HasForeignKey("JobPositionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CvAnalysis");
+
+                    b.Navigation("JobPosition");
+                });
+
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.HiringProcess", b =>
                 {
                     b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.Candidate", "Candidate")
@@ -604,6 +768,11 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Navigation("ChangedByUser");
 
                     b.Navigation("HiringProcess");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis", b =>
+                {
+                    b.Navigation("Matches");
                 });
 #pragma warning restore 612, 618
         }
