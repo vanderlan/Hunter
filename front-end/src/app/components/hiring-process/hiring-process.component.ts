@@ -13,6 +13,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
+import { AuthService } from '../../services/auth.service';
 import { HiringProcessListItem, DashboardStats } from '../../models/hiring-process.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -58,6 +59,7 @@ export class HiringProcessComponent implements OnInit {
 
   constructor(
     private hiringProcessService: HiringProcessService,
+    private authService: AuthService,
     private snackBar: MatSnackBar,
     private router: Router
   ) {
@@ -123,6 +125,14 @@ export class HiringProcessComponent implements OnInit {
 
   viewProcess(process: HiringProcessListItem): void {
     this.router.navigate(['/hiring-process', process.publicId]);
+  }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
+  getReferralsLabel(): string {
+    return this.isAdmin() ? 'Referrals' : 'My Referrals';
   }
 
   getStatusColor(status: string): string {

@@ -34,7 +34,7 @@
 
           <button mat-button routerLink="/hiring-process" routerLinkActive="active" class="nav-item">
             <mat-icon>track_changes</mat-icon>
-            <span *ngIf="sidenavExpanded">My Referrals</span>
+            <span *ngIf="sidenavExpanded">{{ getReferralsLabel() }}</span>
           </button>
 
           @if (isAdmin()) {

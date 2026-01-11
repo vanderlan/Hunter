@@ -4,14 +4,14 @@
     <mat-card-header>
       <mat-card-title>
         <mat-icon>dashboard</mat-icon>
-        Referrals Dashboard
+        {{ getReferralsLabel() }} Dashboard
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
       <div class="stats-grid">
         <div class="stat-item">
           <div class="stat-value">{{ dashboard.totalProcesses }}</div>
-          <div class="stat-label">Total Referrals</div>
+          <div class="stat-label">Total {{ getReferralsLabel() }}</div>
         </div>
         <div class="stat-item accent">
           <div class="stat-value">{{ dashboard.activeProcesses }}</div>
