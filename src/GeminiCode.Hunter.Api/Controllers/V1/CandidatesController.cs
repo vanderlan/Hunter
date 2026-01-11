@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using static GeminiCode.Hunter.Domain.Core.Authentication.AuthorizationConfiguration;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GeminiCode.Hunter.Api.Controllers.V1;
 
@@ -68,7 +69,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     /// <param name="cvFile">The CV file in PDF format (max 10MB)</param>
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("Analyze")]
-    [RateLimit(10, 600)] // Max 10 requests per 10 minutes (600 seconds)
+    [EnableRateLimiting("cvanalysis")]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

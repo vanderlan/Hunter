@@ -27,6 +27,8 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseRateLimiter();
+
 app.ConfigureApp();
 
 app.RunMigrations();

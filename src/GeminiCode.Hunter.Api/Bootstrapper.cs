@@ -9,6 +9,8 @@ using GeminiCode.Hunter.Application.Core.BackgroundServices;
 using GeminiCode.Hunter.Crosscutting.Ioc.Dependencies;
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using Microsoft.FeatureManagement;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GeminiCode.Hunter.Api;
 
@@ -86,5 +88,44 @@ public static class Bootstrapper
 
         // Register background service for automatic job synchronization
         services.AddHostedService<JobSyncBackgroundService>();
+
+        // Configure rate limiting
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            // Login rate limit: 5 requests per minute per IP
+            options.AddFixedWindowLimiter("login", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = configuration.GetValue<int>("RateLimiting:Login:PermitLimit", 5);
+                limiterOptions.Window = TimeSpan.FromSeconds(configuration.GetValue<int>("RateLimiting:Login:WindowInSeconds", 60));
+                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                limiterOptions.QueueLimit = 0;
+            });
+
+            // CV Analysis rate limit: 10 requests per 10 minutes per IP
+            options.AddFixedWindowLimiter("cvanalysis", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = configuration.GetValue<int>("RateLimiting:CvAnalysis:PermitLimit", 10);
+                limiterOptions.Window = TimeSpan.FromSeconds(configuration.GetValue<int>("RateLimiting:CvAnalysis:WindowInSeconds", 600));
+                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                limiterOptions.QueueLimit = 0;
+            });
+
+            options.OnRejected = async (context, cancellationToken) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.ContentType = "application/json";
+                
+                var response = new
+                {
+                    title = "Rate limit exceeded",
+                    errors = new[] { "Too many requests. Please try again later." },
+                    type = "Error"
+                };
+                
+                await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+            };
+        });
     }
 }
