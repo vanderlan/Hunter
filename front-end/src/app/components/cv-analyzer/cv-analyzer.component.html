@@ -68,7 +68,7 @@
           <div class="results-header">
             <h2>
               <mat-icon>check_circle</mat-icon>
-              Found {{ matches.length }} Matching Positions
+              Found {{ matches.length }} Matching Positions{{ candidateInfo?.name ? (' for ' + candidateInfo?.name) : '' }}
             </h2>
             <p>Out of {{ totalPositions }} analyzed positions</p>
             <div class="header-actions">
