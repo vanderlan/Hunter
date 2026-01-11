@@ -5,7 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chip';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -74,7 +74,8 @@ export class HiringProcessDetailComponent implements OnInit {
     this.hiringProcessService.getHiringProcessById(id).subscribe({
       next: (data) => {
         this.process = data;
-        this.selectedStatus = data.status as HiringProcessStatus;
+        // Map string status from API to numeric enum for the select dropdown
+        this.selectedStatus = this.mapStringToEnum(data.status);
         this.loading = false;
       },
       error: (error) => {
@@ -86,12 +87,32 @@ export class HiringProcessDetailComponent implements OnInit {
     });
   }
 
+  mapStringToEnum(status: string): HiringProcessStatus {
+    switch (status) {
+      case 'Referred':
+        return HiringProcessStatus.Referred;
+      case 'Screening':
+        return HiringProcessStatus.Screening;
+      case 'ConsultantTechnicalInterview':
+        return HiringProcessStatus.ConsultantTechnicalInterview;
+      case 'ClientInterview':
+        return HiringProcessStatus.ClientInterview;
+      case 'Hired':
+        return HiringProcessStatus.Hired;
+      case 'Reproved':
+        return HiringProcessStatus.Reproved;
+      default:
+        return HiringProcessStatus.Referred;
+    }
+  }
+
   updateStatus(): void {
     if (!this.process || !this.selectedStatus || !this.isAdmin) {
       return;
     }
 
-    if (this.selectedStatus === this.process.status) {
+    const currentStatusEnum = this.mapStringToEnum(this.process.status);
+    if (this.selectedStatus === currentStatusEnum) {
       this.snackBar.open('Please select a different status', 'Close', { duration: 3000 });
       return;
     }

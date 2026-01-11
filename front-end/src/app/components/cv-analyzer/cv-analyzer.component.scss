@@ -115,7 +115,7 @@
 
   .ai-loading {
     margin: 0 auto 24px;
-    
+
     .ai-star {
       font-size: 80px;
       width: 80px;
@@ -146,7 +146,8 @@
 }
 
 @keyframes aiPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
@@ -216,38 +217,57 @@
 }
 
 .match-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
   mat-card-header {
-    background: linear-gradient(135deg, #5f1f1f 0%, #b13a2f 100%);
+    background: linear-gradient(135deg, #5f1f1f 0%, #81261d 100%);
     color: white;
-    padding: 16px;
-    margin: 10px;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 5px;
 
     mat-card-title {
       color: white;
       font-size: 18px;
       font-weight: 500;
+      margin: 0;
     }
 
     mat-card-subtitle {
       color: rgba(255, 255, 255, 0.9);
       font-size: 14px;
+      margin: 8px 0 0 0;
     }
   }
 
   mat-card-content {
     padding: 24px 16px;
+    flex: 1;
+  }
+
+  mat-card-actions {
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    button {
+      margin: 0;
+    }
   }
 }
 
 .match-percentage {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   h3 {
     font-size: 24px;
     font-weight: 600;
-    margin: 0 0 12px;
-    color:#5f1f1f;
+    margin: 0 0 12px 0;
+    color: #5f1f1f;
   }
 
   mat-progress-bar {
@@ -261,7 +281,7 @@
   background-color: #f5f5f5;
   border-radius: 8px;
   border-left: 4px solid #5f1f1f;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   line-height: 1.6;
   color: #333;
 }

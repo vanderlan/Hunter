@@ -1,12 +1,15 @@
+using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using static GeminiCode.Hunter.Domain.Core.Authentication.AuthorizationConfiguration;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Queries.GetPaginated;
 
 public class HiringProcessGetPaginatedRequestHandler(
     IUnitOfWork unitOfWork,
+    ICurrentUser currentUser,
     ILogger<HiringProcessGetPaginatedRequestHandler> logger)
     : IRequestHandler<HiringProcessGetPaginatedRequest, PagedList<HiringProcessGetPaginatedResponse>>
 {
@@ -16,6 +19,14 @@ public class HiringProcessGetPaginatedRequestHandler(
     {
         logger.LogInformation("Getting paginated hiring processes. Page: {Page}, Quantity: {Quantity}", 
             request.Page, request.Quantity);
+
+        var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id);
+
+        if (!currentUser.Profile.Equals(Roles.Admin, StringComparison.OrdinalIgnoreCase))
+        {
+            request.CreatedByUserId = user.UserId;
+            logger.LogInformation("Partner user filtering by CreatedByUserId: {UserId}", user.UserId);
+        }
 
         var pagedHiringProcesses = await unitOfWork.HiringProcessRepository.ListPaginateAsync(request);
 

@@ -1,4 +1,6 @@
+using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
+using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -7,6 +9,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Queries.GetD
 
 public class HiringProcessGetDashboardRequestHandler(
     IUnitOfWork unitOfWork,
+    ICurrentUser currentUser,
     ILogger<HiringProcessGetDashboardRequestHandler> logger)
     : IRequestHandler<HiringProcessGetDashboardRequest, HiringProcessGetDashboardResponse>
 {
@@ -16,7 +19,23 @@ public class HiringProcessGetDashboardRequestHandler(
     {
         logger.LogInformation("Getting hiring process dashboard statistics");
 
-        var stats = await unitOfWork.HiringProcessRepository.GetDashboardStatsAsync();
+        // Get current user to check role
+        var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
+            ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
+
+        Dictionary<HiringProcessStatus, int> stats;
+
+        // If user is not admin, get stats only for their referrals
+        if (!currentUser.Profile.Equals("admin", StringComparison.OrdinalIgnoreCase))
+        {
+            stats = await unitOfWork.HiringProcessRepository.GetDashboardStatsByUserAsync(user.UserId);
+            logger.LogInformation("Partner user viewing dashboard for their referrals only. UserId: {UserId}", user.UserId);
+        }
+        else
+        {
+            stats = await unitOfWork.HiringProcessRepository.GetDashboardStatsAsync();
+            logger.LogInformation("Admin user viewing all dashboard statistics");
+        }
 
         var statusCounts = stats.ToDictionary(
             kvp => kvp.Key.ToString(), 

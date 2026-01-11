@@ -5,7 +5,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Upd
 
 public class UpdateHiringProcessStatusRequest : IRequest
 {
-    public required string PublicId { get; set; }
+    public string PublicId { get; set; } = string.Empty;
     public required HiringProcessStatus NewStatus { get; set; }
     public string? Notes { get; set; }
 }

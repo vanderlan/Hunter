@@ -6,10 +6,6 @@ public class AddHiringProcessNoteRequestValidator : AbstractValidator<AddHiringP
 {
     public AddHiringProcessNoteRequestValidator()
     {
-        RuleFor(x => x.HiringProcessId)
-            .NotEmpty()
-            .WithMessage("Hiring Process ID is required");
-
         RuleFor(x => x.Note)
             .NotEmpty()
             .WithMessage("Note is required")

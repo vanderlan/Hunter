@@ -80,6 +80,7 @@ export class AppComponent {
   getPageTitle(): string {
     const route = this.currentRoute;
     if (route === '/' || route === '') return 'Analyze CV';
+    if (route.includes('/hiring-process')) return 'My Referrals';
     if (route.includes('/candidates')) return 'Candidates';
     if (route.includes('/admin')) return 'Admin Panel';
     if (route.includes('/job-positions')) return 'Job Positions';

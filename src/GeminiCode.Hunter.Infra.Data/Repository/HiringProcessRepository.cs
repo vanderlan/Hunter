@@ -72,6 +72,17 @@ public class HiringProcessRepository(DataContext dataContext) : BaseEntityReposi
         return stats.ToDictionary(x => x.Status, x => x.Count);
     }
 
+    public async Task<Dictionary<HiringProcessStatus, int>> GetDashboardStatsByUserAsync(long userId)
+    {
+        var stats = await DataContext.Set<HiringProcess>()
+            .Where(x => x.CreatedByUserId == userId)
+            .GroupBy(x => x.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToListAsync();
+
+        return stats.ToDictionary(x => x.Status, x => x.Count);
+    }
+
     private static IQueryable<HiringProcess> ApplyFilters(HiringProcessFilter filter, IQueryable<HiringProcess> query)
     {
         if (filter.CandidateId.HasValue)

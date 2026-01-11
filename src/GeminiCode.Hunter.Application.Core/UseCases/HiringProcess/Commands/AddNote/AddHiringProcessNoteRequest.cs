@@ -4,6 +4,6 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Add
 
 public class AddHiringProcessNoteRequest : IRequest
 {
-    public required string HiringProcessId { get; set; }
+    public string HiringProcessId { get; set; } = string.Empty;
     public required string Note { get; set; }
 }

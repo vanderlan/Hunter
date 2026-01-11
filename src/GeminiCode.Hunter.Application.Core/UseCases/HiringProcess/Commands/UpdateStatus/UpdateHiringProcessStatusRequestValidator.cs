@@ -6,10 +6,6 @@ public class UpdateHiringProcessStatusRequestValidator : AbstractValidator<Updat
 {
     public UpdateHiringProcessStatusRequestValidator()
     {
-        RuleFor(x => x.PublicId)
-            .NotEmpty()
-            .WithMessage("Public ID is required");
-
         RuleFor(x => x.NewStatus)
             .IsInEnum()
             .WithMessage("Invalid status");

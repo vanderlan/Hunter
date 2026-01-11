@@ -17,6 +17,10 @@ public class UpdateHiringProcessStatusRequestHandler(
         logger.LogInformation("Updating hiring process status: {PublicId} to {NewStatus}", 
             request.PublicId, request.NewStatus);
 
+        // Get current user entity to obtain UserId
+        var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
+            ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
+
         var hiringProcess = await unitOfWork.HiringProcessRepository.GetByIdAsync(request.PublicId);
         
         if (hiringProcess == null)
@@ -25,12 +29,11 @@ public class UpdateHiringProcessStatusRequestHandler(
             throw new NotFoundException($"Hiring process with ID {request.PublicId} not found");
         }
 
-        var userId = long.Parse(currentUser.Id);
         var oldStatus = hiringProcess.Status;
 
         // Update status
         hiringProcess.Status = request.NewStatus;
-        hiringProcess.LastUpdatedByUserId = userId;
+        hiringProcess.LastUpdatedByUserId = user.UserId;
         unitOfWork.HiringProcessRepository.Update(hiringProcess);
 
         // Create status history entry
@@ -39,7 +42,7 @@ public class UpdateHiringProcessStatusRequestHandler(
             HiringProcessId = hiringProcess.HiringProcessId,
             FromStatus = oldStatus,
             ToStatus = request.NewStatus,
-            ChangedByUserId = userId,
+            ChangedByUserId = user.UserId,
             Notes = request.Notes
         };
 

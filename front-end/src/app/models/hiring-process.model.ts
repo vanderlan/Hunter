@@ -1,6 +1,6 @@
 export interface HiringProcess {
   publicId: string;
-  status: HiringProcessStatus;
+  status: string; // Backend sends status as string (e.g., "Referred", "Screening")
   candidate: CandidateInfo;
   jobPosition: JobPositionInfo;
   createdByUser: UserInfo;
@@ -71,12 +71,12 @@ export interface PagedHiringProcesses {
 }
 
 export enum HiringProcessStatus {
-  Referred = 'Referred',
-  Screening = 'Screening',
-  ConsultantTechnicalInterview = 'ConsultantTechnicalInterview',
-  ClientInterview = 'ClientInterview',
-  Hired = 'Hired',
-  Reproved = 'Reproved'
+  Referred = 1,
+  Screening = 2,
+  ConsultantTechnicalInterview = 3,
+  ClientInterview = 4,
+  Hired = 5,
+  Reproved = 6
 }
 
 export interface StartHiringProcessRequest {

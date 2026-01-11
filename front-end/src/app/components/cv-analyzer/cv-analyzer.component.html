@@ -134,13 +134,9 @@
             </mat-card-content>
 
             <mat-card-actions>
-              <a mat-button [href]="match.externalUrl" target="_blank">
-                <mat-icon>open_in_new</mat-icon>
-                View Job Details
-              </a>
               <button mat-raised-button color="primary" (click)="startHiringProcess(match)" *ngIf="candidateInfo">
-                <mat-icon>play_arrow</mat-icon>
-                Start Hiring Process
+                <mat-icon>person_add</mat-icon>
+                Refer Candidate
               </button>
             </mat-card-actions>
           </mat-card>

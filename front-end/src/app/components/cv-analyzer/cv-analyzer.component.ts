@@ -208,13 +208,13 @@ export class CvAnalyzerComponent implements OnInit {
     }).subscribe({
       next: (response) => {
         this.snackBar.open(
-          `Hiring process started successfully! Admin users have been notified.`,
+          `Candidate referral submitted successfully! Admin will review and decide whether to start the hiring process.`,
           'Close',
-          { duration: 5000 }
+          { duration: 6000 }
         );
       },
       error: (error) => {
-        const message = error.error?.message || 'Error starting hiring process. It may already exist.';
+        const message = error.error?.message || 'Error submitting referral. It may already exist.';
         this.snackBar.open(message, 'Close', { duration: 5000 });
       }
     });

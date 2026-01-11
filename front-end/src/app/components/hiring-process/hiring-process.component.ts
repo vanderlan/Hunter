@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatChipsModule } from '@angular/material/chip';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +14,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { HiringProcessListItem, DashboardStats } from '../../models/hiring-process.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-hiring-process',
@@ -43,6 +45,7 @@ export class HiringProcessComponent implements OnInit {
   currentPage = 1;
   searchQuery = '';
   dashboard: DashboardStats | null = null;
+  private searchSubject = new Subject<string>();
   
   displayedColumns: string[] = [
     'candidateName',
@@ -57,7 +60,16 @@ export class HiringProcessComponent implements OnInit {
     private hiringProcessService: HiringProcessService,
     private snackBar: MatSnackBar,
     private router: Router
-  ) {}
+  ) {
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.currentPage = 1;
+      this.loadProcesses();
+    });
+  }
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -104,9 +116,9 @@ export class HiringProcessComponent implements OnInit {
     this.loadProcesses();
   }
 
-  onSearch(): void {
-    this.currentPage = 1;
-    this.loadProcesses();
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   viewProcess(process: HiringProcessListItem): void {

@@ -20,6 +20,10 @@ public class StartHiringProcessRequestHandler(
         logger.LogInformation("Starting hiring process for Candidate: {CandidateId}, JobPosition: {JobPositionId}", 
             request.CandidateId, request.JobPositionId);
 
+        // Get current user entity to obtain UserId
+        var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
+            ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
+
         // Get candidate
         var candidate = await unitOfWork.CandidateRepository.GetByIdAsync(request.CandidateId);
         if (candidate == null)
@@ -47,26 +51,27 @@ public class StartHiringProcessRequestHandler(
             throw new ConflictException("A hiring process already exists for this candidate and job position");
         }
 
-        var userId = long.Parse(currentUser.Id);
-
         // Create hiring process
         var hiringProcess = new Domain.Core.Entities.HiringProcess
         {
             CandidateId = candidate.CandidateId,
             JobPositionId = jobPosition.JobPositionId,
             Status = HiringProcessStatus.Referred,
-            CreatedByUserId = userId
+            CreatedByUserId = user.UserId
         };
 
         await unitOfWork.HiringProcessRepository.AddAsync(hiringProcess);
+        
+        // Commit to generate HiringProcessId
+        await unitOfWork.CommitAsync();
 
-        // Create initial status history entry
+        // Create initial status history entry (now that we have HiringProcessId)
         var statusHistory = new Domain.Core.Entities.HiringProcessStatusHistory
         {
             HiringProcessId = hiringProcess.HiringProcessId,
             FromStatus = HiringProcessStatus.Referred,
             ToStatus = HiringProcessStatus.Referred,
-            ChangedByUserId = userId,
+            ChangedByUserId = user.UserId,
             Notes = "Initial hiring process creation"
         };
 

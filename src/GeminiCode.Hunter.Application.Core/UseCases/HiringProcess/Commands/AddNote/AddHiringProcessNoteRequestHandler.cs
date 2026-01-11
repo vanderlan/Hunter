@@ -16,6 +16,10 @@ public class AddHiringProcessNoteRequestHandler(
     {
         logger.LogInformation("Adding note to hiring process: {HiringProcessId}", request.HiringProcessId);
 
+        // Get current user entity to obtain UserId
+        var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
+            ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
+
         var hiringProcess = await unitOfWork.HiringProcessRepository.GetByIdAsync(request.HiringProcessId);
         
         if (hiringProcess == null)
@@ -24,12 +28,10 @@ public class AddHiringProcessNoteRequestHandler(
             throw new NotFoundException($"Hiring process with ID {request.HiringProcessId} not found");
         }
 
-        var userId = long.Parse(currentUser.Id);
-
         var note = new Domain.Core.Entities.HiringProcessNote
         {
             HiringProcessId = hiringProcess.HiringProcessId,
-            UserId = userId,
+            UserId = user.UserId,
             Note = request.Note.Trim()
         };
 
