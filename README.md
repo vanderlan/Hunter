@@ -252,8 +252,9 @@ PUT  /api/Users/Password  # Change own password
 
 ### Candidates
 ```http
-POST /api/Candidates/Analyze  # Legacy endpoint (deprecated)
-# Use /api/CvAnalysis/Analyze instead
+POST /api/Candidates/Analyze  # Deprecated: Use /api/CvAnalysis/Analyze
+# This endpoint is maintained for backward compatibility
+# Consider migrating to the new endpoint
 ```
 
 ## Configuration
@@ -289,7 +290,7 @@ POST /api/Candidates/Analyze  # Legacy endpoint (deprecated)
     "SmtpHost": "smtp.gmail.com",
     "SmtpPort": 587,
     "FromEmail": "your@email.com",
-    "ToEmails": ["recipient@email.com"],  // Array of recipients
+    "ToEmails": ["recipient@email.com"],  // Array of recipients (or use "ToEmail" for single)
     "Password": "your-app-password",
     "EnableSsl": true,
     "ApplicationUrl": "http://localhost:5200"
