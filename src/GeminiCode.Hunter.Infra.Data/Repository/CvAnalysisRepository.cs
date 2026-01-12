@@ -44,4 +44,26 @@ public class CvAnalysisRepository(DataContext dataContext)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.PublicId == publicId);
     }
+
+    public async Task DeleteByCandidateIdAsync(long candidateId)
+    {
+        var existingAnalyses = await DataContext.CvAnalyses
+            .Include(x => x.Matches)
+            .Where(x => x.CandidateId == candidateId)
+            .ToListAsync();
+
+        if (existingAnalyses.Any())
+        {
+            // Delete all matches first (due to foreign key constraint)
+            foreach (var analysis in existingAnalyses)
+            {
+                DataContext.CvAnalysisMatches.RemoveRange(analysis.Matches);
+            }
+
+            // Then delete all analyses
+            DataContext.CvAnalyses.RemoveRange(existingAnalyses);
+            
+            await DataContext.SaveChangesAsync();
+        }
+    }
 }

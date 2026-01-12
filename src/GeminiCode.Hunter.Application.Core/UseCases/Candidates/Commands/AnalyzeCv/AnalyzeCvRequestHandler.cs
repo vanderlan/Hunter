@@ -277,6 +277,9 @@ public class AnalyzeCvRequestHandler(
         {
             logger.LogInformation("Saving CV analysis history for candidate {CandidateId}", candidateId);
 
+            logger.LogInformation("Deleting previous analysis records for candidate {CandidateId}", candidateId);
+            await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidateId);
+
             var cvAnalysis = new CvAnalysisEntity
             {
                 CandidateId = candidateId,
