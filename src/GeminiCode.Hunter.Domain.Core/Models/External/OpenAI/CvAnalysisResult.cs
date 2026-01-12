@@ -13,5 +13,6 @@ public record JobMatchResult(
     string MatchReason,
     List<string> MatchingSkills,
     List<string> MissingSkills,
-    string ReferralReason
+    string ReferralReason,
+    string WhatIsMissingForPerfectMatch
 );

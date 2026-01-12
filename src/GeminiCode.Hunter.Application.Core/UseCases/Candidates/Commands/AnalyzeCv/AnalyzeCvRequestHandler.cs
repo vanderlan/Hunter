@@ -136,7 +136,8 @@ public class AnalyzeCvRequestHandler(
                         Summary = job.Summary,
                         MustHaveSkills = job.MustHaveSkills,
                         NiceToHaveSkills = job.NiceToHaveSkills,
-                        ReferralReason = match.ReferralReason
+                        ReferralReason = match.ReferralReason,
+                        WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch
                     };
                 }).ToList()
             };
@@ -311,7 +312,8 @@ public class AnalyzeCvRequestHandler(
                     CompanyCode = job.CompanyCode,
                     JobSummary = job.Summary,
                     MustHaveSkills = job.MustHaveSkills,
-                    NiceToHaveSkills = job.NiceToHaveSkills
+                    NiceToHaveSkills = job.NiceToHaveSkills,
+                    WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch
                 };
 
                 cvAnalysis.Matches.Add(analysisMatch);

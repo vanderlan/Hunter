@@ -183,11 +183,11 @@
             </div>
           </mat-expansion-panel>
 
-          <mat-expansion-panel *ngIf="match.summary">
+          <mat-expansion-panel *ngIf="match.whatIsMissingForPerfectMatch">
             <mat-expansion-panel-header>
-              <mat-panel-title>Job Description</mat-panel-title>
+              <mat-panel-title>What is missing for a perfect match?</mat-panel-title>
             </mat-expansion-panel-header>
-            <p>{{ match.summary }}</p>
+            <p>{{ match.whatIsMissingForPerfectMatch }}</p>
           </mat-expansion-panel>
         </mat-card-content>
 

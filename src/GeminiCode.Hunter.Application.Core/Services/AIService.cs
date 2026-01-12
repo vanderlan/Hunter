@@ -165,7 +165,8 @@ public class AIService : IAIService
                     m.MatchReason,
                     [.. m.MatchingSkills],
                     [.. m.MissingSkills],
-                    m.ReferralReason
+                    m.ReferralReason,
+                    m.WhatIsMissingForPerfectMatch
                 )).ToList()
             );
 
@@ -321,6 +322,11 @@ public class AIService : IAIService
         sb.AppendLine("   - What makes them stand out for THIS specific role");
         sb.AppendLine("   - Write in first person as if you're the recruiter referring them");
         sb.AppendLine("   - Example: \"I consider [Name] a strong potential talent for [Company] because...");
+        sb.AppendLine("6. Generate 'What is missing for a perfect match?' (2-4 sentences) explaining:");
+        sb.AppendLine("   - Specific skills, experiences, or qualifications the candidate needs to develop");
+        sb.AppendLine("   - Areas where the candidate could improve to reach 100% match");
+        sb.AppendLine("   - Be constructive and actionable");
+        sb.AppendLine("   - If match is already very high (95%+), mention minor improvements or continued development");
         sb.AppendLine();
         sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
@@ -337,7 +343,8 @@ public class AIService : IAIService
         sb.AppendLine("      \"matchReason\": \"string\",");
         sb.AppendLine("      \"matchingSkills\": [\"skill1\", \"skill2\"],");
         sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"],");
-        sb.AppendLine("      \"referralReason\": \"string\"");
+        sb.AppendLine("      \"referralReason\": \"string\",");
+        sb.AppendLine("      \"whatIsMissingForPerfectMatch\": \"string\"");
         sb.AppendLine("    }");
         sb.AppendLine("  ]");
         sb.AppendLine("}");
@@ -387,9 +394,10 @@ public class AIService : IAIService
                     "type": "array",
                     "items": { "type": "string" }
                   },
-                  "referralReason": { "type": "string" }
+                  "referralReason": { "type": "string" },
+                  "whatIsMissingForPerfectMatch": { "type": "string" }
                 },
-                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills", "referralReason"],
+                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills", "referralReason", "whatIsMissingForPerfectMatch"],
                 "additionalProperties": false
               }
             }
@@ -417,7 +425,8 @@ public class AIService : IAIService
         string MatchReason,
         List<string> MatchingSkills,
         List<string> MissingSkills,
-        string ReferralReason
+        string ReferralReason,
+        string WhatIsMissingForPerfectMatch
     );
 
     private void SetupProvider(IConfiguration configuration, ILogger<AIService> logger)
