@@ -90,6 +90,16 @@
     .value {
       color: #333;
     }
+
+    &.resume-viewer {
+      align-items: center;
+
+      button {
+        mat-icon {
+          margin-right: 4px;
+        }
+      }
+    }
   }
 }
 

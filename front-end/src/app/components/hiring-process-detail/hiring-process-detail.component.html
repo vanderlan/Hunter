@@ -47,6 +47,17 @@
               <span class="label">Email:</span>
               <span class="value">{{ process.candidate.email || 'N/A' }}</span>
             </div>
+            <div class="info-item">
+              <span class="label">Phone:</span>
+              <span class="value">{{ process.candidate.phoneNumber || 'N/A' }}</span>
+            </div>
+            <div class="info-item resume-viewer" *ngIf="process.candidate.hasResume">
+              <span class="label">Resume:</span>
+              <button mat-button color="primary" (click)="viewResume()">
+                <mat-icon>description</mat-icon>
+                View CV
+              </button>
+            </div>
           </mat-card-content>
         </mat-card>
 

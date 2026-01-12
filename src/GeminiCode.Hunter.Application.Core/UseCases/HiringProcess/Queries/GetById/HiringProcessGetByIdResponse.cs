@@ -19,6 +19,8 @@ public class CandidateInfo
     public string PublicId { get; set; } = string.Empty;
     public string? Name { get; set; }
     public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool HasResume { get; set; }
 }
 
 public class JobPositionInfo

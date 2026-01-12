@@ -28,6 +28,8 @@ export interface CandidateInfo {
   publicId: string;
   name?: string;
   email?: string;
+  phoneNumber?: string;
+  hasResume?: boolean;
 }
 
 export interface JobPositionInfo {

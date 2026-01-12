@@ -29,6 +29,15 @@ public class HiringProcessGetByIdRequestHandler(
         var notes = await unitOfWork.HiringProcessNoteRepository
             .GetByHiringProcessIdAsync(hiringProcess.HiringProcessId);
 
+        // Check if candidate has resume
+        var hasResume = false;
+        if (hiringProcess.Candidate != null)
+        {
+            var candidateFile = await unitOfWork.CandidateFileRepository
+                .GetByCandidateAndFileTypeAsync(hiringProcess.Candidate.CandidateId, "Resume");
+            hasResume = candidateFile != null;
+        }
+
         var response = new HiringProcessGetByIdResponse
         {
             PublicId = hiringProcess.PublicId,
@@ -37,7 +46,9 @@ public class HiringProcessGetByIdRequestHandler(
             {
                 PublicId = hiringProcess.Candidate?.PublicId ?? string.Empty,
                 Name = hiringProcess.Candidate?.Name,
-                Email = hiringProcess.Candidate?.Email
+                Email = hiringProcess.Candidate?.Email,
+                PhoneNumber = hiringProcess.Candidate?.PhoneNumber,
+                HasResume = hasResume
             },
             JobPosition = new JobPositionInfo
             {
