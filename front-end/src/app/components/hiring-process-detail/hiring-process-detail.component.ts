@@ -44,7 +44,7 @@ export class HiringProcessDetailComponent implements OnInit {
   statusNotes = '';
   isAdmin = false;
 
-  statusOptions = [
+  allStatusOptions = [
     { value: HiringProcessStatus.Referred, label: 'Referred' },
     { value: HiringProcessStatus.Screening, label: 'Screening' },
     { value: HiringProcessStatus.ConsultantTechnicalInterview, label: 'Consultant Technical Interview' },
@@ -181,5 +181,14 @@ export class HiringProcessDetailComponent implements OnInit {
       default:
         return status;
     }
+  }
+
+  get availableStatusOptions() {
+    if (!this.process) {
+      return this.allStatusOptions;
+    }
+    
+    const currentStatusEnum = this.mapStringToEnum(this.process.status);
+    return this.allStatusOptions.filter(option => option.value !== currentStatusEnum);
   }
 }

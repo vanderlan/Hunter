@@ -31,6 +31,14 @@ public class UpdateHiringProcessStatusRequestHandler(
 
         var oldStatus = hiringProcess.Status;
 
+        // Validate that the new status is different from the current status
+        if (oldStatus == request.NewStatus)
+        {
+            logger.LogWarning("Attempted to update hiring process {PublicId} to the same status: {Status}", 
+                request.PublicId, request.NewStatus);
+            throw new BusinessException("Cannot update to the same status. Please select a different status.");
+        }
+
         // Update status
         hiringProcess.Status = request.NewStatus;
         hiringProcess.LastUpdatedByUserId = user.UserId;
