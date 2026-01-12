@@ -13,6 +13,7 @@
       </mat-card-header>
 
       <mat-card-content>
+        <!-- Default State: Upload Interface -->
         <div *ngIf="!analyzing && matches.length === 0">
           <ngx-file-drop 
             dropZoneClassName="drop-zone"
@@ -55,6 +56,7 @@
           </button>
         </div>
 
+        <!-- Analyzing State -->
         <div *ngIf="analyzing" class="analyzing-state">
           <div class="ai-loading">
             <mat-icon class="ai-star">auto_awesome_mosaic</mat-icon>
@@ -62,6 +64,27 @@
           <h3>Analyzing CV...</h3>
           <p>This may take 15-30 seconds. Please wait.</p>
           <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+        </div>
+
+        <!-- Success State: Analysis Results Summary -->
+        <div *ngIf="!analyzing && matches.length > 0" class="results-summary">
+          <div class="success-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <h2>Found {{ matches.length }} Matching Positions</h2>
+          <p class="candidate-name" *ngIf="candidateInfo?.name">for {{ candidateInfo?.name }}</p>
+          <p class="analysis-info">Out of {{ totalPositions }} analyzed positions</p>
+          
+          <div class="summary-actions">
+            <button mat-raised-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume" class="action-btn">
+              <mat-icon>description</mat-icon>
+              View Uploaded Resume
+            </button>
+            <button mat-raised-button (click)="clearFile()" class="action-btn">
+              <mat-icon>upload_file</mat-icon>
+              Analyze Another CV
+            </button>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -115,24 +138,8 @@
 
   <!-- Matching Results - Full Width Section (Outside Grid) -->
   <div *ngIf="!analyzing && matches.length > 0" class="results-section">
-    <div class="results-header">
-      <h2>
-        <mat-icon>check_circle</mat-icon>
-        Found {{ matches.length }} Matching Positions{{ candidateInfo?.name ? (' for ' + candidateInfo?.name) : '' }}
-      </h2>
-      <p>Out of {{ totalPositions }} analyzed positions</p>
-      <div class="header-actions">
-        <button mat-raised-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume">
-          <mat-icon>description</mat-icon>
-          View Uploaded Resume
-        </button>
-        <button mat-raised-button (click)="clearFile()">
-          <mat-icon>upload_file</mat-icon>
-          Analyze Another CV
-        </button>
-      </div>
-    </div>
-
+    <h3 class="section-title">Matching Job Positions</h3>
+    
     <div class="matches-grid">
       <mat-card *ngFor="let match of matches" class="match-card">
         <mat-card-header>

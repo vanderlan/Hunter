@@ -154,6 +154,74 @@
   }
 }
 
+// Results Summary - Inside CV Analysis Card
+.results-summary {
+  text-align: center;
+  padding: 40px 20px;
+
+  .success-icon {
+    margin-bottom: 20px;
+
+    mat-icon {
+      font-size: 80px;
+      width: 80px;
+      height: 80px;
+      color: #2e7d32;
+      animation: successPulse 0.6s ease-out;
+    }
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #2e7d32;
+  }
+
+  .candidate-name {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin: 4px 0;
+  }
+
+  .analysis-info {
+    color: #666;
+    margin: 8px 0 24px;
+    font-size: 14px;
+  }
+
+  .summary-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    margin: 0 auto;
+
+    .action-btn {
+      width: 100%;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes aiPulse {
   0%,
   100% {
@@ -178,48 +246,12 @@
 .results-section {
   margin-bottom: 24px;
 
-  .results-header {
-    background: white;
-    padding: 32px;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    h2 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-size: 28px;
-      font-weight: 500;
-      margin: 0 0 8px;
-      color: #2e7d32;
-
-      mat-icon {
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
-      }
-    }
-
-    p {
-      color: #666;
-      margin: 8px 0 24px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 16px;
-
-      button {
-        mat-icon {
-          margin-right: 8px;
-        }
-      }
-    }
+  .section-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 24px 0;
+    padding: 0 4px;
   }
 }
 
@@ -503,7 +535,7 @@ mat-card-actions {
 }
 
 .history-card {
-  height: 350px;
+  height: 500px;
   display: flex;
   flex-direction: column;
 
@@ -668,48 +700,12 @@ mat-card-actions {
 .results-section {
   margin-bottom: 24px;
 
-  .results-header {
-    background: white;
-    padding: 32px;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-    h2 {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      font-size: 28px;
-      font-weight: 500;
-      margin: 0 0 8px;
-      color: #2e7d32;
-
-      mat-icon {
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
-      }
-    }
-
-    p {
-      color: #666;
-      margin: 8px 0 24px;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 16px;
-
-      button {
-        mat-icon {
-          margin-right: 8px;
-        }
-      }
-    }
+  .section-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 24px 0;
+    padding: 0 4px;
   }
 }
 
