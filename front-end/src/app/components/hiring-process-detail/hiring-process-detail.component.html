@@ -85,7 +85,7 @@
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>New Status</mat-label>
               <mat-select [(ngModel)]="selectedStatus">
-                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+                <mat-option *ngFor="let option of availableStatusOptions" [value]="option.value">
                   {{ option.label }}
                 </mat-option>
               </mat-select>
