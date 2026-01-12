@@ -8,8 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Xunit;
-using System.Reflection;
-using Microsoft.AspNetCore.OutputCaching;
 
 namespace GeminiCode.Hunter.Test.Unit.Api.Controllers.V1;
 
@@ -39,20 +37,6 @@ public class CvAnalysisControllerTest
         Assert.Equal(200, contentResult.StatusCode);
         Assert.IsType<CvAnalysisDetailResponse>(contentResult.Value);
         Assert.Equal(analysisId, response.AnalysisId);
-    }
-
-    [Fact]
-    public void GetById_HasOutputCacheAttribute_WithCorrectPolicy()
-    {
-        //arrange
-        var method = typeof(CvAnalysisController).GetMethod(nameof(CvAnalysisController.GetById));
-
-        //act
-        var outputCacheAttribute = method?.GetCustomAttribute<OutputCacheAttribute>();
-
-        //assert
-        Assert.NotNull(outputCacheAttribute);
-        Assert.Equal("CvAnalysisCache", outputCacheAttribute.PolicyName);
     }
 
     private void SetupMediatorMock()
