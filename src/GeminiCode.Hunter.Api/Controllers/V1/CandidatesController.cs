@@ -9,6 +9,7 @@ using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetById;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -68,6 +69,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     /// <param name="cvFile">The CV file in PDF format (max 10MB)</param>
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("Analyze")]
+    [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
