@@ -6,6 +6,7 @@ using GeminiCode.Hunter.Application.Core.UseCases.CvAnalysis.Queries.GetHistory;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using static GeminiCode.Hunter.Domain.Core.Authentication.AuthorizationConfiguration;
@@ -28,6 +29,7 @@ public class CvAnalysisController(IMediator mediator) : ApiController(mediator)
     }
 
     [HttpGet("{id}")]
+    [OutputCache(PolicyName = "CvAnalysisCache")]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success response with CV analysis details", typeof(CvAnalysisDetailResponse))]
     [SwaggerResponse((int)HttpStatusCode.NotFound)]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
