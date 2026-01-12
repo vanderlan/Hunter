@@ -316,13 +316,7 @@ public class AIService : IAIService
         sb.AppendLine("2. Provide a clear, concise reason for the match percentage");
         sb.AppendLine("3. List specific matching skills found in the CV");
         sb.AppendLine("4. List skills required by the job but missing from the CV");
-        sb.AppendLine("5. Generate a professional referral reason (2-4 sentences) explaining:");
-        sb.AppendLine("   - WHY this candidate is a strong potential fit for the position");
-        sb.AppendLine("   - Specific strengths and relevant experience");
-        sb.AppendLine("   - What makes them stand out for THIS specific role");
-        sb.AppendLine("   - Write in first person as if you're the recruiter referring them");
-        sb.AppendLine("   - Example: \"I consider [Name] a strong potential talent for [Company] because...");
-        sb.AppendLine("6. Generate 'What is missing for a perfect match?' (2-4 sentences) explaining:");
+        sb.AppendLine("5. Generate 'What is missing for a perfect match?' (2-4 sentences) explaining:");
         sb.AppendLine("   - Specific skills, experiences, or qualifications the candidate needs to develop");
         sb.AppendLine("   - Areas where the candidate could improve to reach 100% match");
         sb.AppendLine("   - Be constructive and actionable");
@@ -343,7 +337,6 @@ public class AIService : IAIService
         sb.AppendLine("      \"matchReason\": \"string\",");
         sb.AppendLine("      \"matchingSkills\": [\"skill1\", \"skill2\"],");
         sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"],");
-        sb.AppendLine("      \"referralReason\": \"string\",");
         sb.AppendLine("      \"whatIsMissingForPerfectMatch\": \"string\"");
         sb.AppendLine("    }");
         sb.AppendLine("  ]");
@@ -394,10 +387,9 @@ public class AIService : IAIService
                     "type": "array",
                     "items": { "type": "string" }
                   },
-                  "referralReason": { "type": "string" },
                   "whatIsMissingForPerfectMatch": { "type": "string" }
                 },
-                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills", "referralReason", "whatIsMissingForPerfectMatch"],
+                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills", "whatIsMissingForPerfectMatch"],
                 "additionalProperties": false
               }
             }
@@ -425,7 +417,7 @@ public class AIService : IAIService
         string MatchReason,
         List<string> MatchingSkills,
         List<string> MissingSkills,
-        string ReferralReason,
+        string? ReferralReason,
         string WhatIsMissingForPerfectMatch
     );
 

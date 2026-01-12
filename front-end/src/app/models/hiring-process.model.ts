@@ -108,3 +108,7 @@ export interface UpdateStatusRequest {
 export interface AddNoteRequest {
   note: string;
 }
+
+export interface GenerateAIInsightsResponse {
+  referralReason: string;
+}

@@ -46,6 +46,7 @@ export class HiringProcessDetailComponent implements OnInit {
   selectedStatus: HiringProcessStatus | null = null;
   statusNotes = '';
   isAdmin = false;
+  generatingInsights = false;
 
   allStatusOptions = [
     { value: HiringProcessStatus.Referred, label: 'Referred' },
@@ -154,6 +155,30 @@ export class HiringProcessDetailComponent implements OnInit {
       error: (error) => {
         this.snackBar.open('Error adding note', 'Close', { duration: 3000 });
         console.error('Error adding note:', error);
+      }
+    });
+  }
+
+  generateAIInsights(): void {
+    if (!this.process || !this.isAdmin) {
+      return;
+    }
+
+    this.generatingInsights = true;
+    this.hiringProcessService.generateAIInsights(this.process.publicId).subscribe({
+      next: (response) => {
+        this.generatingInsights = false;
+        this.snackBar.open('AI insights generated successfully!', 'Close', { duration: 3000 });
+        // Update the local process object with the new referral reason
+        if (this.process) {
+          this.process.referralReason = response.referralReason;
+        }
+      },
+      error: (error) => {
+        this.generatingInsights = false;
+        const errorMessage = error.error?.message || 'Error generating AI insights. Please try again.';
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+        console.error('Error generating AI insights:', error);
       }
     });
   }

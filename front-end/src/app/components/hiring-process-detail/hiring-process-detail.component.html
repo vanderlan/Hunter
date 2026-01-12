@@ -85,32 +85,51 @@
         </mat-card>
 
         <!-- AI Insights Card (Admin Only) -->
-        <mat-card class="ai-insights-card" *ngIf="isAdmin && process.referralReason">
+        <mat-card class="ai-insights-card" *ngIf="isAdmin">
           <mat-card-header>
             <mat-card-title>
               <mat-icon>psychology</mat-icon>
               AI Insights
             </mat-card-title>
-            <mat-card-subtitle>Why this referral?</mat-card-subtitle>
+            <mat-card-subtitle *ngIf="process.referralReason">Why this referral?</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <!-- Last AI Analysis Link -->
-            <div class="last-analysis-link" *ngIf="process.lastAIAnalysis">
+            <!-- No Insights State -->
+            <div *ngIf="!process.referralReason" class="no-insights">
+              <mat-icon class="no-insights-icon">info_outline</mat-icon>
+              <p class="no-insights-text">No AI insights available for this referral</p>
               <button 
-                mat-stroked-button 
+                mat-raised-button 
                 color="primary"
-                (click)="viewAIAnalysis(process.lastAIAnalysis.cvAnalysisPublicId)"
-                class="analysis-button">
-                <mat-icon>analytics</mat-icon>
-                AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'short' }} 
-                ({{ process.lastAIAnalysis.matchPercentage }}%)
-                <mat-icon class="external-icon">open_in_new</mat-icon>
+                (click)="generateAIInsights()"
+                [disabled]="generatingInsights"
+                class="generate-button">
+                <mat-icon *ngIf="!generatingInsights">auto_awesome</mat-icon>
+                <mat-spinner *ngIf="generatingInsights" diameter="20" class="button-spinner"></mat-spinner>
+                {{ generatingInsights ? 'Generating...' : 'Generate AI Insights' }}
               </button>
             </div>
 
-            <div class="insights-content">
-              <mat-icon class="insights-icon">lightbulb</mat-icon>
-              <p class="referral-reason">{{ process.referralReason }}</p>
+            <!-- Insights Available State -->
+            <div *ngIf="process.referralReason">
+              <!-- Last AI Analysis Link -->
+              <div class="last-analysis-link" *ngIf="process.lastAIAnalysis">
+                <button 
+                  mat-stroked-button 
+                  color="primary"
+                  (click)="viewAIAnalysis(process.lastAIAnalysis.cvAnalysisPublicId)"
+                  class="analysis-button">
+                  <mat-icon>analytics</mat-icon>
+                  AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'short' }} 
+                  ({{ process.lastAIAnalysis.matchPercentage }}%)
+                  <mat-icon class="external-icon">open_in_new</mat-icon>
+                </button>
+              </div>
+
+              <div class="insights-content">
+                <mat-icon class="insights-icon">lightbulb</mat-icon>
+                <p class="referral-reason">{{ process.referralReason }}</p>
+              </div>
             </div>
           </mat-card-content>
         </mat-card>
