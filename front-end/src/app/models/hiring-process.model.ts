@@ -7,6 +7,7 @@ export interface HiringProcess {
   lastUpdatedByUser?: UserInfo;
   statusHistory: StatusHistoryItem[];
   notes: NoteItem[];
+  referralReason?: string;
   createdAt: Date;
   lastUpdated: Date;
 }
@@ -84,6 +85,7 @@ export enum HiringProcessStatus {
 export interface StartHiringProcessRequest {
   candidateId: string;
   jobPositionId: string;
+  referralReason?: string;
 }
 
 export interface StartHiringProcessResponse {

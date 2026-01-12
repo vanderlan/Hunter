@@ -276,7 +276,8 @@ export class CvAnalyzerComponent implements OnInit {
           // User confirmed, proceed with referral
           this.hiringProcessService.startHiringProcess({
             candidateId: this.candidateInfo!.candidateId,
-            jobPositionId: jobPosition.publicId!
+            jobPositionId: jobPosition.publicId!,
+            referralReason: match.referralReason
           }).subscribe({
             next: (response) => {
               this.snackBar.open(

@@ -109,6 +109,56 @@
   }
 }
 
+.ai-insights-card {
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #5f1f1f;
+    font-size: 18px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  mat-card-subtitle {
+    font-style: italic;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .insights-content {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8f0fe 100%);
+    border-radius: 8px;
+    border-left: 4px solid #b13a2f;
+
+    .insights-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #ff9800;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .referral-reason {
+      margin: 0;
+      line-height: 1.6;
+      color: #333;
+      font-size: 15px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      flex: 1;
+    }
+  }
+}
+
 .timeline-card,
 .notes-card {
   mat-card-title {

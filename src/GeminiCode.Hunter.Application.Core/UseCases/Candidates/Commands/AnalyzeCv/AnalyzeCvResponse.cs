@@ -29,4 +29,5 @@ public class JobMatchDto
     public string? Summary { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
+    public string? ReferralReason { get; set; }
 }

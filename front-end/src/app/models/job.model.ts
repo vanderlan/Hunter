@@ -34,6 +34,7 @@ export interface JobMatch {
   summary?: string;
   mustHaveSkills?: string;
   niceToHaveSkills?: string;
+  referralReason?: string;
 }
 
 export interface CandidateInfo {

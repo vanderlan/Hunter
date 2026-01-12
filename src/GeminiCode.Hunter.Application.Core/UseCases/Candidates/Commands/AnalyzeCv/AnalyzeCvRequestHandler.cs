@@ -135,7 +135,8 @@ public class AnalyzeCvRequestHandler(
                         MissingSkills = match.MissingSkills,
                         Summary = job.Summary,
                         MustHaveSkills = job.MustHaveSkills,
-                        NiceToHaveSkills = job.NiceToHaveSkills
+                        NiceToHaveSkills = job.NiceToHaveSkills,
+                        ReferralReason = match.ReferralReason
                     };
                 }).ToList()
             };

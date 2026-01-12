@@ -84,6 +84,23 @@
           </mat-card-content>
         </mat-card>
 
+        <!-- AI Insights Card (Admin Only) -->
+        <mat-card class="ai-insights-card" *ngIf="isAdmin && process.referralReason">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>psychology</mat-icon>
+              AI Insights
+            </mat-card-title>
+            <mat-card-subtitle>Why this referral?</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="insights-content">
+              <mat-icon class="insights-icon">lightbulb</mat-icon>
+              <p class="referral-reason">{{ process.referralReason }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
         <!-- Update Status (Admin Only) -->
         <mat-card class="status-update-card" *ngIf="isAdmin">
           <mat-card-header>

@@ -67,6 +67,7 @@ public class HiringProcessGetByIdRequestHandler(
                 Name = hiringProcess.LastUpdatedByUser.Name,
                 Email = hiringProcess.LastUpdatedByUser.Email
             } : null,
+            ReferralReason = hiringProcess.ReferralReason,
             StatusHistory = statusHistory.Select(h => new StatusHistoryItem
             {
                 FromStatus = h.FromStatus.ToString(),

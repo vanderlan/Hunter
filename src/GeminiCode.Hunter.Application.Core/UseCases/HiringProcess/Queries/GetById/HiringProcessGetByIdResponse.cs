@@ -10,6 +10,7 @@ public class HiringProcessGetByIdResponse
     public UserInfo? LastUpdatedByUser { get; set; }
     public List<StatusHistoryItem> StatusHistory { get; set; } = [];
     public List<NoteItem> Notes { get; set; } = [];
+    public string? ReferralReason { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime LastUpdated { get; set; }
 }

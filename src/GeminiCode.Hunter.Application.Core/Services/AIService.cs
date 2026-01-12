@@ -164,7 +164,8 @@ public class AIService : IAIService
                     m.MatchPercentage,
                     m.MatchReason,
                     [.. m.MatchingSkills],
-                    [.. m.MissingSkills]
+                    [.. m.MissingSkills],
+                    m.ReferralReason
                 )).ToList()
             );
 
@@ -314,6 +315,12 @@ public class AIService : IAIService
         sb.AppendLine("2. Provide a clear, concise reason for the match percentage");
         sb.AppendLine("3. List specific matching skills found in the CV");
         sb.AppendLine("4. List skills required by the job but missing from the CV");
+        sb.AppendLine("5. Generate a professional referral reason (2-4 sentences) explaining:");
+        sb.AppendLine("   - WHY this candidate is a strong potential fit for the position");
+        sb.AppendLine("   - Specific strengths and relevant experience");
+        sb.AppendLine("   - What makes them stand out for THIS specific role");
+        sb.AppendLine("   - Write in first person as if you're the recruiter referring them");
+        sb.AppendLine("   - Example: \"I consider [Name] a strong potential talent for [Company] because...");
         sb.AppendLine();
         sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
@@ -329,7 +336,8 @@ public class AIService : IAIService
         sb.AppendLine("      \"matchPercentage\": 85.5,");
         sb.AppendLine("      \"matchReason\": \"string\",");
         sb.AppendLine("      \"matchingSkills\": [\"skill1\", \"skill2\"],");
-        sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"]");
+        sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"],");
+        sb.AppendLine("      \"referralReason\": \"string\"");
         sb.AppendLine("    }");
         sb.AppendLine("  ]");
         sb.AppendLine("}");
@@ -378,9 +386,10 @@ public class AIService : IAIService
                   "missingSkills": {
                     "type": "array",
                     "items": { "type": "string" }
-                  }
+                  },
+                  "referralReason": { "type": "string" }
                 },
-                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills"],
+                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills", "referralReason"],
                 "additionalProperties": false
               }
             }
@@ -407,7 +416,8 @@ public class AIService : IAIService
         decimal MatchPercentage,
         string MatchReason,
         List<string> MatchingSkills,
-        List<string> MissingSkills
+        List<string> MissingSkills,
+        string ReferralReason
     );
 
     private void SetupProvider(IConfiguration configuration, ILogger<AIService> logger)

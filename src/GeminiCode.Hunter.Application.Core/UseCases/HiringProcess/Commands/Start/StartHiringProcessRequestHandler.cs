@@ -57,7 +57,8 @@ public class StartHiringProcessRequestHandler(
             CandidateId = candidate.CandidateId,
             JobPositionId = jobPosition.JobPositionId,
             Status = HiringProcessStatus.Referred,
-            CreatedByUserId = user.UserId
+            CreatedByUserId = user.UserId,
+            ReferralReason = request.ReferralReason
         };
 
         await unitOfWork.HiringProcessRepository.AddAsync(hiringProcess);
