@@ -34,6 +34,8 @@ public static class Bootstrapper
 
         app.UseRouting();
 
+        app.UseOutputCaching();
+
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -71,6 +73,8 @@ public static class Bootstrapper
         services.AddApplicationHealthChecks(configuration);
 
         services.ConfigureSwagger();
+
+        services.ConfigureOutputCaching();
 
         services.AddDatabaseContext();
         services.AddUnitOfWork();
