@@ -3,6 +3,7 @@ using System.Net.Mail;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
+using static GeminiCode.Hunter.Domain.Core.Constants.DomainConstants;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
 
@@ -283,6 +284,10 @@ public class EmailService : IEmailService
 
     private static string GetMatchLevel(double percentage)
     {
-        return percentage >= 70 ? "high" : percentage >= 50 ? "medium" : "low";
+        return percentage >= AIMatching.HighMatchPercentage 
+            ? "high" 
+            : percentage >= AIMatching.MediumMatchPercentage 
+            ? "medium" 
+            : "low";
     }
 }

@@ -328,7 +328,7 @@ public class AIService : IAIService
         sb.AppendLine("   - Be constructive and actionable");
         sb.AppendLine("   - If match is already very high (95%+), mention minor improvements or continued development");
         sb.AppendLine();
-        sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
+        sb.AppendLine($"Return ONLY positions with match percentage > {AIMatching.MinimumMatchPercentage}%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
         sb.AppendLine();
         sb.AppendLine("# OUTPUT FORMAT");

@@ -238,7 +238,7 @@ export class CvAnalyzerComponent implements OnInit {
 
   getMatchColor(percentage: number): string {
     if (percentage >= 80) return 'primary';
-    if (percentage >= 60) return 'accent';
+    if (percentage >= 70) return 'accent';
     if (percentage >= 40) return 'warn';
     return '';
   }

@@ -15,7 +15,7 @@
 + **AI-Powered CV Analysis**
 	+ Dual AI provider support: OpenAI GPT-4o or DeepSeek (90% cost savings)
 	+ PDF text extraction and analysis (PdfPig)
-	+ Intelligent match percentage calculation (>20% threshold)
+	+ Intelligent match percentage calculation (>70% threshold)
 	+ Comprehensive skills gap analysis
 	+ Matching and missing skills identification
 	+ Detailed recommendations for each candidate
