@@ -14,6 +14,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
+import { CvAnalysisService } from '../../services/cv-analysis.service';
 import { AuthService } from '../../services/auth.service';
 import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.model';
 
@@ -59,6 +60,7 @@ export class HiringProcessDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private hiringProcessService: HiringProcessService,
+    private cvAnalysisService: CvAnalysisService,
     private authService: AuthService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
@@ -211,6 +213,27 @@ export class HiringProcessDetailComponent implements OnInit {
         maxWidth: '1200px',
         panelClass: 'resume-viewer-dialog'
       });
+    });
+  }
+
+  viewAIAnalysis(cvAnalysisPublicId: string): void {
+    // Load the analysis detail and show in a dialog
+    this.cvAnalysisService.getAnalysisDetail(cvAnalysisPublicId).subscribe({
+      next: (analysisDetail) => {
+        import('./ai-analysis-dialog.component').then(m => {
+          this.dialog.open(m.AIAnalysisDialogComponent, {
+            data: analysisDetail,
+            width: '90vw',
+            height: '90vh',
+            maxWidth: '1400px',
+            panelClass: 'ai-analysis-dialog'
+          });
+        });
+      },
+      error: (error) => {
+        this.snackBar.open('Error loading AI analysis', 'Close', { duration: 3000 });
+        console.error('Error loading AI analysis:', error);
+      }
     });
   }
 }

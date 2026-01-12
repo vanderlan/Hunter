@@ -39,6 +39,24 @@ public class HiringProcessGetByIdRequestHandler(
             hasResume = candidateFile != null;
         }
 
+        // Get last AI analysis for this candidate and job position
+        LastAIAnalysisInfo? lastAIAnalysis = null;
+        if (hiringProcess.Candidate != null && hiringProcess.JobPosition != null)
+        {
+            var lastMatch = await unitOfWork.CvAnalysisRepository
+                .GetLastAnalysisMatchAsync(hiringProcess.CandidateId, hiringProcess.JobPositionId);
+            
+            if (lastMatch != null)
+            {
+                lastAIAnalysis = new LastAIAnalysisInfo
+                {
+                    CvAnalysisPublicId = lastMatch.CvAnalysis.PublicId,
+                    AnalyzedAt = lastMatch.CvAnalysis.AnalyzedAt.ToApplicationTime(),
+                    MatchPercentage = lastMatch.MatchPercentage
+                };
+            }
+        }
+
         var response = new HiringProcessGetByIdResponse
         {
             PublicId = hiringProcess.PublicId,
@@ -69,6 +87,7 @@ public class HiringProcessGetByIdRequestHandler(
                 Email = hiringProcess.LastUpdatedByUser.Email
             } : null,
             ReferralReason = hiringProcess.ReferralReason,
+            LastAIAnalysis = lastAIAnalysis,
             StatusHistory = statusHistory.Select(h => new StatusHistoryItem
             {
                 FromStatus = h.FromStatus.ToString(),

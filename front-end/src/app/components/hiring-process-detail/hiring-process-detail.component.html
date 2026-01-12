@@ -94,6 +94,20 @@
             <mat-card-subtitle>Why this referral?</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
+            <!-- Last AI Analysis Link -->
+            <div class="last-analysis-link" *ngIf="process.lastAIAnalysis">
+              <button 
+                mat-stroked-button 
+                color="primary"
+                (click)="viewAIAnalysis(process.lastAIAnalysis.cvAnalysisPublicId)"
+                class="analysis-button">
+                <mat-icon>analytics</mat-icon>
+                AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'short' }} 
+                ({{ process.lastAIAnalysis.matchPercentage }}%)
+                <mat-icon class="external-icon">open_in_new</mat-icon>
+              </button>
+            </div>
+
             <div class="insights-content">
               <mat-icon class="insights-icon">lightbulb</mat-icon>
               <p class="referral-reason">{{ process.referralReason }}</p>

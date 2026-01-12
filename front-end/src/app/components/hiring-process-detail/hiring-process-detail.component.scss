@@ -130,6 +130,36 @@
     margin-top: 4px;
   }
 
+  .last-analysis-link {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+
+    .analysis-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 16px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      .external-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-left: 4px;
+      }
+    }
+  }
+
   .insights-content {
     display: flex;
     gap: 16px;

@@ -66,4 +66,14 @@ public class CvAnalysisRepository(DataContext dataContext)
             await DataContext.SaveChangesAsync();
         }
     }
+
+    public async Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId)
+    {
+        return await DataContext.CvAnalysisMatches
+            .Include(x => x.CvAnalysis)
+            .Where(x => x.CvAnalysis.CandidateId == candidateId && x.JobPositionId == jobPositionId)
+            .OrderByDescending(x => x.CvAnalysis.AnalyzedAt)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
 }

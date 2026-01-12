@@ -11,4 +11,5 @@ public interface ICvAnalysisRepository : IBaseEntityRepository<CvAnalysis>
     Task<int> GetCountByUserIdAsync(long userId);
     Task<CvAnalysis?> GetWithMatchesAsync(string publicId);
     Task DeleteByCandidateIdAsync(long candidateId);
+    Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId);
 }

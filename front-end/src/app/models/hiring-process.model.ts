@@ -8,6 +8,7 @@ export interface HiringProcess {
   statusHistory: StatusHistoryItem[];
   notes: NoteItem[];
   referralReason?: string;
+  lastAIAnalysis?: LastAIAnalysisInfo;
   createdAt: Date;
   lastUpdated: Date;
 }
@@ -58,6 +59,12 @@ export interface NoteItem {
   note: string;
   userName: string;
   createdAt: Date;
+}
+
+export interface LastAIAnalysisInfo {
+  cvAnalysisPublicId: string;
+  analyzedAt: Date;
+  matchPercentage: number;
 }
 
 export interface DashboardStats {
