@@ -1,5 +1,6 @@
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
+using GeminiCode.Hunter.Domain.Core.Extensions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
@@ -35,7 +36,7 @@ public class GetCvAnalysisHistoryRequestHandler(
             AnalysisId = a.PublicId,
             CandidateName = a.Candidate?.Name ?? "Unknown",
             CandidateEmail = a.Candidate?.Email ?? "",
-            AnalyzedAt = a.AnalyzedAt,
+            AnalyzedAt = a.AnalyzedAt.ToApplicationTime(), // Convert to configured timezone
             AnalyzedByUserName = a.User?.Name ?? "",
             TotalPositionsAnalyzed = a.TotalPositionsAnalyzed,
             MatchesFound = a.MatchesFound
