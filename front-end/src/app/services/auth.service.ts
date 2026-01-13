@@ -13,7 +13,7 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'hunter_refresh_token';
   private readonly apiUrl = `${environment.apiUrl}/auth`;
   
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(
