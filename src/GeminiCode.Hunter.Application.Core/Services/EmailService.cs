@@ -324,8 +324,8 @@ public class EmailService : IEmailService
             {
                 ["CandidateName"] = candidateName,
                 ["JobTitle"] = jobTitle,
-                ["OldStatus"] = FormatStatusName(oldStatus),
-                ["NewStatus"] = FormatStatusName(newStatus),
+                ["OldStatus"] = oldStatus,
+                ["NewStatus"] = newStatus,
                 ["ChangedByUserName"] = changedByUserName,
                 ["Notes"] = notes ?? "",
                 ["HasNotes"] = !string.IsNullOrWhiteSpace(notes),
@@ -337,7 +337,7 @@ public class EmailService : IEmailService
             var mail = new MailMessage
             {
                 From = new MailAddress(_fromEmail, "Hunter"),
-                Subject = $"Status Update - {candidateName} moved to {FormatStatusName(newStatus)}",
+                Subject = $"Status Update - {candidateName} moved to {newStatus}",
                 Body = htmlBody,
                 IsBodyHtml = true,
                 BodyEncoding = Encoding.UTF8,
@@ -412,15 +412,13 @@ public class EmailService : IEmailService
         }
     }
 
-    private static string FormatStatusName(string status)
+    private static string GetMatchLevel(double percentage)
     {
-        // Convert from enum name to display name
-        return status switch
-        {
-            "ConsultantTechnicalInterview" => "Consultant Technical Interview",
-            "ClientInterview" => "Client Interview",
-            _ => status
-        };
+        return percentage >= AIMatching.HighMatchPercentage 
+            ? "high" 
+            : percentage >= AIMatching.MediumMatchPercentage 
+            ? "medium" 
+            : "low";
     }
 
     private List<Dictionary<string, object>> ConvertToPositionsList(object matchResults)
@@ -483,14 +481,5 @@ public class EmailService : IEmailService
         }
 
         return positions;
-    }
-
-    private static string GetMatchLevel(double percentage)
-    {
-        return percentage >= AIMatching.HighMatchPercentage 
-            ? "high" 
-            : percentage >= AIMatching.MediumMatchPercentage 
-            ? "medium" 
-            : "low";
     }
 }

@@ -79,7 +79,7 @@ public class CandidateDeleteRequestHandlerTests
             AnalyzedAt = DateTime.UtcNow
         };
 
-        var hiringProcesses = new List<GeminiCode.Hunter.Domain.Core.Entities.HiringProcess>
+        var hiringProcesses = new List<Hunter.Domain.Core.Entities.HiringProcess>
         {
             new()
             {
@@ -87,7 +87,7 @@ public class CandidateDeleteRequestHandlerTests
                 PublicId = "hp-id",
                 CandidateId = candidate.CandidateId,
                 JobPositionId = 1,
-                Status = HiringProcessStatus.Referred,
+                Status = HiringProcessStatus.ReferredByPartner,
                 CreatedByUserId = 1
             }
         };
@@ -143,7 +143,7 @@ public class CandidateDeleteRequestHandlerTests
             PublicId = "hp-id",
             CandidateId = candidate.CandidateId,
             JobPositionId = 1,
-            Status = HiringProcessStatus.Referred,
+            Status = HiringProcessStatus.ReferredByPartner,
             CreatedByUserId = 1
         };
 

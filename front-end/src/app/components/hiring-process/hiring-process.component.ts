@@ -141,6 +141,9 @@ export class HiringProcessComponent implements OnInit {
         return 'primary';
       case 'Reproved':
         return 'warn';
+      case 'New':
+      case 'ReferredByPartner':
+      case 'ReferredInternally':
       case 'Screening':
       case 'ConsultantTechnicalInterview':
       case 'ClientInterview':
@@ -152,6 +155,10 @@ export class HiringProcessComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     switch (status) {
+      case 'ReferredByPartner':
+        return 'Referred by Partner';
+      case 'ReferredInternally':
+        return 'Referred Internally';
       case 'ConsultantTechnicalInterview':
         return 'Consultant Technical Interview';
       case 'ClientInterview':
