@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { CandidateService } from '../../services/candidate.service';
+import { AuthService } from '../../services/auth.service';
 import { Candidate } from '../../models/candidate.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -53,10 +54,10 @@ export class CandidatesComponent implements OnInit {
 
   constructor(
     private candidateService: CandidateService,
+    private authService: AuthService,
     private snackBar: MatSnackBar,
     public dialog: MatDialog
   ) {
-    // Setup auto-search with debounce
     this.searchSubject.pipe(
       debounceTime(400),
       distinctUntilChanged()
@@ -199,6 +200,60 @@ export class CandidatesComponent implements OnInit {
       error: (error) => {
         this.snackBar.open('Error downloading resume', 'Close', { duration: 3000 });
       }
+    });
+  }
+
+  canDeleteCandidate(candidate: Candidate): boolean {
+    const isAdmin = this.authService.isAdmin();
+    
+    if (isAdmin) {
+      return true;
+    }
+    
+    return !candidate.hasHiringProcess;
+  }
+
+  deleteCandidate(candidate: Candidate): void {
+    if (!this.canDeleteCandidate(candidate)) {
+      this.snackBar.open(
+        'Only Admin users can delete candidates with existing hiring processes',
+        'Close',
+        { duration: 5000 }
+      );
+      return;
+    }
+
+    import('./candidate-delete-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.CandidateDeleteDialogComponent, {
+        data: {
+          candidate: candidate,
+          hasHiringProcess: candidate.hasHiringProcess || false,
+          isAdmin: this.authService.isAdmin()
+        },
+        width: '550px',
+        maxWidth: '95vw',
+        disableClose: true,
+        autoFocus: true,
+        panelClass: 'candidate-delete-dialog'
+      });
+
+      dialogRef.afterClosed().subscribe(confirmed => {
+        if (confirmed) {
+          this.loading = true;
+          this.candidateService.deleteCandidate(candidate.publicId).subscribe({
+            next: () => {
+              this.loading = false;
+              this.snackBar.open('Candidate deleted successfully', 'Close', { duration: 3000 });
+              this.loadCandidates();
+            },
+            error: (error) => {
+              this.loading = false;
+              const message = error.error?.message || error.message || 'Error deleting candidate';
+              this.snackBar.open(message, 'Close', { duration: 5000 });
+            }
+          });
+        }
+      });
     });
   }
 }
