@@ -12,6 +12,18 @@
     </mat-card-content>
   </mat-card>
 
+  <!-- Search Section (No Card) -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput 
+             [(ngModel)]="searchQuery" 
+             (ngModelChange)="onSearchChange($event)"
+             placeholder="Search by title, company, or job code">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
   <!-- Positions Listing Card -->
   <mat-card class="positions-listing-card">
     <mat-card-header>
@@ -20,7 +32,8 @@
         <span>Available Positions</span>
       </mat-card-title>
       <mat-card-subtitle class="positions-listing-subtitle">
-        {{ positions.length }} open positions
+        {{ filteredPositions.length }} open position{{ filteredPositions.length !== 1 ? 's' : '' }}
+        <span *ngIf="searchQuery && filteredPositions.length !== positions.length"> (filtered from {{ positions.length }})</span>
       </mat-card-subtitle>
     </mat-card-header>
 
@@ -32,15 +45,22 @@
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="!loading && positions.length === 0" class="positions-empty-state">
+      <div *ngIf="!loading && filteredPositions.length === 0 && !searchQuery" class="positions-empty-state">
         <mat-icon class="positions-empty-icon">info_outline</mat-icon>
         <p class="positions-empty-text">No positions available at the moment</p>
       </div>
 
+      <!-- No Results State -->
+      <div *ngIf="!loading && filteredPositions.length === 0 && searchQuery" class="positions-empty-state">
+        <mat-icon class="positions-empty-icon">search_off</mat-icon>
+        <p class="positions-empty-text">No positions found matching "{{ searchQuery }}"</p>
+        <p class="positions-empty-hint">Try a different search term</p>
+      </div>
+
       <!-- Positions List -->
-      <div *ngIf="!loading && positions.length > 0" class="positions-list-wrapper">
+      <div *ngIf="!loading && filteredPositions.length > 0" class="positions-list-wrapper">
         <div 
-          *ngFor="let position of positions" 
+          *ngFor="let position of filteredPositions" 
           class="position-list-item"
           (click)="openPositionDetails(position)">
           <div class="position-item-header">

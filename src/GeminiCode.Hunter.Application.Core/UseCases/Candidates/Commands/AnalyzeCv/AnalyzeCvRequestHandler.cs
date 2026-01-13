@@ -125,6 +125,7 @@ public class AnalyzeCvRequestHandler(
                     var job = jobPositions.First(j => j.JobCode == match.JobCode);
                     return new JobMatchDto
                     {
+                        JobPositionId = job.PublicId,
                         JobCode = match.JobCode,
                         JobTitle = match.JobTitle,
                         CompanyCode = job.CompanyCode,

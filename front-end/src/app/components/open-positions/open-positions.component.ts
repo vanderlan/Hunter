@@ -1,22 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { JobService } from '../../services/job.service';
 import { JobPosition } from '../../models/job.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-open-positions',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatSnackBarModule
   ],
   templateUrl: './open-positions.component.html',
@@ -24,13 +32,24 @@ import { JobPosition } from '../../models/job.model';
 })
 export class OpenPositionsComponent implements OnInit {
   positions: JobPosition[] = [];
+  filteredPositions: JobPosition[] = [];
   loading = false;
+  searchQuery = '';
+  private searchSubject = new Subject<string>();
 
   constructor(
     private jobService: JobService,
     private snackBar: MatSnackBar,
     public dialog: MatDialog
-  ) {}
+  ) {
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.filterPositions();
+    });
+  }
 
   ngOnInit(): void {
     this.loadPositions();
@@ -41,6 +60,7 @@ export class OpenPositionsComponent implements OnInit {
     this.jobService.getActiveJobs().subscribe({
       next: (positions) => {
         this.positions = positions;
+        this.filteredPositions = positions;
         this.loading = false;
       },
       error: (error) => {
@@ -49,6 +69,26 @@ export class OpenPositionsComponent implements OnInit {
         console.error('Error loading positions:', error);
       }
     });
+  }
+
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
+  }
+
+  filterPositions(): void {
+    if (!this.searchQuery.trim()) {
+      this.filteredPositions = this.positions;
+      return;
+    }
+
+    const searchLower = this.searchQuery.toLowerCase();
+    this.filteredPositions = this.positions.filter(position => 
+      position.title.toLowerCase().includes(searchLower) ||
+      position.companyCode.toLowerCase().includes(searchLower) ||
+      position.jobCode.toLowerCase().includes(searchLower) ||
+      (position.summary && position.summary.toLowerCase().includes(searchLower))
+    );
   }
 
   openPositionDetails(position: JobPosition): void {
