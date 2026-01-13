@@ -72,7 +72,7 @@ public class EmailService : IEmailService
                 return;
             }
 
-            _logger.LogInformation("Sending job changes notification email to {Count} recipients", toEmails.Count);
+            _logger.LogInformation("Sending job changes notification email to {Count} recipients individually", toEmails.Count);
 
             var templateData = new Dictionary<string, object>
             {
@@ -88,34 +88,49 @@ public class EmailService : IEmailService
 
             var htmlBody = _templateService.RenderJobChangesTemplate(templateData);
 
-            var mail = new MailMessage
-            {
-                From = new MailAddress(_fromEmail, "Hunter Job Monitor"),
-                Subject = $"Hunter Job Alert – {newJobs.Count} New, {closedJobs.Count} Closed",
-                Body = htmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-                SubjectEncoding = Encoding.UTF8
-            };
+            // Send separate email to each recipient to maintain privacy
+            var successCount = 0;
+            var failureCount = 0;
 
             foreach (var email in toEmails)
             {
-                mail.To.Add(email);
+                try
+                {
+                    var mail = new MailMessage
+                    {
+                        From = new MailAddress(_fromEmail, "Hunter Job Monitor"),
+                        Subject = $"Hunter Job Alert – {newJobs.Count} New, {closedJobs.Count} Closed",
+                        Body = htmlBody,
+                        IsBodyHtml = true,
+                        BodyEncoding = Encoding.UTF8,
+                        SubjectEncoding = Encoding.UTF8
+                    };
+
+                    mail.To.Add(email);
+
+                    using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+                    {
+                        Credentials = new NetworkCredential(_fromEmail, _password),
+                        EnableSsl = _enableSsl
+                    };
+
+                    await smtp.SendMailAsync(mail);
+                    successCount++;
+                    _logger.LogDebug("Job changes notification sent successfully to {Email}", email);
+                }
+                catch (Exception ex)
+                {
+                    failureCount++;
+                    _logger.LogError(ex, "Failed to send job changes notification to {Email}", email);
+                }
             }
 
-            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
-            {
-                Credentials = new NetworkCredential(_fromEmail, _password),
-                EnableSsl = _enableSsl
-            };
-
-            await smtp.SendMailAsync(mail);
-
-            _logger.LogInformation("Job changes notification email sent successfully to {Emails}", string.Join(", ", toEmails));
+            _logger.LogInformation("Job changes notification completed: {SuccessCount} succeeded, {FailureCount} failed out of {TotalCount} total", 
+                successCount, failureCount, toEmails.Count);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send job changes notification email");
+            _logger.LogError(ex, "Failed to send job changes notification emails");
         }
     }
 
