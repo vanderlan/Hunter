@@ -27,6 +27,11 @@
             <span *ngIf="sidenavExpanded">Analyze CV</span>
           </button>
 
+          <button mat-button routerLink="/open-positions" routerLinkActive="active" class="nav-item">
+            <mat-icon>work_outline</mat-icon>
+            <span *ngIf="sidenavExpanded">Open Positions</span>
+          </button>
+
           <button mat-button routerLink="/candidates" routerLinkActive="active" class="nav-item">
             <mat-icon>folder_shared</mat-icon>
             <span *ngIf="sidenavExpanded">Candidates</span>
