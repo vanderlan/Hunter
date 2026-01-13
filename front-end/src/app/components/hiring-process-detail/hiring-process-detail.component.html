@@ -145,7 +145,7 @@
           <mat-card-content>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>New Status</mat-label>
-              <mat-select [(ngModel)]="selectedStatus">
+              <mat-select [(ngModel)]="selectedStatus" [disabled]="updatingStatus">
                 <mat-option *ngFor="let option of availableStatusOptions" [value]="option.value">
                   {{ option.label }}
                 </mat-option>
@@ -154,12 +154,18 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Notes (Optional)</mat-label>
-              <textarea matInput [(ngModel)]="statusNotes" rows="3" maxlength="1000"></textarea>
+              <textarea matInput [(ngModel)]="statusNotes" rows="3" maxlength="1000" [disabled]="updatingStatus"></textarea>
             </mat-form-field>
 
-            <button mat-raised-button color="primary" (click)="updateStatus()" class="full-width">
-              <mat-icon>check</mat-icon>
-              Update Status
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="updateStatus()" 
+              [disabled]="updatingStatus"
+              class="full-width">
+              <mat-icon *ngIf="!updatingStatus">check</mat-icon>
+              <mat-spinner *ngIf="updatingStatus" diameter="20" class="button-spinner"></mat-spinner>
+              {{ updatingStatus ? 'Updating...' : 'Update Status' }}
             </button>
           </mat-card-content>
         </mat-card>
@@ -217,11 +223,16 @@
             <div class="add-note">
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Add a note...</mat-label>
-                <textarea matInput [(ngModel)]="newNote" rows="3" maxlength="2000"></textarea>
+                <textarea matInput [(ngModel)]="newNote" rows="3" maxlength="2000" [disabled]="addingNote"></textarea>
               </mat-form-field>
-              <button mat-raised-button color="accent" (click)="addNote()" [disabled]="!newNote.trim()">
-                <mat-icon>add</mat-icon>
-                Add Note
+              <button 
+                mat-raised-button 
+                color="accent" 
+                (click)="addNote()" 
+                [disabled]="!newNote.trim() || addingNote">
+                <mat-icon *ngIf="!addingNote">add</mat-icon>
+                <mat-spinner *ngIf="addingNote" diameter="20" class="button-spinner"></mat-spinner>
+                {{ addingNote ? 'Adding...' : 'Add Note' }}
               </button>
             </div>
 

@@ -42,6 +42,8 @@ import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.
 export class HiringProcessDetailComponent implements OnInit {
   process: HiringProcess | null = null;
   loading = true;
+  updatingStatus = false;
+  addingNote = false;
   newNote = '';
   selectedStatus: HiringProcessStatus | null = null;
   statusNotes = '';
@@ -123,16 +125,19 @@ export class HiringProcessDetailComponent implements OnInit {
       return;
     }
 
+    this.updatingStatus = true;
     this.hiringProcessService.updateStatus(this.process.publicId, {
       newStatus: this.selectedStatus,
       notes: this.statusNotes || undefined
     }).subscribe({
       next: () => {
+        this.updatingStatus = false;
         this.snackBar.open('Status updated successfully', 'Close', { duration: 3000 });
         this.statusNotes = '';
         this.loadProcess(this.process!.publicId);
       },
       error: (error) => {
+        this.updatingStatus = false;
         this.snackBar.open('Error updating status', 'Close', { duration: 3000 });
         console.error('Error updating status:', error);
       }
@@ -144,15 +149,18 @@ export class HiringProcessDetailComponent implements OnInit {
       return;
     }
 
+    this.addingNote = true;
     this.hiringProcessService.addNote(this.process.publicId, {
       note: this.newNote.trim()
     }).subscribe({
       next: () => {
+        this.addingNote = false;
         this.snackBar.open('Note added successfully', 'Close', { duration: 3000 });
         this.newNote = '';
         this.loadProcess(this.process!.publicId);
       },
       error: (error) => {
+        this.addingNote = false;
         this.snackBar.open('Error adding note', 'Close', { duration: 3000 });
         console.error('Error adding note:', error);
       }
