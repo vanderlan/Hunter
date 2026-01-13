@@ -4,6 +4,7 @@ using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Threading;
@@ -16,6 +17,7 @@ public class UpdateHiringProcessStatusRequestHandlerTests
 {
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<ICurrentUser> _currentUserMock;
+    private readonly Mock<IMediator> _mediatorMock;
     private readonly Mock<ILogger<UpdateHiringProcessStatusRequestHandler>> _loggerMock;
     private readonly UpdateHiringProcessStatusRequestHandler _handler;
 
@@ -23,11 +25,13 @@ public class UpdateHiringProcessStatusRequestHandlerTests
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _currentUserMock = new Mock<ICurrentUser>();
+        _mediatorMock = new Mock<IMediator>();
         _loggerMock = new Mock<ILogger<UpdateHiringProcessStatusRequestHandler>>();
 
         _handler = new UpdateHiringProcessStatusRequestHandler(
             _unitOfWorkMock.Object,
             _currentUserMock.Object,
+            _mediatorMock.Object,
             _loggerMock.Object);
     }
 

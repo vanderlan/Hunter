@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
@@ -92,7 +93,9 @@ public class EmailService : IEmailService
                 From = new MailAddress(_fromEmail, "Hunter Job Monitor"),
                 Subject = $"Hunter Job Alert – {newJobs.Count} New, {closedJobs.Count} Closed",
                 Body = htmlBody,
-                IsBodyHtml = true
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
             };
 
             foreach (var email in toEmails)
@@ -147,9 +150,11 @@ public class EmailService : IEmailService
             var mail = new MailMessage
             {
                 From = new MailAddress(_fromEmail, "Hunter CV Matcher"),
-                Subject = $"🎯 Hunter Candidate Matches – {totalMatches} Matches for {positions.Count} Position(s)",
+                Subject = $"Hunter Candidate Matches - {totalMatches} Matches for {positions.Count} Position(s)",
                 Body = htmlBody,
-                IsBodyHtml = true
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
             };
 
             foreach (var email in _toEmails)
@@ -197,9 +202,11 @@ public class EmailService : IEmailService
             var mail = new MailMessage
             {
                 From = new MailAddress(_fromEmail, "Hunter"),
-                Subject = "Welcome to Hunter! 🎯",
+                Subject = "Welcome to Hunter!",
                 Body = htmlBody,
-                IsBodyHtml = true
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
             };
 
             mail.To.Add(userEmail);
@@ -218,6 +225,187 @@ public class EmailService : IEmailService
         {
             _logger.LogError(ex, "Failed to send welcome email");
         }
+    }
+
+    public async Task SendCandidateReferralNotificationAsync(
+        List<string> toEmails,
+        string candidateName,
+        string candidateEmail,
+        string jobTitle,
+        string jobCode,
+        string referredByUserName,
+        string? referralReason)
+    {
+        try
+        {
+            if (!toEmails.Any())
+            {
+                _logger.LogInformation("No admin users to notify about candidate referral");
+                return;
+            }
+
+            _logger.LogInformation("Sending candidate referral notification to {Count} admins", toEmails.Count);
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["CandidateName"] = candidateName,
+                ["CandidateEmail"] = candidateEmail,
+                ["JobTitle"] = jobTitle,
+                ["JobCode"] = jobCode,
+                ["ReferredByUserName"] = referredByUserName,
+                ["ReferralReason"] = referralReason ?? "",
+                ["HasReferralReason"] = !string.IsNullOrWhiteSpace(referralReason),
+                ["ApplicationUrl"] = _applicationUrl
+            };
+
+            var htmlBody = _templateService.RenderCandidateReferralTemplate(templateData);
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_fromEmail, "Hunter"),
+                Subject = $"New Candidate Referral - {candidateName} for {jobTitle}",
+                Body = htmlBody,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
+
+            foreach (var email in toEmails)
+            {
+                mail.To.Add(email);
+            }
+
+            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_fromEmail, _password),
+                EnableSsl = _enableSsl
+            };
+
+            await smtp.SendMailAsync(mail);
+
+            _logger.LogInformation("Candidate referral notification sent successfully to {Emails}", 
+                string.Join(", ", toEmails));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send candidate referral notification");
+        }
+    }
+
+    public async Task SendStatusChangeNotificationAsync(
+        string toEmail,
+        string candidateName,
+        string jobTitle,
+        string oldStatus,
+        string newStatus,
+        string changedByUserName,
+        string? notes)
+    {
+        try
+        {
+            _logger.LogInformation("Sending status change notification to {Email}", toEmail);
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["CandidateName"] = candidateName,
+                ["JobTitle"] = jobTitle,
+                ["OldStatus"] = FormatStatusName(oldStatus),
+                ["NewStatus"] = FormatStatusName(newStatus),
+                ["ChangedByUserName"] = changedByUserName,
+                ["Notes"] = notes ?? "",
+                ["HasNotes"] = !string.IsNullOrWhiteSpace(notes),
+                ["ApplicationUrl"] = _applicationUrl
+            };
+
+            var htmlBody = _templateService.RenderStatusChangeTemplate(templateData);
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_fromEmail, "Hunter"),
+                Subject = $"Status Update - {candidateName} moved to {FormatStatusName(newStatus)}",
+                Body = htmlBody,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
+
+            mail.To.Add(toEmail);
+
+            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_fromEmail, _password),
+                EnableSsl = _enableSsl
+            };
+
+            await smtp.SendMailAsync(mail);
+
+            _logger.LogInformation("Status change notification sent successfully to {Email}", toEmail);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send status change notification");
+        }
+    }
+
+    public async Task SendNoteAddedNotificationAsync(
+        string toEmail,
+        string candidateName,
+        string jobTitle,
+        string noteText,
+        string addedByUserName)
+    {
+        try
+        {
+            _logger.LogInformation("Sending note added notification to {Email}", toEmail);
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["CandidateName"] = candidateName,
+                ["JobTitle"] = jobTitle,
+                ["NoteText"] = noteText,
+                ["AddedByUserName"] = addedByUserName,
+                ["ApplicationUrl"] = _applicationUrl
+            };
+
+            var htmlBody = _templateService.RenderNoteAddedTemplate(templateData);
+
+            var mail = new MailMessage
+            {
+                From = new MailAddress(_fromEmail, "Hunter"),
+                Subject = $"New Note Added - {candidateName}",
+                Body = htmlBody,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
+
+            mail.To.Add(toEmail);
+
+            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            {
+                Credentials = new NetworkCredential(_fromEmail, _password),
+                EnableSsl = _enableSsl
+            };
+
+            await smtp.SendMailAsync(mail);
+
+            _logger.LogInformation("Note added notification sent successfully to {Email}", toEmail);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send note added notification");
+        }
+    }
+
+    private static string FormatStatusName(string status)
+    {
+        // Convert from enum name to display name
+        return status switch
+        {
+            "ConsultantTechnicalInterview" => "Consultant Technical Interview",
+            "ClientInterview" => "Client Interview",
+            _ => status
+        };
     }
 
     private List<Dictionary<string, object>> ConvertToPositionsList(object matchResults)

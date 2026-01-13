@@ -29,12 +29,19 @@ public class HiringProcessStartedNotificationHandler(
                 return;
             }
 
-            // Send email to each admin (in a real scenario, you might want to batch this)
-            foreach (var admin in adminUsers)
-            {
-                logger.LogInformation("Notifying admin {AdminName} ({AdminEmail}) about hiring process start", 
-                    admin.Name, admin.Email);
-            }
+            var adminEmails = adminUsers.Select(u => u.Email).ToList();
+
+            logger.LogInformation("Sending candidate referral notification to {Count} admin(s)", adminEmails.Count);
+
+            // Send email notification to all admins
+            await emailService.SendCandidateReferralNotificationAsync(
+                adminEmails,
+                notification.CandidateName,
+                notification.CandidateEmail,
+                notification.JobTitle,
+                notification.JobCode,
+                notification.StartedByUserName,
+                notification.ReferralReason);
 
             logger.LogInformation("Hiring process started notification completed for process: {HiringProcessId}", 
                 notification.HiringProcessId);
