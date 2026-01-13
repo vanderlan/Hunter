@@ -50,6 +50,33 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         return result;
     }
 
+    public string RenderCandidateReferralTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering candidate referral template");
+        var template = LoadTemplate("CandidateReferralTemplate.html");
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, length: {Length}", result.Length);
+        return result;
+    }
+
+    public string RenderStatusChangeTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering status change template");
+        var template = LoadTemplate("StatusChangeTemplate.html");
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, length: {Length}", result.Length);
+        return result;
+    }
+
+    public string RenderNoteAddedTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering note added template");
+        var template = LoadTemplate("NoteAddedTemplate.html");
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, length: {Length}", result.Length);
+        return result;
+    }
+
     private string LoadTemplate(string templateName)
     {
         try

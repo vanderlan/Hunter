@@ -9,7 +9,8 @@ import {
   StartHiringProcessRequest,
   StartHiringProcessResponse,
   UpdateStatusRequest,
-  AddNoteRequest
+  AddNoteRequest,
+  GenerateAIInsightsResponse
 } from '../models/hiring-process.model';
 
 @Injectable({
@@ -83,6 +84,12 @@ export class HiringProcessService {
 
   addNote(id: string, request: AddNoteRequest): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/${id}/Notes`, request, {
+      headers: this.getHeaders()
+    });
+  }
+
+  generateAIInsights(id: string): Observable<GenerateAIInsightsResponse> {
+    return this.http.post<GenerateAIInsightsResponse>(`${this.apiUrl}/${id}/GenerateAIInsights`, {}, {
       headers: this.getHeaders()
     });
   }

@@ -29,6 +29,9 @@ public class CvAnalysisMatchMapping : IEntityTypeConfiguration<CvAnalysisMatch>
         builder.Property(x => x.MissingSkills)
             .IsRequired();
         
+        builder.Property(x => x.WhatIsMissingForPerfectMatch)
+            .HasColumnType("text");
+        
         builder.Property(x => x.JobTitle)
             .IsRequired()
             .HasMaxLength(200);

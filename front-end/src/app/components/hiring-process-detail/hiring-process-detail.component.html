@@ -47,6 +47,17 @@
               <span class="label">Email:</span>
               <span class="value">{{ process.candidate.email || 'N/A' }}</span>
             </div>
+            <div class="info-item">
+              <span class="label">Phone:</span>
+              <span class="value">{{ process.candidate.phoneNumber || 'N/A' }}</span>
+            </div>
+            <div class="info-item resume-viewer" *ngIf="process.candidate.hasResume">
+              <span class="label">Resume:</span>
+              <button mat-button color="primary" (click)="viewResume()">
+                <mat-icon>description</mat-icon>
+                View CV
+              </button>
+            </div>
           </mat-card-content>
         </mat-card>
 
@@ -73,6 +84,56 @@
           </mat-card-content>
         </mat-card>
 
+        <!-- AI Insights Card (Admin Only) -->
+        <mat-card class="ai-insights-card" *ngIf="isAdmin">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>psychology</mat-icon>
+              AI Insights
+            </mat-card-title>
+            <mat-card-subtitle *ngIf="process.referralReason">Why this referral?</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- No Insights State -->
+            <div *ngIf="!process.referralReason" class="no-insights">
+              <mat-icon class="no-insights-icon">info_outline</mat-icon>
+              <p class="no-insights-text">No AI insights available for this referral</p>
+              <button 
+                mat-raised-button 
+                color="primary"
+                (click)="generateAIInsights()"
+                [disabled]="generatingInsights"
+                class="generate-button">
+                <mat-icon *ngIf="!generatingInsights">auto_awesome</mat-icon>
+                <mat-spinner *ngIf="generatingInsights" diameter="20" class="button-spinner"></mat-spinner>
+                {{ generatingInsights ? 'Generating...' : 'Generate AI Insights' }}
+              </button>
+            </div>
+
+            <!-- Insights Available State -->
+            <div *ngIf="process.referralReason">
+              <!-- Last AI Analysis Link -->
+              <div class="last-analysis-link" *ngIf="process.lastAIAnalysis">
+                <button 
+                  mat-stroked-button 
+                  color="primary"
+                  (click)="viewAIAnalysis(process.lastAIAnalysis.cvAnalysisPublicId)"
+                  class="analysis-button">
+                  <mat-icon>analytics</mat-icon>
+                  AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'short' }} 
+                  ({{ process.lastAIAnalysis.matchPercentage }}%)
+                  <mat-icon class="external-icon">open_in_new</mat-icon>
+                </button>
+              </div>
+
+              <div class="insights-content">
+                <mat-icon class="insights-icon">lightbulb</mat-icon>
+                <p class="referral-reason">{{ process.referralReason }}</p>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
         <!-- Update Status (Admin Only) -->
         <mat-card class="status-update-card" *ngIf="isAdmin">
           <mat-card-header>
@@ -84,8 +145,8 @@
           <mat-card-content>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>New Status</mat-label>
-              <mat-select [(ngModel)]="selectedStatus">
-                <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+              <mat-select [(ngModel)]="selectedStatus" [disabled]="updatingStatus">
+                <mat-option *ngFor="let option of availableStatusOptions" [value]="option.value">
                   {{ option.label }}
                 </mat-option>
               </mat-select>
@@ -93,12 +154,18 @@
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Notes (Optional)</mat-label>
-              <textarea matInput [(ngModel)]="statusNotes" rows="3" maxlength="1000"></textarea>
+              <textarea matInput [(ngModel)]="statusNotes" rows="3" maxlength="1000" [disabled]="updatingStatus"></textarea>
             </mat-form-field>
 
-            <button mat-raised-button color="primary" (click)="updateStatus()" class="full-width">
-              <mat-icon>check</mat-icon>
-              Update Status
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="updateStatus()" 
+              [disabled]="updatingStatus"
+              class="full-width">
+              <mat-icon *ngIf="!updatingStatus">check</mat-icon>
+              <mat-spinner *ngIf="updatingStatus" diameter="20" class="button-spinner"></mat-spinner>
+              {{ updatingStatus ? 'Updating...' : 'Update Status' }}
             </button>
           </mat-card-content>
         </mat-card>
@@ -156,11 +223,16 @@
             <div class="add-note">
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Add a note...</mat-label>
-                <textarea matInput [(ngModel)]="newNote" rows="3" maxlength="2000"></textarea>
+                <textarea matInput [(ngModel)]="newNote" rows="3" maxlength="2000" [disabled]="addingNote"></textarea>
               </mat-form-field>
-              <button mat-raised-button color="accent" (click)="addNote()" [disabled]="!newNote.trim()">
-                <mat-icon>add</mat-icon>
-                Add Note
+              <button 
+                mat-raised-button 
+                color="accent" 
+                (click)="addNote()" 
+                [disabled]="!newNote.trim() || addingNote">
+                <mat-icon *ngIf="!addingNote">add</mat-icon>
+                <mat-spinner *ngIf="addingNote" diameter="20" class="button-spinner"></mat-spinner>
+                {{ addingNote ? 'Adding...' : 'Add Note' }}
               </button>
             </div>
 

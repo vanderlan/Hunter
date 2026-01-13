@@ -13,6 +13,7 @@
       </mat-card-header>
 
       <mat-card-content>
+        <!-- Default State: Upload Interface -->
         <div *ngIf="!analyzing && matches.length === 0">
           <ngx-file-drop 
             dropZoneClassName="drop-zone"
@@ -55,92 +56,34 @@
           </button>
         </div>
 
+        <!-- Analyzing State -->
         <div *ngIf="analyzing" class="analyzing-state">
           <div class="ai-loading">
             <mat-icon class="ai-star">auto_awesome_mosaic</mat-icon>
           </div>
           <h3>Analyzing CV...</h3>
-          <p>This may take 15-30 seconds. Please wait.</p>
+          <p>This may take 1-2 minutes. Please wait.</p>
           <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
         </div>
 
-        <div *ngIf="!analyzing && matches.length > 0" class="results-container">
-          <div class="results-header">
-            <h2>
-              <mat-icon>check_circle</mat-icon>
-              Found {{ matches.length }} Matching Positions{{ candidateInfo?.name ? (' for ' + candidateInfo?.name) : '' }}
-            </h2>
-            <p>Out of {{ totalPositions }} analyzed positions</p>
-            <div class="header-actions">
-              <button mat-raised-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume">
-                <mat-icon>description</mat-icon>
-                View Uploaded Resume
-              </button>
-              <button mat-raised-button (click)="clearFile()">
-                <mat-icon>upload_file</mat-icon>
-                Analyze Another CV
-              </button>
-            </div>
+        <!-- Success State: Analysis Results Summary -->
+        <div *ngIf="!analyzing && matches.length > 0" class="results-summary">
+          <div class="success-icon">
+            <mat-icon>check_circle</mat-icon>
           </div>
-
-          <div class="matches-grid">
-            <mat-card *ngFor="let match of matches" class="match-card">
-              <mat-card-header>
-                <mat-card-title>{{ match.jobTitle }}</mat-card-title>
-                <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
-              </mat-card-header>
-
-              <mat-card-content>
-                <div class="match-percentage">
-                  <h3>{{ match.matchPercentage }}% Match</h3>
-                  <mat-progress-bar 
-                    mode="determinate" 
-                    [value]="match.matchPercentage"
-                    [color]="getMatchColor(match.matchPercentage)">
-                  </mat-progress-bar>
-                </div>
-
-                <p class="match-reason">{{ match.matchReason }}</p>
-
-                <mat-expansion-panel>
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>Skills Analysis</mat-panel-title>
-                  </mat-expansion-panel-header>
-
-                  <div class="skills-section">
-                    <h4>Matching Skills</h4>
-                    <mat-chip-set>
-                      <mat-chip *ngFor="let skill of match.matchingSkills" class="skill-match">
-                        {{ skill }}
-                      </mat-chip>
-                    </mat-chip-set>
-                  </div>
-
-                  <div class="skills-section">
-                    <h4>Skills to Develop</h4>
-                    <mat-chip-set>
-                      <mat-chip *ngFor="let skill of match.missingSkills" class="skill-missing">
-                        {{ skill }}
-                      </mat-chip>
-                    </mat-chip-set>
-                  </div>
-                </mat-expansion-panel>
-
-                <mat-expansion-panel *ngIf="match.summary">
-                  <mat-expansion-panel-header>
-                    <mat-panel-title>Job Description</mat-panel-title>
-                  </mat-expansion-panel-header>
-                  <p>{{ match.summary }}</p>
-                </mat-expansion-panel>
-              </mat-card-content>
-
-              <mat-card-actions>
-                <button mat-raised-button color="primary" (click)="startHiringProcess(match)" *ngIf="candidateInfo">
-                  <mat-icon>person_add</mat-icon>
-                  Refer Candidate
-                </button>
-              </mat-card-actions>
-            </mat-card>
+          <h2>Found {{ matches.length }} Matching Positions</h2>
+          <p class="candidate-name" *ngIf="candidateInfo?.name">for {{ candidateInfo?.name }}</p>
+          <p class="analysis-info">Out of {{ totalPositions }} analyzed positions</p>
+          
+          <div class="summary-actions">
+            <button mat-raised-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume" class="action-btn">
+              <mat-icon>description</mat-icon>
+              View Uploaded Resume
+            </button>
+            <button mat-raised-button (click)="clearFile()" class="action-btn">
+              <mat-icon>upload_file</mat-icon>
+              Analyze Another CV
+            </button>
           </div>
         </div>
       </mat-card-content>
@@ -193,7 +136,72 @@
     </mat-card>
   </div>
 
-  <!-- Available Positions Card - Full Width Below -->
+  <!-- Matching Results - Full Width Section (Outside Grid) -->
+  <div *ngIf="!analyzing && matches.length > 0" class="results-section">
+    <h3 class="section-title">Matching Job Positions</h3>
+    
+    <div class="matches-grid">
+      <mat-card *ngFor="let match of matches" class="match-card">
+        <mat-card-header>
+          <mat-card-title>{{ match.jobTitle }}</mat-card-title>
+          <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="match-percentage">
+            <h3>{{ match.matchPercentage }}% Match</h3>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="match.matchPercentage"
+              [color]="getMatchColor(match.matchPercentage)">
+            </mat-progress-bar>
+          </div>
+
+          <p class="match-reason">{{ match.matchReason }}</p>
+
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>Skills Analysis</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="skills-section">
+              <h4>Matching Skills</h4>
+              <mat-chip-set>
+                <mat-chip *ngFor="let skill of match.matchingSkills" class="skill-match">
+                  {{ skill }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+
+            <div class="skills-section">
+              <h4>Skills to Develop</h4>
+              <mat-chip-set>
+                <mat-chip *ngFor="let skill of match.missingSkills" class="skill-missing">
+                  {{ skill }}
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-expansion-panel>
+
+          <mat-expansion-panel *ngIf="match.whatIsMissingForPerfectMatch">
+            <mat-expansion-panel-header>
+              <mat-panel-title>What is missing for a perfect match?</mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>{{ match.whatIsMissingForPerfectMatch }}</p>
+          </mat-expansion-panel>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="startHiringProcess(match)" *ngIf="candidateInfo">
+            <mat-icon>person_add</mat-icon>
+            Refer Candidate
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Available Positions Card - Separate Full Width Section -->
   <mat-card class="positions-listing-card">
     <mat-card-header>
       <mat-card-title class="positions-listing-title">

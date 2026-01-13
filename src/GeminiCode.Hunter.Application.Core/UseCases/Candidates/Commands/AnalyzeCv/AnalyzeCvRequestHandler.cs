@@ -135,7 +135,9 @@ public class AnalyzeCvRequestHandler(
                         MissingSkills = match.MissingSkills,
                         Summary = job.Summary,
                         MustHaveSkills = job.MustHaveSkills,
-                        NiceToHaveSkills = job.NiceToHaveSkills
+                        NiceToHaveSkills = job.NiceToHaveSkills,
+                        ReferralReason = match.ReferralReason,
+                        WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch
                     };
                 }).ToList()
             };
@@ -277,6 +279,9 @@ public class AnalyzeCvRequestHandler(
         {
             logger.LogInformation("Saving CV analysis history for candidate {CandidateId}", candidateId);
 
+            logger.LogInformation("Deleting previous analysis records for candidate {CandidateId}", candidateId);
+            await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidateId);
+
             var cvAnalysis = new CvAnalysisEntity
             {
                 CandidateId = candidateId,
@@ -307,7 +312,8 @@ public class AnalyzeCvRequestHandler(
                     CompanyCode = job.CompanyCode,
                     JobSummary = job.Summary,
                     MustHaveSkills = job.MustHaveSkills,
-                    NiceToHaveSkills = job.NiceToHaveSkills
+                    NiceToHaveSkills = job.NiceToHaveSkills,
+                    WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch
                 };
 
                 cvAnalysis.Matches.Add(analysisMatch);

@@ -8,5 +8,11 @@ public static class DomainConstants
         public const string DeepSeek = "DeepSeek";
         public const string DeepSeekUrl = "https://api.deepseek.com";
     }
-}
 
+    public static class AIMatching
+    {
+        public const int MinimumMatchPercentage = 70;
+        public const int HighMatchPercentage = 70;
+        public const int MediumMatchPercentage = 50;
+    }
+}

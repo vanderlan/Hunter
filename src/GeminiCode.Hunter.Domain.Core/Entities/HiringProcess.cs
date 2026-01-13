@@ -11,6 +11,7 @@ public class HiringProcess : BaseEntity
     public required HiringProcessStatus Status { get; set; }
     public required long CreatedByUserId { get; set; }
     public long? LastUpdatedByUserId { get; set; }
+    public string? ReferralReason { get; set; }
     
     public virtual Candidate? Candidate { get; set; }
     public virtual JobPosition? JobPosition { get; set; }

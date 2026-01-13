@@ -1,3 +1,4 @@
+using GeminiCode.Hunter.Domain.Core.Extensions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -29,6 +30,33 @@ public class HiringProcessGetByIdRequestHandler(
         var notes = await unitOfWork.HiringProcessNoteRepository
             .GetByHiringProcessIdAsync(hiringProcess.HiringProcessId);
 
+        // Check if candidate has resume
+        var hasResume = false;
+        if (hiringProcess.Candidate != null)
+        {
+            var candidateFile = await unitOfWork.CandidateFileRepository
+                .GetByCandidateAndFileTypeAsync(hiringProcess.Candidate.CandidateId, "Resume");
+            hasResume = candidateFile != null;
+        }
+
+        // Get last AI analysis for this candidate and job position
+        LastAIAnalysisInfo? lastAIAnalysis = null;
+        if (hiringProcess.Candidate != null && hiringProcess.JobPosition != null)
+        {
+            var lastMatch = await unitOfWork.CvAnalysisRepository
+                .GetLastAnalysisMatchAsync(hiringProcess.CandidateId, hiringProcess.JobPositionId);
+            
+            if (lastMatch != null)
+            {
+                lastAIAnalysis = new LastAIAnalysisInfo
+                {
+                    CvAnalysisPublicId = lastMatch.CvAnalysis.PublicId,
+                    AnalyzedAt = lastMatch.CvAnalysis.AnalyzedAt.ToApplicationTime(),
+                    MatchPercentage = lastMatch.MatchPercentage
+                };
+            }
+        }
+
         var response = new HiringProcessGetByIdResponse
         {
             PublicId = hiringProcess.PublicId,
@@ -37,7 +65,9 @@ public class HiringProcessGetByIdRequestHandler(
             {
                 PublicId = hiringProcess.Candidate?.PublicId ?? string.Empty,
                 Name = hiringProcess.Candidate?.Name,
-                Email = hiringProcess.Candidate?.Email
+                Email = hiringProcess.Candidate?.Email,
+                PhoneNumber = hiringProcess.Candidate?.PhoneNumber,
+                HasResume = hasResume
             },
             JobPosition = new JobPositionInfo
             {
@@ -56,23 +86,25 @@ public class HiringProcessGetByIdRequestHandler(
                 Name = hiringProcess.LastUpdatedByUser.Name,
                 Email = hiringProcess.LastUpdatedByUser.Email
             } : null,
+            ReferralReason = hiringProcess.ReferralReason,
+            LastAIAnalysis = lastAIAnalysis,
             StatusHistory = statusHistory.Select(h => new StatusHistoryItem
             {
                 FromStatus = h.FromStatus.ToString(),
                 ToStatus = h.ToStatus.ToString(),
                 ChangedByUserName = h.ChangedByUser?.Name ?? string.Empty,
                 Notes = h.Notes,
-                CreatedAt = h.CreatedAt
+                CreatedAt = h.CreatedAt.ToApplicationTime() // Convert to configured timezone
             }).ToList(),
             Notes = notes.Select(n => new NoteItem
             {
                 PublicId = n.PublicId,
                 Note = n.Note,
                 UserName = n.User?.Name ?? string.Empty,
-                CreatedAt = n.CreatedAt
+                CreatedAt = n.CreatedAt.ToApplicationTime() // Convert to configured timezone
             }).ToList(),
-            CreatedAt = hiringProcess.CreatedAt,
-            LastUpdated = hiringProcess.LastUpdated
+            CreatedAt = hiringProcess.CreatedAt.ToApplicationTime(), // Convert to configured timezone
+            LastUpdated = hiringProcess.LastUpdated.ToApplicationTime() // Convert to configured timezone
         };
 
         logger.LogInformation("Hiring process retrieved successfully: {PublicId}", request.PublicId);

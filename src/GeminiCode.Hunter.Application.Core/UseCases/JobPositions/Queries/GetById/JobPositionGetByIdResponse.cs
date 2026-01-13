@@ -1,4 +1,5 @@
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Extensions;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Queries.GetById;
 
@@ -40,10 +41,10 @@ public class JobPositionGetByIdResponse
             MustHaveSkills = jobPosition.MustHaveSkills,
             NiceToHaveSkills = jobPosition.NiceToHaveSkills,
             IsActive = jobPosition.IsActive,
-            ClosedAt = jobPosition.ClosedAt,
-            LastCheckedAt = jobPosition.LastCheckedAt,
-            LastUpdated = jobPosition.LastUpdated,
-            CreatedAt = jobPosition.CreatedAt
+            ClosedAt = jobPosition.ClosedAt?.ToApplicationTime(), // Convert to configured timezone
+            LastCheckedAt = jobPosition.LastCheckedAt.ToApplicationTime(), // Convert to configured timezone
+            LastUpdated = jobPosition.LastUpdated.ToApplicationTime(), // Convert to configured timezone
+            CreatedAt = jobPosition.CreatedAt.ToApplicationTime() // Convert to configured timezone
         };
     }
 }

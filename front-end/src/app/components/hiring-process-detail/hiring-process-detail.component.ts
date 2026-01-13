@@ -11,8 +11,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
+import { CvAnalysisService } from '../../services/cv-analysis.service';
 import { AuthService } from '../../services/auth.service';
 import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.model';
 
@@ -31,6 +33,7 @@ import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.
     MatInputModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatDialogModule,
     FormsModule
   ],
   templateUrl: './hiring-process-detail.component.html',
@@ -39,12 +42,15 @@ import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.
 export class HiringProcessDetailComponent implements OnInit {
   process: HiringProcess | null = null;
   loading = true;
+  updatingStatus = false;
+  addingNote = false;
   newNote = '';
   selectedStatus: HiringProcessStatus | null = null;
   statusNotes = '';
   isAdmin = false;
+  generatingInsights = false;
 
-  statusOptions = [
+  allStatusOptions = [
     { value: HiringProcessStatus.Referred, label: 'Referred' },
     { value: HiringProcessStatus.Screening, label: 'Screening' },
     { value: HiringProcessStatus.ConsultantTechnicalInterview, label: 'Consultant Technical Interview' },
@@ -57,8 +63,10 @@ export class HiringProcessDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private hiringProcessService: HiringProcessService,
+    private cvAnalysisService: CvAnalysisService,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -117,16 +125,19 @@ export class HiringProcessDetailComponent implements OnInit {
       return;
     }
 
+    this.updatingStatus = true;
     this.hiringProcessService.updateStatus(this.process.publicId, {
       newStatus: this.selectedStatus,
       notes: this.statusNotes || undefined
     }).subscribe({
       next: () => {
+        this.updatingStatus = false;
         this.snackBar.open('Status updated successfully', 'Close', { duration: 3000 });
         this.statusNotes = '';
         this.loadProcess(this.process!.publicId);
       },
       error: (error) => {
+        this.updatingStatus = false;
         this.snackBar.open('Error updating status', 'Close', { duration: 3000 });
         console.error('Error updating status:', error);
       }
@@ -138,17 +149,44 @@ export class HiringProcessDetailComponent implements OnInit {
       return;
     }
 
+    this.addingNote = true;
     this.hiringProcessService.addNote(this.process.publicId, {
       note: this.newNote.trim()
     }).subscribe({
       next: () => {
+        this.addingNote = false;
         this.snackBar.open('Note added successfully', 'Close', { duration: 3000 });
         this.newNote = '';
         this.loadProcess(this.process!.publicId);
       },
       error: (error) => {
+        this.addingNote = false;
         this.snackBar.open('Error adding note', 'Close', { duration: 3000 });
         console.error('Error adding note:', error);
+      }
+    });
+  }
+
+  generateAIInsights(): void {
+    if (!this.process || !this.isAdmin) {
+      return;
+    }
+
+    this.generatingInsights = true;
+    this.hiringProcessService.generateAIInsights(this.process.publicId).subscribe({
+      next: (response) => {
+        this.generatingInsights = false;
+        this.snackBar.open('AI insights generated successfully!', 'Close', { duration: 3000 });
+        // Update the local process object with the new referral reason
+        if (this.process) {
+          this.process.referralReason = response.referralReason;
+        }
+      },
+      error: (error) => {
+        this.generatingInsights = false;
+        const errorMessage = error.error?.message || 'Error generating AI insights. Please try again.';
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+        console.error('Error generating AI insights:', error);
       }
     });
   }
@@ -181,5 +219,54 @@ export class HiringProcessDetailComponent implements OnInit {
       default:
         return status;
     }
+  }
+
+  get availableStatusOptions() {
+    if (!this.process) {
+      return this.allStatusOptions;
+    }
+    
+    const currentStatusEnum = this.mapStringToEnum(this.process.status);
+    return this.allStatusOptions.filter(option => option.value !== currentStatusEnum);
+  }
+
+  viewResume(): void {
+    if (!this.process || !this.process.candidate.publicId) {
+      return;
+    }
+
+    import('../resume-viewer/resume-viewer-dialog.component').then(m => {
+      this.dialog.open(m.ResumeViewerDialogComponent, {
+        data: {
+          candidateId: this.process!.candidate.publicId,
+          candidateName: this.process!.candidate.name || 'Candidate'
+        },
+        width: '90vw',
+        height: '90vh',
+        maxWidth: '1200px',
+        panelClass: 'resume-viewer-dialog'
+      });
+    });
+  }
+
+  viewAIAnalysis(cvAnalysisPublicId: string): void {
+    // Load the analysis detail and show in a dialog
+    this.cvAnalysisService.getAnalysisDetail(cvAnalysisPublicId).subscribe({
+      next: (analysisDetail) => {
+        import('./ai-analysis-dialog.component').then(m => {
+          this.dialog.open(m.AIAnalysisDialogComponent, {
+            data: analysisDetail,
+            width: '90vw',
+            height: '90vh',
+            maxWidth: '1400px',
+            panelClass: 'ai-analysis-dialog'
+          });
+        });
+      },
+      error: (error) => {
+        this.snackBar.open('Error loading AI analysis', 'Close', { duration: 3000 });
+        console.error('Error loading AI analysis:', error);
+      }
+    });
   }
 }

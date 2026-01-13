@@ -47,7 +47,8 @@ public class GetCvAnalysisDetailRequestHandler(
                 MissingSkills = System.Text.Json.JsonSerializer.Deserialize<List<string>>(m.MissingSkills) ?? [],
                 Summary = m.JobSummary,
                 MustHaveSkills = m.MustHaveSkills,
-                NiceToHaveSkills = m.NiceToHaveSkills
+                NiceToHaveSkills = m.NiceToHaveSkills,
+                WhatIsMissingForPerfectMatch = m.WhatIsMissingForPerfectMatch
             }).OrderByDescending(m => m.MatchPercentage).ToList()
         };
 

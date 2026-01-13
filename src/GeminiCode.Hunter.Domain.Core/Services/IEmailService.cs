@@ -20,4 +20,29 @@ public interface IEmailService
         string userName,
         string userEmail,
         string password);
+    
+    Task SendCandidateReferralNotificationAsync(
+        List<string> toEmails,
+        string candidateName,
+        string candidateEmail,
+        string jobTitle,
+        string jobCode,
+        string referredByUserName,
+        string? referralReason);
+    
+    Task SendStatusChangeNotificationAsync(
+        string toEmail,
+        string candidateName,
+        string jobTitle,
+        string oldStatus,
+        string newStatus,
+        string changedByUserName,
+        string? notes);
+    
+    Task SendNoteAddedNotificationAsync(
+        string toEmail,
+        string candidateName,
+        string jobTitle,
+        string noteText,
+        string addedByUserName);
 }

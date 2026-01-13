@@ -25,6 +25,30 @@ public class HiringProcessRepository(DataContext dataContext) : BaseEntityReposi
             .SingleOrDefaultAsync(x => x.PublicId == publicId);
     }
 
+    public async Task LoadRelatedEntitiesAsync(HiringProcess hiringProcess)
+    {
+        if (hiringProcess.Candidate == null)
+        {
+            await DataContext.Entry(hiringProcess)
+                .Reference(x => x.Candidate)
+                .LoadAsync();
+        }
+
+        if (hiringProcess.JobPosition == null)
+        {
+            await DataContext.Entry(hiringProcess)
+                .Reference(x => x.JobPosition)
+                .LoadAsync();
+        }
+
+        if (hiringProcess.CreatedByUser == null)
+        {
+            await DataContext.Entry(hiringProcess)
+                .Reference(x => x.CreatedByUser)
+                .LoadAsync();
+        }
+    }
+
     public async Task<PagedList<HiringProcess>> ListPaginateAsync(HiringProcessFilter filter)
     {
         IQueryable<HiringProcess> query = DataContext.Set<HiringProcess>()

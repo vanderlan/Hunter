@@ -1,3 +1,4 @@
+using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Notifications.StatusChanged;
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
@@ -9,6 +10,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Upd
 public class UpdateHiringProcessStatusRequestHandler(
     IUnitOfWork unitOfWork,
     ICurrentUser currentUser,
+    IMediator mediator,
     ILogger<UpdateHiringProcessStatusRequestHandler> logger)
     : IRequestHandler<UpdateHiringProcessStatusRequest>
 {
@@ -31,6 +33,17 @@ public class UpdateHiringProcessStatusRequestHandler(
 
         var oldStatus = hiringProcess.Status;
 
+        // Validate that the new status is different from the current status
+        if (oldStatus == request.NewStatus)
+        {
+            logger.LogWarning("Attempted to update hiring process {PublicId} to the same status: {Status}", 
+                request.PublicId, request.NewStatus);
+            throw new BusinessException("Cannot update to the same status. Please select a different status.");
+        }
+
+        // Load related entities for notification
+        await unitOfWork.HiringProcessRepository.LoadRelatedEntitiesAsync(hiringProcess);
+
         // Update status
         hiringProcess.Status = request.NewStatus;
         hiringProcess.LastUpdatedByUserId = user.UserId;
@@ -48,6 +61,22 @@ public class UpdateHiringProcessStatusRequestHandler(
 
         await unitOfWork.HiringProcessStatusHistoryRepository.AddAsync(statusHistory);
         await unitOfWork.CommitAsync();
+
+        // Send notification to the user who made the referral
+        if (hiringProcess.CreatedByUser != null && hiringProcess.Candidate != null && hiringProcess.JobPosition != null)
+        {
+            await mediator.Publish(new HiringProcessStatusChangedNotification
+            {
+                HiringProcessId = hiringProcess.PublicId,
+                CandidateName = hiringProcess.Candidate.Name ?? "Unknown",
+                JobTitle = hiringProcess.JobPosition.Title,
+                OldStatus = oldStatus.ToString(),
+                NewStatus = request.NewStatus.ToString(),
+                ChangedByUserName = user.Name,
+                Notes = request.Notes,
+                ReferredByUserEmail = hiringProcess.CreatedByUser.Email
+            }, cancellationToken);
+        }
 
         logger.LogInformation("Hiring process status updated successfully: {PublicId}, {OldStatus} -> {NewStatus}", 
             request.PublicId, oldStatus, request.NewStatus);

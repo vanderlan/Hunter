@@ -238,7 +238,7 @@ export class CvAnalyzerComponent implements OnInit {
 
   getMatchColor(percentage: number): string {
     if (percentage >= 80) return 'primary';
-    if (percentage >= 60) return 'accent';
+    if (percentage >= 70) return 'accent';
     if (percentage >= 40) return 'warn';
     return '';
   }
@@ -257,21 +257,42 @@ export class CvAnalyzerComponent implements OnInit {
       return;
     }
 
-    this.hiringProcessService.startHiringProcess({
-      candidateId: this.candidateInfo.candidateId,
-      jobPositionId: jobPosition.publicId
-    }).subscribe({
-      next: (response) => {
-        this.snackBar.open(
-          `Candidate referral submitted successfully! Admin will review and decide whether to start the hiring process.`,
-          'Close',
-          { duration: 6000 }
-        );
-      },
-      error: (error) => {
-        const message = error.error?.message || 'Error submitting referral. It may already exist.';
-        this.snackBar.open(message, 'Close', { duration: 5000 });
-      }
+    // Show confirmation dialog
+    import('./refer-confirmation-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.ReferConfirmationDialogComponent, {
+        data: {
+          candidateName: this.candidateInfo!.name || 'Unknown Candidate',
+          jobTitle: match.jobTitle,
+          matchPercentage: match.matchPercentage
+        },
+        width: '500px',
+        maxWidth: '95vw',
+        disableClose: false,
+        autoFocus: true
+      });
+
+      dialogRef.afterClosed().subscribe(confirmed => {
+        if (confirmed) {
+          // User confirmed, proceed with referral
+          this.hiringProcessService.startHiringProcess({
+            candidateId: this.candidateInfo!.candidateId,
+            jobPositionId: jobPosition.publicId!,
+            referralReason: match.referralReason
+          }).subscribe({
+            next: (response) => {
+              this.snackBar.open(
+                `Candidate referral submitted successfully! Admin will review and decide whether to start the hiring process.`,
+                'Close',
+                { duration: 6000 }
+              );
+            },
+            error: (error) => {
+              const message = error.error?.message || 'Error submitting referral. It may already exist.';
+              this.snackBar.open(message, 'Close', { duration: 5000 });
+            }
+          });
+        }
+      });
     });
   }
 }

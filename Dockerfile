@@ -9,7 +9,9 @@ RUN dotnet publish "src/GeminiCode.Hunter.Api/GeminiCode.Hunter.Api.csproj" -c R
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:80  
+ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_Kestrel__Limits__RequestHeadersTimeout=00:05:00
+ENV ASPNETCORE_Kestrel__Limits__KeepAliveTimeout=00:05:00
 EXPOSE 80
 
 WORKDIR /app

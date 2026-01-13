@@ -44,4 +44,36 @@ public class CvAnalysisRepository(DataContext dataContext)
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.PublicId == publicId);
     }
+
+    public async Task DeleteByCandidateIdAsync(long candidateId)
+    {
+        var existingAnalyses = await DataContext.CvAnalyses
+            .Include(x => x.Matches)
+            .Where(x => x.CandidateId == candidateId)
+            .ToListAsync();
+
+        if (existingAnalyses.Any())
+        {
+            // Delete all matches first (due to foreign key constraint)
+            foreach (var analysis in existingAnalyses)
+            {
+                DataContext.CvAnalysisMatches.RemoveRange(analysis.Matches);
+            }
+
+            // Then delete all analyses
+            DataContext.CvAnalyses.RemoveRange(existingAnalyses);
+            
+            await DataContext.SaveChangesAsync();
+        }
+    }
+
+    public async Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId)
+    {
+        return await DataContext.CvAnalysisMatches
+            .Include(x => x.CvAnalysis)
+            .Where(x => x.CvAnalysis.CandidateId == candidateId && x.JobPositionId == jobPositionId)
+            .OrderByDescending(x => x.CvAnalysis.AnalyzedAt)
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
 }

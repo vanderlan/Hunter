@@ -10,6 +10,7 @@ public class CvAnalysisMatch : BaseEntity
     public string MatchReason { get; set; } = string.Empty;
     public string MatchingSkills { get; set; } = string.Empty;
     public string MissingSkills { get; set; } = string.Empty;
+    public string? WhatIsMissingForPerfectMatch { get; set; }
     
     public string JobTitle { get; set; } = string.Empty;
     public string JobCode { get; set; } = string.Empty;

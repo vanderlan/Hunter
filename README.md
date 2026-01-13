@@ -8,31 +8,49 @@
 
 ## About this Project
 
-**Hunter** is a comprehensive AI-powered system for analyzing CVs against job positions. It uses OpenAI GPT-4o to intelligently match candidates with available jobs, providing match percentages, skills analysis, and detailed recommendations.
+**Hunter** is a comprehensive AI-powered recruitment management system that streamlines the entire hiring process from CV analysis to candidate tracking. It intelligently matches candidates with job positions using advanced AI technology (OpenAI GPT-4o or DeepSeek) and provides complete hiring process management capabilities.
 
 ### Key Features
 
 + **AI-Powered CV Analysis**
-	+ OpenAI GPT-4o integration for intelligent matching
-	+ PDF text extraction and analysis
-	+ Match percentage calculation (>20% threshold)
-	+ Skills gap analysis
+	+ Dual AI provider support: OpenAI GPT-4o or DeepSeek (90% cost savings)
+	+ PDF text extraction and analysis (PdfPig)
+	+ Intelligent match percentage calculation (>70% threshold)
+	+ Comprehensive skills gap analysis
 	+ Matching and missing skills identification
+	+ Detailed recommendations for each candidate
 
-+ **Job Management**
++ **Hiring Process Management**
+	+ Complete candidate lifecycle tracking (Referred → Screening → Technical Interview → Client Interview → Hired/Reproved)
+	+ Visual timeline of status history
+	+ Collaborative notes system for team communication
+	+ Role-based status updates (Admin only)
+	+ Dashboard with hiring statistics
+	+ Integration with CV analyzer for seamless workflow
+
++ **Job Management & AI Enrichment**
 	+ Automated web scraping from external job boards
-	+ Background service for hourly synchronization (8 AM - 6 PM)
+	+ AI-powered job data extraction and enrichment
+	+ Background service for hourly synchronization (8 AM - 6 PM, Mon-Fri)
 	+ Email notifications on job changes
 	+ Job position tracking and history
+	+ Smart sync logic (one-time AI enrichment per job)
+
++ **User Management & Security**
+	+ Role-based access control (Admin/Partner)
+	+ JWT authentication with refresh tokens
+	+ Secure password hashing (SHA-512)
+	+ User profile management
+	+ Admin area for user administration
 
 + **Modern Tech Stack**
-	+ .NET 10 Web API backend
+	+ .NET 10 Web API backend with CQRS pattern
 	+ Angular 17 standalone components frontend
-	+ PostgreSQL database
-	+ Elasticsearch + Kibana for logging
-	+ Docker Compose for containerization
+	+ PostgreSQL 16.3 database
+	+ Elasticsearch 8.17.4 + Kibana 8.10.2 for logging
+	+ Docker Compose for full-stack orchestration
 
-## ?? Quick Start with Docker
+## 🚀 Quick Start with Docker
 
 **Start the entire system with one command:**
 
@@ -56,28 +74,52 @@ docker-compose up -d
 
 **Libraries & Frameworks:**
 + Entity Framework Core 10.0
-	+ Fluent API
+	+ Fluent API with custom mappings
 	+ PostgreSQL provider (Npgsql)
 	+ CreatedAt and UpdatedAt by default
-	+ Pagination support
+	+ Pagination support with filters
+	+ Cascade delete configurations
 
 + MediatR (CQRS + Notifications)
+	+ Command/Query separation
+	+ Request handlers for all operations
+	+ Notification pattern for cross-cutting concerns
+	
 + Swagger/OpenAPI Documentation
-+ Fluent Validation
++ Fluent Validation (Input validation)
 + Authentication & Authorization
 	+ JWT Token with Refresh Token
 	+ Claims and profiles configuration
-	+ Role-based access control (Admin/User)
+	+ Role-based access control (Admin/Partner)
 	+ Secure password hashing (SHA-512)
 
 + Serilog (Structured Logging)
 	+ Elasticsearch integration
 	+ Correlation ID tracking
+	+ Request/response logging
 	
-+ OpenAI API Integration
-+ HtmlAgilityPack (Web Scraping)
-+ PdfPig (PDF Text Extraction)
-+ Bogus (Test Data Generation)
++ AI Integration (Dual Provider Support)
+	+ OpenAI GPT-4o (default)
+	+ DeepSeek (90% cost savings alternative)
+	+ Structured JSON responses with schema validation
+	+ CV analysis and job enrichment
+	
++ Additional Libraries
+	+ HtmlAgilityPack (Web Scraping)
+	+ PdfPig (PDF Text Extraction)
+	+ Bogus (Test Data Generation)
+
+**Domain Entities:**
++ **User** - System users with roles (Admin/Partner)
++ **JobPosition** - Job openings with AI-enriched details
++ **Candidate** - Candidate profiles
++ **CvAnalysis** - CV analysis results
++ **CvAnalysisMatch** - Match results between CV and jobs
++ **HiringProcess** - Complete hiring lifecycle tracking
++ **HiringProcessStatusHistory** - Status change audit trail
++ **HiringProcessNote** - Collaborative notes
++ **RefreshToken** - JWT refresh tokens
++ **CandidateFile** - Uploaded CV files
 
 **Patterns & Best Practices:**
 1. Business Exceptions
@@ -106,14 +148,42 @@ docker-compose up -d
 + SCSS styling
 + Lazy loading routes
 + JWT Authentication with auto-refresh
++ Role-based UI rendering
 
-**Features:**
-+ Drag & drop CV upload (ngx-file-drop)
-+ Real-time CV analysis with loading animations
-+ Match percentage visualization
-+ Skills analysis display
-+ Job management interface
-+ Responsive design (mobile-first)
+**Components & Features:**
++ **CV Analyzer**
+	+ Drag & drop CV upload (ngx-file-drop)
+	+ Real-time CV analysis with loading animations
+	+ Match percentage visualization with cards
+	+ Skills analysis display (matching & missing)
+	+ Job details dialog
+	+ Start hiring process from matches
+	
++ **Hiring Process Management**
+	+ Dashboard with statistics (total, active, hired, reproved)
+	+ Paginated list with search functionality
+	+ Color-coded status chips
+	+ Detailed view with visual timeline
+	+ Collaborative notes section
+	+ Status update form (Admin only)
+	
++ **Job Positions Management**
+	+ List all job positions
+	+ Create, update, and manage jobs
+	+ Job details with AI-enriched content
+	+ Skills visualization
+	
++ **Admin Area**
+	+ User management (create, update, delete)
+	+ Role assignment (Admin/Partner)
+	+ User activity monitoring
+	
++ **Additional Features**
+	+ Responsive design (mobile-first)
+	+ Change password functionality
+	+ User preferences management
+	+ Login with remember me
+	+ Sidebar navigation with role-based menu items
 
 ## Docker Services
 
@@ -136,22 +206,55 @@ The application runs 5 containerized services:
 
 ### Authentication
 ```http
-POST /api/auth/login
-POST /api/auth/refresh-token
+POST /api/auth/login          # User login
+POST /api/auth/refresh-token  # Refresh JWT token
 ```
 
-### Jobs
+### Job Positions
 ```http
-GET  /api/jobs/active
-GET  /api/jobs/active?companyCode={code}
-POST /api/jobs/sync  # Admin only
+GET  /api/JobPositions                      # List all jobs (paginated)
+GET  /api/JobPositions/{id}                 # Get job by ID
+POST /api/JobPositions                      # Create new job (Admin)
+PUT  /api/JobPositions/{id}                 # Update job (Admin)
+DELETE /api/JobPositions/{id}               # Delete job (Admin)
+POST /api/JobPositions/Sync                 # Sync from external source (Admin)
+GET  /api/JobPositions/active               # List active jobs
+GET  /api/JobPositions/active?companyCode=X # Filter by company
+```
+
+### CV Analysis
+```http
+POST /api/CvAnalysis/Analyze  # Analyze CV against jobs
+Content-Type: multipart/form-data
+File: PDF (max 10MB)
+Body: { candidateName, candidateEmail }
+```
+
+### Hiring Process
+```http
+GET  /api/HiringProcess              # List all hiring processes (paginated)
+GET  /api/HiringProcess/{id}         # Get process details
+GET  /api/HiringProcess/Dashboard    # Get dashboard statistics
+POST /api/HiringProcess              # Start new process (Admin/Partner)
+PUT  /api/HiringProcess/{id}/Status  # Update status (Admin only)
+POST /api/HiringProcess/{id}/Notes   # Add note (Admin/Partner)
+```
+
+### User Management
+```http
+GET  /api/Users           # List all users (Admin)
+GET  /api/Users/{id}      # Get user by ID (Admin)
+POST /api/Users           # Create user (Admin)
+PUT  /api/Users/{id}      # Update user (Admin)
+DELETE /api/Users/{id}    # Delete user (Admin)
+PUT  /api/Users/Password  # Change own password
 ```
 
 ### Candidates
 ```http
-POST /api/candidates/analyze  # Admin only
-Content-Type: multipart/form-data
-File: PDF (max 10MB)
+POST /api/Candidates/Analyze  # Deprecated: Use /api/CvAnalysis/Analyze
+# This endpoint is maintained for backward compatibility
+# Consider migrating to the new endpoint
 ```
 
 ## Configuration
@@ -169,8 +272,16 @@ File: PDF (max 10MB)
     "Audience": "http://www.hunter-api.com",
     "TokenExpirationMinutes": 120
   },
+  "AI": {
+    "Provider": "OpenAI"  // or "DeepSeek" for 90% cost savings
+  },
   "OpenAI": {
-    "ApiKey": "sk-your-openai-api-key"
+    "ApiKey": "sk-your-openai-api-key",
+    "Model": "gpt-4o"
+  },
+  "DeepSeek": {
+    "ApiKey": "sk-your-deepseek-api-key",  // Required when using DeepSeek provider
+    "Model": "deepseek-chat"
   },
   "JobScraper": {
     "CareersUrl": "https://taller.applytojob.com/apply/"
@@ -179,18 +290,98 @@ File: PDF (max 10MB)
     "SmtpHost": "smtp.gmail.com",
     "SmtpPort": 587,
     "FromEmail": "your@email.com",
-    "ToEmail": "recipient@email.com",
+    "ToEmails": ["recipient@email.com"],  // Array of recipients (or use "ToEmail" for single)
     "Password": "your-app-password",
-    "EnableSsl": true
+    "EnableSsl": true,
+    "ApplicationUrl": "http://localhost:5200"
   },
   "JobSync": {
     "StartTime": "08:00",
     "EndTime": "18:00",
     "IntervalHours": 1,
     "Enabled": true
+  },
+  "ElasticConfiguration": {
+    "Uri": "http://localhost:9200"
   }
 }
 ```
+
+### AI Provider Configuration
+
+**OpenAI (Default - High Quality)**
+```json
+{
+  "AI": {
+    "Provider": "OpenAI"  // or omit this setting
+  },
+  "OpenAI": {
+    "ApiKey": "sk-your-key",
+    "Model": "gpt-4o"
+  }
+}
+```
+
+**DeepSeek (90% Cost Savings)**
+```json
+{
+  "AI": {
+    "Provider": "DeepSeek"
+  },
+  "DeepSeek": {
+    "ApiKey": "sk-your-key",
+    "Model": "deepseek-chat"
+  }
+}
+```
+
+**Cost Comparison (Pricing as of January 2026):**
+
+| Provider | Cost per 1M tokens | Typical Monthly Cost |
+|----------|-------------------|---------------------|
+| OpenAI GPT-4o | $2.50 / $10.00 (in/out) | ~$15.60 |
+| DeepSeek | $0.27 / $1.10 (in/out) | ~$1.56 |
+
+*Note: AI provider pricing may change. Please check provider websites for current rates.*
+
+## AI Job Enrichment
+
+The Hunter uses AI to automatically extract and structure job information from scraped web pages, providing high-quality, consistent data for CV matching.
+
+### How It Works
+
+1. **Job Scraper** fetches raw HTML from external job boards
+2. **AI Service** (OpenAI or DeepSeek) analyzes the HTML content
+3. **Structured Extraction** generates:
+   - Job summary
+   - Detailed responsibilities
+   - Comprehensive skills list
+   - Must-have skills (required)
+   - Nice-to-have skills (optional)
+4. **One-time Processing** - Each job is enriched only once (cost optimization)
+5. **Existing Jobs** - Only update LastCheckedAt timestamp (no AI call)
+
+### Benefits
+
+✅ **Accuracy** - AI understands context better than regex/HTML parsing  
+✅ **Maintainability** - No brittle HTML selectors to maintain  
+✅ **Consistency** - Structured JSON output every time  
+✅ **Cost-Effective** - One-time processing per new job  
+✅ **Flexible** - Works with any HTML structure  
+
+### Smart Sync Logic
+
+```
+NEW Job → Extract HTML → Call AI → Save Enriched Data
+EXISTING Job (same title) → Update LastCheckedAt only (no AI call)
+CHANGED Title → Mark as closed + Create as new job
+```
+
+**Monthly Cost Estimate (50 new jobs):**
+- Input tokens: 50 × 3000 = 150K tokens
+- Output tokens: 50 × 400 = 20K tokens
+- **OpenAI:** ~$0.58/month
+- **DeepSeek:** ~$0.06/month
 
 ## Background Services
 
@@ -203,35 +394,85 @@ File: PDF (max 10MB)
 
 **Daily Schedule Example:**
 ```
-08:00 AM ? Sync #1
-09:00 AM ? Sync #2
+08:00 AM → Sync #1
+09:00 AM → Sync #2
 ...
-06:00 PM ? Sync #11 (last of the day)
+06:00 PM → Sync #11 (last of the day)
 ```
 
 ## Email Notifications
 
 Automatically sends notifications when:
-- ? New job positions are added
-- ? Job positions are closed/removed
+- 📩 New job positions are added
+- 📩 Job positions are closed/removed
 
 **Email Format:**
 ```
-???????????????????????????????????????
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      HUNTER JOB CHANGES DETECTED
-???????????????????????????????????????
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-??? NEW POSITIONS OPENED ???
+✅ NEW POSITIONS OPENED ✅
 Total: 2
 
-  ? Senior Backend Developer
-  ? Frontend Developer
+  ◉ Senior Backend Developer
+  ◉ Frontend Developer
 
-??? POSITIONS CLOSED ???
+❌ POSITIONS CLOSED ❌
 Total: 1
 
-  ? Junior Developer
+  ◉ Junior Developer
 ```
+
+## Hiring Process Workflow
+
+The Hunter provides a complete hiring process management system to track candidates from initial referral to final decision.
+
+### Status Flow
+
+```
+1. Referred (Initial Status)
+   ↓
+2. Screening
+   ↓
+3. Consultant Technical Interview
+   ↓
+4. Client Interview
+   ↓
+5. Hired ✅  or  Reproved ❌
+```
+
+### Features
+
+**For Partners:**
+- Start hiring processes from CV matches
+- View all hiring processes
+- Add collaborative notes
+- Track candidate progress
+
+**For Admins:**
+- All partner capabilities
+- Update process status
+- Receive notifications for new processes
+- Manage complete hiring lifecycle
+
+### Integration
+
+The hiring process integrates seamlessly with the CV analyzer:
+1. Upload CV and analyze against job positions
+2. View match results with percentages
+3. Click "Start Hiring Process" on promising matches
+4. Track candidate through all stages
+5. Collaborate with team via notes
+6. Update status as candidate progresses
+
+### Dashboard Statistics
+
+- Total processes
+- Active processes
+- Hired count
+- Reproved count
+- Success rate calculation
 
 ## Development Setup
 
@@ -296,14 +537,14 @@ dotnet ef migrations add MigrationName -p GeminiCode.Hunter.Infra.Data -s Gemini
 dotnet ef database update -p GeminiCode.Hunter.Infra.Data -s GeminiCode.Hunter.Api --verbose
 ```
 
-### ?? PostgreSQL DateTime Note
+### ⚠️ PostgreSQL DateTime Note
 When using PostgreSQL with `timestamp without time zone`, ensure DateTime values use `DateTimeKind.Unspecified`:
 
 ```csharp
-// ? Correct
+// ✅ Correct
 var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 
-// ? Wrong
+// ❌ Wrong
 var now = DateTime.UtcNow; // DateTimeKind.Utc causes errors
 ```
 
@@ -330,28 +571,110 @@ dotnet test /p:CollectCoverage=true
 
 ```
 Hunter/
-??? src/
-?   ??? GeminiCode.Hunter.Api/              # Web API
-?   ??? GeminiCode.Hunter.Application.Core/ # Business Logic
-?   ??? GeminiCode.Hunter.Domain.Core/      # Domain Models
-?   ??? GeminiCode.Hunter.Infra.Data/       # Data Access
-?   ??? GeminiCode.Hunter.Crosscutting.Ioc/ # DI Configuration
-?   ??? GeminiCode.Hunter.Crosscutting.Resources/ # Localization
-??? tests/
-?   ??? GeminiCode.Hunter.Test/             # Unit & Integration Tests
-??? front-end/                               # Angular Frontend
-?   ??? src/
-?   ?   ??? app/
-?   ?   ?   ??? components/                 # UI Components
-?   ?   ?   ??? services/                   # API Services
-?   ?   ?   ??? guards/                     # Route Guards
-?   ?   ?   ??? interceptors/               # HTTP Interceptors
-?   ?   ?   ??? models/                     # TypeScript Models
-?   ?   ??? environments/                   # Environment Config
-?   ??? Dockerfile                          # Frontend Docker
-?   ??? nginx.conf                          # Nginx Configuration
-??? docker-compose.yml                       # Full Stack Orchestration
-??? Dockerfile                              # Backend Docker
+├── src/
+│   ├── GeminiCode.Hunter.Api/                      # Web API Layer
+│   │   ├── Controllers/                            # API Controllers
+│   │   │   ├── V1/AuthController.cs                # Authentication
+│   │   │   ├── V1/JobPositionsController.cs        # Job Management
+│   │   │   ├── V1/CvAnalysisController.cs          # CV Analysis
+│   │   │   ├── V1/HiringProcessController.cs       # Hiring Process
+│   │   │   ├── V1/UsersController.cs               # User Management
+│   │   │   └── V1/CandidatesController.cs          # Candidates (legacy)
+│   │   └── Middlewares/                            # Exception handling, CORS
+│   │
+│   ├── GeminiCode.Hunter.Application.Core/         # Business Logic (CQRS)
+│   │   ├── UseCases/                               # Commands & Queries
+│   │   │   ├── Auth/                               # Login, Refresh Token
+│   │   │   ├── JobPositions/                       # CRUD, Sync
+│   │   │   ├── CvAnalysis/                         # Analyze CV
+│   │   │   ├── HiringProcess/                      # Process Management
+│   │   │   ├── Users/                              # User Management
+│   │   │   └── Candidates/                         # Candidate matching
+│   │   ├── Services/                               # Application Services
+│   │   │   ├── OpenAIService.cs                    # AI Integration (dual provider)
+│   │   │   ├── JobScraperService.cs                # Web scraping
+│   │   │   ├── EmailService.cs                     # Email notifications
+│   │   │   └── BackgroundServices/                 # Hosted Services
+│   │   └── Notifications/                          # MediatR notifications
+│   │
+│   ├── GeminiCode.Hunter.Domain.Core/              # Domain Models
+│   │   ├── Entities/                               # Domain Entities
+│   │   │   ├── User.cs                             # Users (Admin/Partner)
+│   │   │   ├── JobPosition.cs                      # Job openings
+│   │   │   ├── Candidate.cs                        # Candidates
+│   │   │   ├── CvAnalysis.cs                       # Analysis results
+│   │   │   ├── CvAnalysisMatch.cs                  # CV-Job matches
+│   │   │   ├── HiringProcess.cs                    # Hiring lifecycle
+│   │   │   ├── HiringProcessStatusHistory.cs       # Status audit trail
+│   │   │   ├── HiringProcessNote.cs                # Collaborative notes
+│   │   │   ├── CandidateFile.cs                    # Uploaded CVs
+│   │   │   └── RefreshToken.cs                     # JWT refresh tokens
+│   │   ├── Models/                                 # DTOs, Requests, Responses
+│   │   └── Services/                               # Domain service interfaces
+│   │
+│   ├── GeminiCode.Hunter.Infra.Data/               # Data Access Layer
+│   │   ├── Context/                                # EF Core DbContext
+│   │   ├── Mapping/                                # Fluent API mappings
+│   │   ├── Repositories/                           # Repository implementations
+│   │   ├── UnitOfWork/                             # Unit of Work pattern
+│   │   └── Migrations/                             # EF Core migrations
+│   │
+│   ├── GeminiCode.Hunter.Crosscutting.Ioc/         # Dependency Injection
+│   └── GeminiCode.Hunter.Crosscutting.Resources/   # Localization Resources
+│
+├── tests/
+│   └── GeminiCode.Hunter.Test/                     # Unit & Integration Tests
+│       ├── Unit/                                   # Unit tests
+│       ├── Integration/                            # Integration tests
+│       └── Shared/Faker/                           # Test data generators
+│
+├── front-end/                                       # Angular 17 Frontend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── components/                         # UI Components
+│   │   │   │   ├── login/                          # Login page
+│   │   │   │   ├── cv-analyzer/                    # CV analysis UI
+│   │   │   │   ├── hiring-process/                 # Process list view
+│   │   │   │   ├── hiring-process-detail/          # Process detail view
+│   │   │   │   ├── job-positions/                  # Job management
+│   │   │   │   ├── user-management/                # User admin
+│   │   │   │   ├── admin/                          # Admin dashboard
+│   │   │   │   ├── match-result-card/              # Match display
+│   │   │   │   ├── resume-viewer/                  # PDF viewer
+│   │   │   │   ├── change-password/                # Password change
+│   │   │   │   ├── preferences/                    # User preferences
+│   │   │   │   └── candidates/                     # Candidate list
+│   │   │   ├── services/                           # API Services
+│   │   │   │   ├── auth.service.ts                 # Authentication
+│   │   │   │   ├── cv-analysis.service.ts          # CV analysis
+│   │   │   │   ├── hiring-process.service.ts       # Hiring process
+│   │   │   │   ├── job-position.service.ts         # Job positions
+│   │   │   │   └── user.service.ts                 # User management
+│   │   │   ├── guards/                             # Route Guards
+│   │   │   │   ├── auth.guard.ts                   # Authentication
+│   │   │   │   └── role.guard.ts                   # Authorization
+│   │   │   ├── interceptors/                       # HTTP Interceptors
+│   │   │   │   ├── auth.interceptor.ts             # JWT injection
+│   │   │   │   └── error.interceptor.ts            # Error handling
+│   │   │   └── models/                             # TypeScript Models
+│   │   │       ├── user.model.ts
+│   │   │       ├── job.model.ts
+│   │   │       ├── cv-analysis.model.ts
+│   │   │       └── hiring-process.model.ts
+│   │   └── environments/                           # Environment configs
+│   ├── Dockerfile                                  # Frontend container
+│   └── nginx.conf                                  # Nginx web server config
+│
+├── .github/
+│   └── workflows/                                  # CI/CD Pipelines
+│       ├── build.yml                               # Build & Test
+│       └── deploy.yml                              # Deploy to production
+│
+├── docker-compose.yml                              # Development orchestration
+├── docker-compose.prod.yml                         # Production orchestration
+├── Dockerfile                                      # Backend container
+├── deploy.sh                                       # Production deployment script
+└── README.md                                       # This file
 ```
 
 ## Docker Commands
@@ -365,7 +688,7 @@ docker-compose up --build         # Rebuild and start
 ### Stop Services
 ```bash
 docker-compose down               # Stop all services
-docker-compose down -v            # Stop and remove volumes (?? deletes data)
+docker-compose down -v            # Stop and remove volumes (⚠️ deletes data)
 ```
 
 ### View Logs
@@ -422,14 +745,14 @@ services:
 
 ## Security
 
-- ? JWT authentication with refresh tokens
-- ? Role-based authorization
-- ? CORS configuration
-- ? Password hashing (SHA-512)
-- ? SQL injection prevention (EF Core)
-- ? XSS protection
-- ? CSRF protection
-- ? Rate limiting (recommended for production)
+- ✅ JWT authentication with refresh tokens
+- ✅ Role-based authorization (Admin/Partner)
+- ✅ CORS configuration
+- ✅ Password hashing (SHA-512)
+- ✅ SQL injection prevention (EF Core)
+- ✅ XSS protection
+- ✅ CSRF protection
+- 🔒 Rate limiting (recommended for production)
 
 ## Performance
 
@@ -439,7 +762,7 @@ services:
 - Reduces OpenAI API costs by ~95%
 
 **Frontend Optimization:**
-- Production build: 676 KB ? 141 KB (gzipped)
+- Production build: 676 KB → 141 KB (gzipped)
 - Lazy loading routes
 - Code splitting
 - Asset caching
@@ -455,7 +778,7 @@ dotnet new hunter-api --companyName "MyCompany" --output "MyProject" --systemDat
 
 ## Default Credentials
 
-?? **Change these in production!**
+⚠️ **Change these in production!**
 
 **Application:**
 - Email: `adm@hunter.com`
@@ -486,13 +809,37 @@ For issues and questions:
 
 ## Roadmap
 
+### ✅ Completed Features
+- [x] AI-powered CV analysis with OpenAI GPT-4o
+- [x] Dual AI provider support (OpenAI/DeepSeek)
+- [x] Hiring process management with status tracking
+- [x] Automated job scraping and AI enrichment
+- [x] Background job synchronization service
+- [x] Email notifications for job changes
+- [x] User management with role-based access
+- [x] JWT authentication with refresh tokens
+- [x] Angular 17 frontend with Material Design
+- [x] Docker containerization
+- [x] CI/CD with GitHub Actions
+- [x] Elasticsearch + Kibana logging
+- [x] Collaborative notes system
+- [x] Status history audit trail
+
+### 🚀 Planned Features
 - [ ] Implement distributed caching (Redis)
 - [ ] Add WebSocket support for real-time updates
-- [ ] Multi-language CV support
+- [ ] Multi-language CV support (Spanish, French, etc.)
 - [ ] Resume builder feature
-- [ ] Interview scheduling
-- [ ] Candidate database
-- [ ] Advanced analytics dashboard
+- [ ] Interview scheduling integration
+- [ ] Advanced candidate database with search
+- [ ] Analytics dashboard with charts and metrics
 - [ ] Mobile app (React Native)
+- [ ] Bulk CV upload and analysis
+- [ ] Email templates customization
+- [ ] Integration with LinkedIn API
+- [ ] Automated interview question generation
+- [ ] Video interview integration
+- [ ] Candidate skill assessments
+- [ ] Offer letter generation
 
 *Owner:* https://github.com/vanderlan

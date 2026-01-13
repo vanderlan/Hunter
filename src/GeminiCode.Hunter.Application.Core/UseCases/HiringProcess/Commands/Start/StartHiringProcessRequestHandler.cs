@@ -57,7 +57,8 @@ public class StartHiringProcessRequestHandler(
             CandidateId = candidate.CandidateId,
             JobPositionId = jobPosition.JobPositionId,
             Status = HiringProcessStatus.Referred,
-            CreatedByUserId = user.UserId
+            CreatedByUserId = user.UserId,
+            ReferralReason = request.ReferralReason
         };
 
         await unitOfWork.HiringProcessRepository.AddAsync(hiringProcess);
@@ -86,7 +87,8 @@ public class StartHiringProcessRequestHandler(
             CandidateEmail = candidate.Email ?? "",
             JobTitle = jobPosition.Title,
             JobCode = jobPosition.JobCode,
-            StartedByUserName = currentUser.Name
+            StartedByUserName = currentUser.Name,
+            ReferralReason = request.ReferralReason
         }, cancellationToken);
 
         logger.LogInformation("Hiring process started successfully: {PublicId}", hiringProcess.PublicId);
