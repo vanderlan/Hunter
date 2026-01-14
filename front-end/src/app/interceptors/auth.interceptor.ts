@@ -72,7 +72,11 @@ export class AuthInterceptor implements HttpInterceptor {
             return next.handle(this.addToken(request, token));
           }
           // Token is empty string, which means refresh failed
-          return throwError(() => new Error('Authentication failed'));
+          return throwError(() => new HttpErrorResponse({ 
+            error: 'Token refresh failed', 
+            status: 401,
+            statusText: 'Unauthorized'
+          }));
         })
       );
     }
