@@ -75,7 +75,7 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>Status</th>
           <td mat-cell *matCellDef="let process">
-            <mat-chip [color]="getStatusColor(process.status)" selected>
+            <mat-chip [ngClass]="getStatusColor(process.status)">
               {{ getStatusLabel(process.status) }}
             </mat-chip>
           </td>

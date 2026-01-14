@@ -100,7 +100,7 @@ export class HiringProcessComponent implements OnInit {
       this.searchQuery || undefined
     ).subscribe({
       next: (data) => {
-        this.processes = data.items;
+        this.processes = this.sortProcessesByStatus(data.items);
         this.totalCount = data.count;
         this.loading = false;
       },
@@ -109,6 +109,42 @@ export class HiringProcessComponent implements OnInit {
         this.snackBar.open('Error loading hiring processes', 'Close', { duration: 3000 });
         console.error('Error loading processes:', error);
       }
+    });
+  }
+
+  getStatusPriority(status: string): number {
+    switch (status) {
+      case 'New':
+        return 1;
+      case 'ReferredByPartner':
+      case 'ReferredInternally':
+        return 2;
+      case 'Screening':
+        return 3;
+      case 'ConsultantTechnicalInterview':
+        return 4;
+      case 'ClientInterview':
+        return 5;
+      case 'Hired':
+        return 6;
+      case 'Reproved':
+        return 7;
+      default:
+        return 8;
+    }
+  }
+
+  sortProcessesByStatus(processes: HiringProcessListItem[]): HiringProcessListItem[] {
+    return processes.sort((a, b) => {
+      const priorityA = this.getStatusPriority(a.status);
+      const priorityB = this.getStatusPriority(b.status);
+      
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+      
+      // If same priority, sort by date (most recent first)
+      return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
     });
   }
 
@@ -137,17 +173,22 @@ export class HiringProcessComponent implements OnInit {
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'Hired':
-        return 'primary';
-      case 'Reproved':
-        return 'warn';
       case 'New':
+        return 'status-new';
       case 'ReferredByPartner':
+        return 'status-referred-partner';
       case 'ReferredInternally':
+        return 'status-referred-internal';
       case 'Screening':
+        return 'status-screening';
       case 'ConsultantTechnicalInterview':
+        return 'status-technical';
       case 'ClientInterview':
-        return 'accent';
+        return 'status-client';
+      case 'Hired':
+        return 'status-hired';
+      case 'Reproved':
+        return 'status-reproved';
       default:
         return '';
     }
