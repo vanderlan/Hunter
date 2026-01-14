@@ -44,11 +44,11 @@
 	+ Admin area for user administration
 
 + **Modern Tech Stack**
-	+ .NET 10 Web API backend with CQRS pattern
-	+ Angular 17 standalone components frontend
-	+ PostgreSQL 16.3 database
-	+ Elasticsearch 8.17.4 + Kibana 8.10.2 for logging
-	+ Docker Compose for full-stack orchestration
++ .NET 10 Web API backend with CQRS pattern
++ Angular 17 standalone components frontend
++ PostgreSQL 16.3 database
++ New Relic APM for monitoring
++ Docker Compose for full-stack orchestration
 
 ## 🚀 Quick Start with Docker
 
@@ -59,10 +59,9 @@ docker-compose up -d
 ```
 
 **Access the application:**
-- Frontend: http://localhost:4200
+- Frontend: http://localhost:5200
 - API: http://localhost:5010
 - Swagger: http://localhost:5010/swagger
-- Kibana (Logs): http://localhost:5601
 
 **Login credentials:**
 - Email: `adm@hunter.com`
@@ -94,9 +93,9 @@ docker-compose up -d
 	+ Secure password hashing (SHA-512)
 
 + Serilog (Structured Logging)
-	+ Elasticsearch integration
-	+ Correlation ID tracking
-	+ Request/response logging
++ Console output
++ Correlation ID tracking
++ Request/response logging
 	
 + AI Integration (Dual Provider Support)
 	+ OpenAI GPT-4o (default)
@@ -187,19 +186,17 @@ docker-compose up -d
 
 ## Docker Services
 
-The application runs 5 containerized services:
+The application runs 3 containerized services:
 
 | Service | Port | Technology | Purpose |
 |---------|------|------------|---------|
-| **frontend** | 4200 | Angular 17 + Nginx | Web UI |
+| **frontend** | 5200 | Angular 17 + Nginx | Web UI |
 | **api** | 5010 | .NET 10 + New Relic | REST API with APM |
 | **postgresql** | 5432 | PostgreSQL 16.3 | Database |
-| **elasticsearch** | 9200 | Elasticsearch 8.17.4 | Log storage |
-| **kibana** | 5601 | Kibana 8.10.2 | Log viewer |
 
 ### Resource Requirements
-- **RAM**: 3-4 GB minimum
-- **Disk**: 3 GB for images + data
+- **RAM**: 2 GB minimum
+- **Disk**: 1 GB for images + data
 - **CPU**: 2+ cores recommended
 
 ### New Relic Integration
@@ -308,9 +305,6 @@ POST /api/Candidates/Analyze  # Deprecated: Use /api/CvAnalysis/Analyze
     "EndTime": "18:00",
     "IntervalHours": 1,
     "Enabled": true
-  },
-  "ElasticConfiguration": {
-    "Uri": "http://localhost:9200"
   },
   "NewRelic": {
     "AppName": "Hunter",
@@ -766,16 +760,10 @@ To view your application metrics:
 3. Find your "Hunter" application
 4. View real-time performance data, errors, and transactions
 
-**Kibana Dashboard:**
-1. Access http://localhost:5601
-2. Create index pattern: `hunter-api-*`
-3. View structured logs in Discover
-4. Create dashboards for monitoring
-
-**Log Correlation:**
-- All logs include correlation IDs
-- Track requests across services
-- Structured JSON logging
+**Application Logs:**
+- Console logging for development
+- Structured logging with correlation IDs
+- Request/response logging
 
 ## Production Deployment
 

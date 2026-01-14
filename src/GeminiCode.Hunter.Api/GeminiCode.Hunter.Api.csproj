@@ -11,9 +11,7 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <PackageReference Include="Asp.Versioning.Mvc" />
-    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
-    <PackageReference Include="Elastic.Serilog.Sinks" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
