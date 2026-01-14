@@ -6,7 +6,7 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, throwError, Subject } from 'rxjs';
+import { Observable, throwError, Subject, EMPTY } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
@@ -26,7 +26,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
+        // Don't retry 401 errors from the refresh token endpoint to avoid infinite loops
+        if (error.status === 401 && !request.url.includes('/Auth/RefreshToken')) {
           return this.handle401Error(request, next);
         }
         return throwError(() => error);
@@ -55,8 +56,11 @@ export class AuthInterceptor implements HttpInterceptor {
         }),
         catchError((error) => {
           this.isRefreshing = false;
-          this.refreshTokenSubject.next(null);
           this.authService.logout();
+          // Complete the subject to unblock queued requests, they will get EMPTY observable
+          this.refreshTokenSubject.complete();
+          // Create a new subject for future requests
+          this.refreshTokenSubject = new Subject<string | null>();
           return throwError(() => error);
         })
       );
