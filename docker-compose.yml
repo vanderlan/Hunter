@@ -26,6 +26,12 @@ services:
       - Email__Password=${EMAIL_PASSWORD}
       - Email__EnableSsl=${EMAIL_ENABLE_SSL:-true}
       - Email__ApplicationUrl=${APP_URL:-http://localhost:5200}
+      - NEW_RELIC_LICENSE_KEY=88c9223c371e67d2f21b07be5d622589FFFFNRAL
+      - NEW_RELIC_APP_NAME=Hunter
+      - CORECLR_ENABLE_PROFILING=1
+      - CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A}
+      - CORECLR_NEWRELIC_HOME=/usr/local/newrelic-dotnet-agent
+      - CORECLR_PROFILER_PATH=/usr/local/newrelic-dotnet-agent/libNewRelicProfiler.so
     networks:
       - backend-network
 

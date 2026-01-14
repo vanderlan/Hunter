@@ -192,7 +192,7 @@ The application runs 5 containerized services:
 | Service | Port | Technology | Purpose |
 |---------|------|------------|---------|
 | **frontend** | 4200 | Angular 17 + Nginx | Web UI |
-| **api** | 5010 | .NET 10 | REST API |
+| **api** | 5010 | .NET 10 + New Relic | REST API with APM |
 | **postgresql** | 5432 | PostgreSQL 16.3 | Database |
 | **elasticsearch** | 9200 | Elasticsearch 8.17.4 | Log storage |
 | **kibana** | 5601 | Kibana 8.10.2 | Log viewer |
@@ -201,6 +201,14 @@ The application runs 5 containerized services:
 - **RAM**: 3-4 GB minimum
 - **Disk**: 3 GB for images + data
 - **CPU**: 2+ cores recommended
+
+### New Relic Integration
+The API service includes the New Relic .NET agent for application performance monitoring. The agent is automatically installed and configured in the Docker container with:
+- Automatic instrumentation of ASP.NET Core
+- Database query monitoring
+- External service call tracking
+- Error tracking and alerting
+- Custom transaction naming
 
 ## API Endpoints
 
@@ -303,11 +311,41 @@ POST /api/Candidates/Analyze  # Deprecated: Use /api/CvAnalysis/Analyze
   },
   "ElasticConfiguration": {
     "Uri": "http://localhost:9200"
+  },
+  "NewRelic": {
+    "AppName": "Hunter",
+    "LicenseKey": "your-new-relic-license-key"
   }
 }
 ```
 
-### AI Provider Configuration
+### New Relic Configuration
+
+New Relic APM is integrated for application performance monitoring. The configuration is managed through:
+
+**appsettings.json:**
+```json
+{
+  "NewRelic": {
+    "AppName": "Hunter",
+    "LicenseKey": "your-new-relic-license-key"
+  }
+}
+```
+
+**Environment Variables (Docker/Production):**
+```bash
+NEW_RELIC_LICENSE_KEY=your-license-key
+NEW_RELIC_APP_NAME=Hunter
+CORECLR_ENABLE_PROFILING=1
+CORECLR_PROFILER={36032161-FFC0-4B61-B559-F6C5D41BAE5A}
+CORECLR_NEWRELIC_HOME=/usr/local/newrelic-dotnet-agent
+CORECLR_PROFILER_PATH=/usr/local/newrelic-dotnet-agent/libNewRelicProfiler.so
+```
+
+The New Relic agent is automatically installed in the Docker container and will start monitoring as soon as the application starts.
+
+## AI Provider Configuration
 
 **OpenAI (Default - High Quality)**
 ```json
@@ -705,6 +743,28 @@ docker-compose restart api        # Restart specific service
 ```
 
 ## Monitoring & Logs
+
+**New Relic APM:**
+
+The Hunter API is integrated with New Relic for comprehensive application performance monitoring (APM). New Relic provides:
+- Real-time performance metrics
+- Transaction tracing
+- Error tracking and alerting
+- Database query performance analysis
+- Custom instrumentation support
+
+The New Relic agent is automatically installed and configured in the Docker container. The agent will start monitoring your application as soon as it runs.
+
+**New Relic Configuration:**
+- License Key: Configured via environment variables
+- App Name: "Hunter"
+- Agent Version: 10.47.2
+
+To view your application metrics:
+1. Log in to your New Relic account at https://one.newrelic.com
+2. Navigate to APM & Services
+3. Find your "Hunter" application
+4. View real-time performance data, errors, and transactions
 
 **Kibana Dashboard:**
 1. Access http://localhost:5601
