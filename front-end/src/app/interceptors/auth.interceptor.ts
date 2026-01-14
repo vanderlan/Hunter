@@ -6,14 +6,14 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, throwError, Subject, EMPTY } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
-  private refreshTokenSubject: Subject<string | null> = new Subject<string | null>();
+  private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
   constructor(private authService: AuthService) {}
 
@@ -56,11 +56,9 @@ export class AuthInterceptor implements HttpInterceptor {
         }),
         catchError((error) => {
           this.isRefreshing = false;
+          // Emit empty string to signal failure to queued requests
+          this.refreshTokenSubject.next('');
           this.authService.logout();
-          // Complete the subject to unblock queued requests, they will get EMPTY observable
-          this.refreshTokenSubject.complete();
-          // Create a new subject for future requests
-          this.refreshTokenSubject = new Subject<string | null>();
           return throwError(() => error);
         })
       );
@@ -70,7 +68,11 @@ export class AuthInterceptor implements HttpInterceptor {
         filter(token => token !== null),
         take(1),
         switchMap(token => {
-          return next.handle(this.addToken(request, token as string));
+          if (token && token !== '') {
+            return next.handle(this.addToken(request, token));
+          }
+          // Token is empty string, which means refresh failed
+          return throwError(() => new Error('Authentication failed'));
         })
       );
     }
