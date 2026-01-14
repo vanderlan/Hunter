@@ -33,23 +33,13 @@ public class JobChangesDetectedNotificationHandler(
 
             if (emailAddresses.Any())
             {
-                logger.LogInformation("Sending job change notifications to {Count} users asynchronously", emailAddresses.Count);
+                logger.LogInformation("Sending job change notifications to {Count} users", emailAddresses.Count);
 
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await emailService.SendJobChangesNotificationAsync(
-                            emailAddresses,
-                            [.. notification.NewJobTitles],
-                            [.. notification.ClosedJobTitles],
-                            DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Failed to send job changes notification email asynchronously");
-                    }
-                }, cancellationToken);
+                await emailService.SendJobChangesNotificationAsync(
+                    emailAddresses,
+                    [.. notification.NewJobTitles],
+                    [.. notification.ClosedJobTitles],
+                    DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
             }
             else
             {

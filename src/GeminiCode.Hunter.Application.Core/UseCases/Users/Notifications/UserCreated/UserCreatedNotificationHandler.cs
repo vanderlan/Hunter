@@ -12,7 +12,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Notifications.UserCr
         IEmailService emailService)
         : INotificationHandler<UserCreatedNotification>
     {
-        public Task Handle(UserCreatedNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(UserCreatedNotification notification, CancellationToken cancellationToken)
         {
             logger.LogInformation("A notification {notificationType} has been received. Notification details: {notification}. Action performed by: {currentUserName}",
                 nameof(UserCreatedNotification),
@@ -21,24 +21,12 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Notifications.UserCr
 
             if (notification.SendWelcomeEmail)
             {
-                logger.LogInformation("Sending welcome email to new user asynchronously");
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await emailService.SendWelcomeEmailAsync(
-                            notification.Entity.Name,
-                            notification.Entity.Email,
-                            notification.PlainPassword);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, "Failed to send welcome email asynchronously");
-                    }
-                }, cancellationToken);
+                logger.LogInformation("Sending welcome email to new user");
+                await emailService.SendWelcomeEmailAsync(
+                    notification.Entity.Name,
+                    notification.Entity.Email,
+                    notification.PlainPassword);
             }
-
-            return Task.CompletedTask;
         }
     }
 }
