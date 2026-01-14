@@ -13,7 +13,7 @@ import { AuthService } from '../services/auth.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
   constructor(private authService: AuthService) {}
 
@@ -65,10 +65,10 @@ export class AuthInterceptor implements HttpInterceptor {
     } else {
       // Queue requests while token is being refreshed
       return this.refreshTokenSubject.pipe(
-        filter(token => token !== null),
+        filter((token): token is string => token !== null),
         take(1),
         switchMap(token => {
-          if (token && token !== '') {
+          if (token !== '') {
             return next.handle(this.addToken(request, token));
           }
           // Token is empty string, which means refresh failed
