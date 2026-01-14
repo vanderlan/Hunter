@@ -23,6 +23,7 @@ export interface PagedList<T> {
 }
 
 export interface JobMatch {
+  jobPositionId?: string;
   jobCode: string;
   jobTitle: string;
   companyCode: string;

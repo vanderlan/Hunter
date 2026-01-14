@@ -4,6 +4,7 @@ using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
+using GeminiCode.Hunter.Domain.Core.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Start;
@@ -56,7 +57,7 @@ public class StartHiringProcessRequestHandler(
         {
             CandidateId = candidate.CandidateId,
             JobPositionId = jobPosition.JobPositionId,
-            Status = HiringProcessStatus.Referred,
+            Status = HiringProcessStatus.ReferredByPartner,
             CreatedByUserId = user.UserId,
             ReferralReason = request.ReferralReason
         };
@@ -67,11 +68,11 @@ public class StartHiringProcessRequestHandler(
         await unitOfWork.CommitAsync();
 
         // Create initial status history entry (now that we have HiringProcessId)
-        var statusHistory = new Domain.Core.Entities.HiringProcessStatusHistory
+        var statusHistory = new HiringProcessStatusHistory
         {
             HiringProcessId = hiringProcess.HiringProcessId,
-            FromStatus = HiringProcessStatus.Referred,
-            ToStatus = HiringProcessStatus.Referred,
+            FromStatus = HiringProcessStatus.New,
+            ToStatus = HiringProcessStatus.ReferredByPartner,
             ChangedByUserId = user.UserId,
             Notes = "Initial hiring process creation"
         };

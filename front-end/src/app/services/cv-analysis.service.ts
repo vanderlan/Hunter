@@ -46,7 +46,7 @@ export class CvAnalysisService {
       .set('page', page.toString())
       .set('quantity', pageSize.toString());
 
-    return this.http.get<PagedAnalysisHistory>(`${this.apiUrl}/history`, {
+    return this.http.get<PagedAnalysisHistory>(`${this.apiUrl}/History`, {
       params,
       headers: new HttpHeaders({
         'x-api-version': environment.apiVersion

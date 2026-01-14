@@ -81,4 +81,10 @@ export class CandidateService {
       });
     });
   }
+
+  deleteCandidate(candidateId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${candidateId}`, {
+      headers: this.getHeaders()
+    });
+  }
 }

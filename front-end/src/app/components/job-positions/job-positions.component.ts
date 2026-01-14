@@ -15,6 +15,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { JobPositionService } from '../../services/job-position.service';
 import { JobPosition } from '../../models/job.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-job-positions',
@@ -50,6 +52,7 @@ export class JobPositionsComponent implements OnInit {
   isEditing = false;
   jobPositionForm: FormGroup;
   currentJobPositionId: string | null = null;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private jobPositionService: JobPositionService,
@@ -68,6 +71,15 @@ export class JobPositionsComponent implements OnInit {
       mustHaveSkills: [''],
       niceToHaveSkills: [''],
       isActive: [true]
+    });
+
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.pageIndex = 0;
+      this.loadJobPositions();
     });
   }
 
@@ -97,9 +109,9 @@ export class JobPositionsComponent implements OnInit {
     this.loadJobPositions();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadJobPositions();
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   showCreateForm(): void {

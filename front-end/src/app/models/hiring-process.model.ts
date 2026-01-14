@@ -81,12 +81,14 @@ export interface PagedHiringProcesses {
 }
 
 export enum HiringProcessStatus {
-  Referred = 1,
-  Screening = 2,
-  ConsultantTechnicalInterview = 3,
-  ClientInterview = 4,
-  Hired = 5,
-  Reproved = 6
+  New = 0,
+  ReferredByPartner = 1,
+  ReferredInternally = 2,
+  Screening = 3,
+  ConsultantTechnicalInterview = 4,
+  ClientInterview = 5,
+  Hired = 6,
+  Reproved = 7
 }
 
 export interface StartHiringProcessRequest {

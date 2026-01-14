@@ -132,10 +132,13 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
         display: flex;
         align-items: center;
         gap: 12px;
-        color: #5f1f1f;
+        color: #333;
         margin: 0;
+        font-size: 24px;
+        font-weight: 500;
 
         mat-icon {
+          color: #5f1f1f;
           font-size: 28px;
           width: 28px;
           height: 28px;
@@ -144,16 +147,16 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
     }
 
     mat-dialog-content {
-      padding: 24px;
+      padding: 32px;
       max-height: 70vh;
       overflow-y: auto;
     }
 
     .analysis-header {
       background: linear-gradient(135deg, #f5f7fa 0%, #e8f0fe 100%);
-      padding: 20px;
+      padding: 24px;
       border-radius: 8px;
-      margin-bottom: 24px;
+      margin-bottom: 32px;
       border-left: 4px solid #5f1f1f;
 
       .header-info {
@@ -161,6 +164,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
           margin: 0 0 8px 0;
           color: #5f1f1f;
           font-size: 24px;
+          font-weight: 600;
         }
 
         .email {
@@ -190,9 +194,10 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
 
     .matches-section {
       .section-title {
-        color: #5f1f1f;
-        font-size: 20px;
-        margin-bottom: 16px;
+        color: #333;
+        font-size: 22px;
+        font-weight: 600;
+        margin: 0 0 24px 0;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -201,7 +206,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
       .matches-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-        gap: 20px;
+        gap: 24px;
 
         @media (max-width: 768px) {
           grid-template-columns: 1fr;
@@ -209,79 +214,123 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
       }
 
       .match-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
         mat-card-header {
-          background-color: #f5f5f5;
-          padding: 16px;
-          margin: -16px -16px 16px;
+          background: linear-gradient(135deg, #5f1f1f 0%, #81261d 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 5px;
 
           mat-card-title {
-            color: #5f1f1f;
+            color: white;
             font-size: 18px;
+            font-weight: 500;
+            margin: 0;
           }
 
           mat-card-subtitle {
+            color: rgba(255, 255, 255, 0.9);
             font-size: 14px;
-            margin-top: 4px;
+            margin: 8px 0 0 0;
           }
         }
 
+        mat-card-content {
+          padding: 24px 16px;
+          flex: 1;
+        }
+
         .match-percentage {
-          margin-bottom: 16px;
+          margin-bottom: 20px;
 
           h3 {
-            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
             color: #5f1f1f;
-            font-size: 20px;
+          }
+
+          mat-progress-bar {
+            height: 12px;
+            border-radius: 6px;
           }
         }
 
         .match-reason {
-          padding: 12px;
+          padding: 16px;
           background-color: #f5f5f5;
-          border-radius: 4px;
-          border-left: 3px solid #5f1f1f;
-          margin-bottom: 16px;
-          font-size: 14px;
+          border-radius: 8px;
+          border-left: 4px solid #5f1f1f;
+          margin-bottom: 20px;
           line-height: 1.6;
+          color: #333;
+          font-size: 14px;
         }
 
         mat-expansion-panel {
           margin-bottom: 8px;
+          box-shadow: none !important;
+          border: 1px solid #e0e0e0;
+
+          &::before {
+            display: none;
+          }
+
+          mat-expansion-panel-header {
+            background-color: #fafafa;
+            font-weight: 500;
+
+            &:hover {
+              background-color: #f5f5f5;
+            }
+          }
+
+          mat-panel-title {
+            font-size: 14px;
+            color: #333;
+          }
 
           .skills-section {
-            margin-bottom: 16px;
+            margin-bottom: 24px;
 
             &:last-child {
               margin-bottom: 0;
             }
 
             h4 {
-              color: #5f1f1f;
               font-size: 14px;
-              margin: 0 0 8px 0;
+              font-weight: 600;
+              margin: 0 0 12px 0;
+              color: #666;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
             }
 
-            mat-chip-set {
-              mat-chip {
-                margin: 4px;
-              }
+            mat_chip_set {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+            }
 
-              .skill-match {
-                background-color: #e8f5e9;
-                color: #2e7d32;
-              }
+            .skill-match {
+              background-color: #c8e6c9 !important;
+              color: #2e7d32 !important;
+            }
 
-              .skill-missing {
-                background-color: #fff3e0;
-                color: #e65100;
-              }
+            .skill-missing {
+              background-color: #ffcdd2 !important;
+              color: #c62828 !important;
             }
           }
 
           p {
+            padding: 16px 0;
             margin: 0;
             line-height: 1.6;
-            color: #555;
+            color: #666;
           }
         }
       }

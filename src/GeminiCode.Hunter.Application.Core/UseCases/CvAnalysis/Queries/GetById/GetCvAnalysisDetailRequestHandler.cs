@@ -37,6 +37,7 @@ public class GetCvAnalysisDetailRequestHandler(
             MatchesFound = analysis.MatchesFound,
             Matches = analysis.Matches.Select(m => new JobMatchDto
             {
+                JobPositionId = m.JobPosition?.PublicId ?? "",
                 JobCode = m.JobCode,
                 JobTitle = m.JobTitle,
                 CompanyCode = m.CompanyCode,

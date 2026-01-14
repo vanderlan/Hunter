@@ -15,7 +15,7 @@ import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-fi
 import { JobService } from '../../services/job.service';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { CvAnalysisService, CvAnalysisHistoryItem } from '../../services/cv-analysis.service';
-import { JobMatch, JobPosition, CandidateInfo } from '../../models/job.model';
+import { JobMatch, CandidateInfo } from '../../models/job.model';
 
 @Component({
   selector: 'app-cv-analyzer',
@@ -46,10 +46,6 @@ export class CvAnalyzerComponent implements OnInit {
   dragOver = false;
   candidateInfo: CandidateInfo | null = null;
 
-  // Available positions section
-  availablePositions: JobPosition[] = [];
-  loadingPositions = false;
-
   // Analysis history section
   analysisHistory: CvAnalysisHistoryItem[] = [];
   loadingHistory = false;
@@ -66,7 +62,6 @@ export class CvAnalyzerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.fetchAvailablePositions();
     this.loadAnalysisHistory();
   }
 
@@ -108,31 +103,6 @@ export class CvAnalyzerComponent implements OnInit {
           { duration: 5000 }
         );
       }
-    });
-  }
-
-  fetchAvailablePositions(): void {
-    this.loadingPositions = true;
-    this.jobService.getActiveJobs().subscribe({
-      next: (positions) => {
-        this.availablePositions = positions;
-        this.loadingPositions = false;
-      },
-      error: (error) => {
-        this.loadingPositions = false;
-        console.error('Error loading positions:', error);
-      }
-    });
-  }
-
-  openPositionDetails(position: JobPosition): void {
-    import('./position-details-dialog.component').then(m => {
-      this.dialog.open(m.PositionDetailsDialogComponent, {
-        data: position,
-        width: '800px',
-        maxWidth: '95vw',
-        panelClass: 'position-details-dialog-container'
-      });
     });
   }
 
@@ -244,18 +214,20 @@ export class CvAnalyzerComponent implements OnInit {
   }
 
   startHiringProcess(match: JobMatch): void {
+    console.log('Starting hiring process for match:', match);
+    
     if (!this.candidateInfo) {
       this.snackBar.open('Candidate information not available', 'Close', { duration: 3000 });
       return;
     }
 
-    // Find the job position ID based on the job code
-    const jobPosition = this.availablePositions.find(p => p.jobCode === match.jobCode);
-    
-    if (!jobPosition || !jobPosition.publicId) {
-      this.snackBar.open('Job position not found', 'Close', { duration: 3000 });
+    if (!match.jobPositionId) {
+      console.error('Job position ID is missing from match:', match);
+      this.snackBar.open('Job position information not available. Please analyze the CV again.', 'Close', { duration: 5000 });
       return;
     }
+
+    console.log('Proceeding with referral - Candidate:', this.candidateInfo.candidateId, 'Job:', match.jobPositionId);
 
     // Show confirmation dialog
     import('./refer-confirmation-dialog.component').then(m => {
@@ -273,13 +245,15 @@ export class CvAnalyzerComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe(confirmed => {
         if (confirmed) {
+          console.log('User confirmed referral, calling API...');
           // User confirmed, proceed with referral
           this.hiringProcessService.startHiringProcess({
             candidateId: this.candidateInfo!.candidateId,
-            jobPositionId: jobPosition.publicId!,
+            jobPositionId: match.jobPositionId!,
             referralReason: match.referralReason
           }).subscribe({
             next: (response) => {
+              console.log('Referral successful:', response);
               this.snackBar.open(
                 `Candidate referral submitted successfully! Admin will review and decide whether to start the hiring process.`,
                 'Close',
@@ -287,10 +261,13 @@ export class CvAnalyzerComponent implements OnInit {
               );
             },
             error: (error) => {
+              console.error('Referral error:', error);
               const message = error.error?.message || 'Error submitting referral. It may already exist.';
               this.snackBar.open(message, 'Close', { duration: 5000 });
             }
           });
+        } else {
+          console.log('User cancelled referral');
         }
       });
     });

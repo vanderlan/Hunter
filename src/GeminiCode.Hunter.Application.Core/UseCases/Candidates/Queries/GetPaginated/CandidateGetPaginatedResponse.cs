@@ -12,6 +12,22 @@ public class CandidateGetPaginatedResponse
     public DateTime AnalyzedAt { get; set; }
     public string AnalyzedByUserName { get; set; }
     public DateTime CreatedAt { get; set; }
+    public bool HasHiringProcess { get; set; }
+
+    public static CandidateGetPaginatedResponse From(Candidate candidate, bool hasHiringProcess)
+    {
+        return new CandidateGetPaginatedResponse
+        {
+            PublicId = candidate.PublicId,
+            Name = candidate.Name,
+            Email = candidate.Email,
+            PhoneNumber = candidate.PhoneNumber,
+            AnalyzedAt = candidate.AnalyzedAt.ToApplicationTime(),
+            AnalyzedByUserName = candidate.User?.Name ?? "Unknown",
+            CreatedAt = candidate.CreatedAt.ToApplicationTime(),
+            HasHiringProcess = hasHiringProcess
+        };
+    }
 
     public static implicit operator CandidateGetPaginatedResponse(Candidate candidate)
     {
@@ -24,9 +40,10 @@ public class CandidateGetPaginatedResponse
             Name = candidate.Name,
             Email = candidate.Email,
             PhoneNumber = candidate.PhoneNumber,
-            AnalyzedAt = candidate.AnalyzedAt.ToApplicationTime(), // Convert to configured timezone
+            AnalyzedAt = candidate.AnalyzedAt.ToApplicationTime(),
             AnalyzedByUserName = candidate.User?.Name ?? "Unknown",
-            CreatedAt = candidate.CreatedAt.ToApplicationTime() // Convert to configured timezone
+            CreatedAt = candidate.CreatedAt.ToApplicationTime(),
+            HasHiringProcess = false
         };
     }
 }

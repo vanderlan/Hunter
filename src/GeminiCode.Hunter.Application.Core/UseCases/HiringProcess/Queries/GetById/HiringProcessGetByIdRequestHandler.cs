@@ -94,17 +94,17 @@ public class HiringProcessGetByIdRequestHandler(
                 ToStatus = h.ToStatus.ToString(),
                 ChangedByUserName = h.ChangedByUser?.Name ?? string.Empty,
                 Notes = h.Notes,
-                CreatedAt = h.CreatedAt.ToApplicationTime() // Convert to configured timezone
+                CreatedAt = h.CreatedAt.ToApplicationTime()
             }).ToList(),
             Notes = notes.Select(n => new NoteItem
             {
                 PublicId = n.PublicId,
                 Note = n.Note,
                 UserName = n.User?.Name ?? string.Empty,
-                CreatedAt = n.CreatedAt.ToApplicationTime() // Convert to configured timezone
+                CreatedAt = n.CreatedAt.ToApplicationTime()
             }).ToList(),
-            CreatedAt = hiringProcess.CreatedAt.ToApplicationTime(), // Convert to configured timezone
-            LastUpdated = hiringProcess.LastUpdated.ToApplicationTime() // Convert to configured timezone
+            CreatedAt = hiringProcess.CreatedAt.ToApplicationTime(),
+            LastUpdated = hiringProcess.LastUpdated.ToApplicationTime()
         };
 
         logger.LogInformation("Hiring process retrieved successfully: {PublicId}", request.PublicId);

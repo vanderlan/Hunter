@@ -8,6 +8,7 @@ export interface Candidate {
   createdAt: Date;
   hasResume?: boolean;
   resumeFileName?: string;
+  hasHiringProcess?: boolean;
 }
 
 export interface PagedCandidates {

@@ -2,6 +2,7 @@ using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Notifications.St
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
+using GeminiCode.Hunter.Domain.Core.Extensions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -70,8 +71,8 @@ public class UpdateHiringProcessStatusRequestHandler(
                 HiringProcessId = hiringProcess.PublicId,
                 CandidateName = hiringProcess.Candidate.Name ?? "Unknown",
                 JobTitle = hiringProcess.JobPosition.Title,
-                OldStatus = oldStatus.ToString(),
-                NewStatus = request.NewStatus.ToString(),
+                OldStatus = oldStatus.Description(),
+                NewStatus = request.NewStatus.Description(),
                 ChangedByUserName = user.Name,
                 Notes = request.Notes,
                 ReferredByUserEmail = hiringProcess.CreatedByUser.Email

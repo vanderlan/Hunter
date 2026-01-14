@@ -51,7 +51,9 @@ export class HiringProcessDetailComponent implements OnInit {
   generatingInsights = false;
 
   allStatusOptions = [
-    { value: HiringProcessStatus.Referred, label: 'Referred' },
+    { value: HiringProcessStatus.New, label: 'New' },
+    { value: HiringProcessStatus.ReferredByPartner, label: 'Referred by Partner' },
+    { value: HiringProcessStatus.ReferredInternally, label: 'Referred Internally' },
     { value: HiringProcessStatus.Screening, label: 'Screening' },
     { value: HiringProcessStatus.ConsultantTechnicalInterview, label: 'Consultant Technical Interview' },
     { value: HiringProcessStatus.ClientInterview, label: 'Client Interview' },
@@ -97,8 +99,12 @@ export class HiringProcessDetailComponent implements OnInit {
 
   mapStringToEnum(status: string): HiringProcessStatus {
     switch (status) {
-      case 'Referred':
-        return HiringProcessStatus.Referred;
+      case 'New':
+        return HiringProcessStatus.New;
+      case 'ReferredByPartner':
+        return HiringProcessStatus.ReferredByPartner;
+      case 'ReferredInternally':
+        return HiringProcessStatus.ReferredInternally;
       case 'Screening':
         return HiringProcessStatus.Screening;
       case 'ConsultantTechnicalInterview':
@@ -110,7 +116,7 @@ export class HiringProcessDetailComponent implements OnInit {
       case 'Reproved':
         return HiringProcessStatus.Reproved;
       default:
-        return HiringProcessStatus.Referred;
+        return HiringProcessStatus.New;
     }
   }
 
@@ -201,6 +207,9 @@ export class HiringProcessDetailComponent implements OnInit {
         return 'primary';
       case 'Reproved':
         return 'warn';
+      case 'New':
+      case 'ReferredByPartner':
+      case 'ReferredInternally':
       case 'Screening':
       case 'ConsultantTechnicalInterview':
       case 'ClientInterview':
@@ -212,6 +221,10 @@ export class HiringProcessDetailComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     switch (status) {
+      case 'ReferredByPartner':
+        return 'Referred by Partner';
+      case 'ReferredInternally':
+        return 'Referred Internally';
       case 'ConsultantTechnicalInterview':
         return 'Consultant Technical Interview';
       case 'ClientInterview':

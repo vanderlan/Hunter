@@ -2,6 +2,7 @@ using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Delete;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.UploadResume;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.DownloadResume;
@@ -123,5 +124,23 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     {
         var response = await Mediator.Send(new CandidateDownloadResumeRequest(id));
         return File(response.FileData, response.ContentType, response.FileName);
+    }
+
+    /// <summary>
+    /// Deletes a candidate and all related data (CvAnalysis, Matches, Files, HiringProcess)
+    /// Partner users can only delete candidates without hiring processes
+    /// Admin users can delete any candidate
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <returns>No content on success</returns>
+    [HttpDelete("{id}")]
+    [SwaggerResponse((int)HttpStatusCode.NoContent, "Candidate deleted successfully")]
+    [SwaggerResponse((int)HttpStatusCode.NotFound, "Candidate not found")]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Only Admin can delete candidates with hiring processes")]
+    [SwaggerResponse((int)HttpStatusCode.Forbidden, "Insufficient permissions")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await Mediator.Send(new CandidateDeleteRequest { PublicId = id });
+        return NoContent();
     }
 }

@@ -111,6 +111,14 @@
               </button>
             </mat-menu>
 
+            <button mat-icon-button 
+                    color="warn" 
+                    (click)="deleteCandidate(element)"
+                    [disabled]="!canDeleteCandidate(element)"
+                    [matTooltip]="canDeleteCandidate(element) ? 'Delete candidate' : 'Only Admin can delete candidates with hiring processes'">
+              <mat-icon>delete</mat-icon>
+            </button>
+
             <mat-spinner *ngIf="uploadingResumeFor === element.publicId" 
                         diameter="24" 
                         class="inline-spinner">
