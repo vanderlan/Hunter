@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeminiCode.Hunter.Api", "src\GeminiCode.Hunter.Api\GeminiCode.Hunter.Api.csproj", "{8C8470D6-0951-4B42-8935-779D8672F5B1}"
 EndProject
@@ -19,6 +19,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{2D8CC498-597C-4415-95BF-48E623039F90}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
+		Directory.Packages.props = Directory.Packages.props
 		docker-compose.yml = docker-compose.yml
 		Dockerfile = Dockerfile
 		README.md = README.md
