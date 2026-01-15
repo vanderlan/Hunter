@@ -22,12 +22,13 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 
 [ApiVersion(1.0)]
 [Route("[controller]")]
-[AuthorizeFor(Roles.Admin)]
+[Authorize]
 public class UsersController(IMediator mediator) : ApiController(mediator)
 {
     [HttpGet]
     [SwaggerResponse((int)HttpStatusCode.OK,"A success response with a list of Users paginated", typeof(PagedList<UserGetPaginatedResponse>))]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin)]
     public async Task<IActionResult> Get([FromQuery] UserGetPaginatedRequest filter)
     {
         return Ok(await Mediator.Send(filter));
@@ -37,6 +38,7 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     [SwaggerResponse((int)HttpStatusCode.OK,"A success response with a single User", typeof(UserGetByIdResponse))]
     [SwaggerResponse((int)HttpStatusCode.NotFound)]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin)]
     public async Task<IActionResult> Get(string id)
     {
         var user = await Mediator.Send(new UserGetByIdRequest(id));
@@ -51,6 +53,7 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     [SwaggerResponse((int)HttpStatusCode.Created,"A valid User created", typeof(UserCreateResponse))]
     [SwaggerResponse((int)HttpStatusCode.BadRequest,"A error response with the error description", typeof(ExceptionResponse))]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin)]
     public async Task<IActionResult> Post([FromBody] UserCreateRequest userCreateRequest)
     {
         return Created(await Mediator.Send(userCreateRequest));
@@ -61,6 +64,7 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     [SwaggerResponse((int)HttpStatusCode.Accepted)]
     [SwaggerResponse((int)HttpStatusCode.NotFound)]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin)]
     public async Task<IActionResult> Put(string id, [FromBody] UserUpdateRequest userUpdateRequest)
     {
         userUpdateRequest.PublicId = id;
@@ -74,6 +78,7 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     [SwaggerResponse((int)HttpStatusCode.NoContent)]
     [SwaggerResponse((int)HttpStatusCode.NotFound)]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin)]
     public async Task<IActionResult> Delete(string id)
     {
         await Mediator.Send(new UserDeleteRequest(id));
@@ -82,11 +87,11 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     }
 
     [HttpPatch("Me/Password")]
-    [Authorize]
     [SwaggerResponse((int)HttpStatusCode.BadRequest, "A error response with the error description", typeof(ExceptionResponse))]
     [SwaggerResponse((int)HttpStatusCode.Accepted)]
     [SwaggerResponse((int)HttpStatusCode.NotFound)]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin, Roles.Partner)]
     public async Task<IActionResult> PatchChangePassword([FromBody] UserChangePasswordRequest userChangePasswordRequest)
     {
         await Mediator.Send(userChangePasswordRequest);
@@ -95,19 +100,19 @@ public class UsersController(IMediator mediator) : ApiController(mediator)
     }
 
     [HttpGet("Me/Preferences")]
-    [Authorize]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success response with user preferences", typeof(UserGetPreferencesResponse))]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin, Roles.Partner)]
     public async Task<IActionResult> GetPreferences()
     {
         return Ok(await Mediator.Send(new UserGetPreferencesRequest()));
     }
 
     [HttpPut("Me/Preferences")]
-    [Authorize]
     [SwaggerResponse((int)HttpStatusCode.BadRequest, "A error response with the error description", typeof(ExceptionResponse))]
     [SwaggerResponse((int)HttpStatusCode.Accepted)]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [AuthorizeFor(Roles.Admin, Roles.Partner)]
     public async Task<IActionResult> PutPreferences([FromBody] UserUpdatePreferencesRequest userUpdatePreferencesRequest)
     {
         await Mediator.Send(userUpdatePreferencesRequest);
