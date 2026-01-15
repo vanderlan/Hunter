@@ -13,4 +13,5 @@ public interface IUserRepository : IBaseEntityRepository<User>
     Task<PagedList<User>> ListPaginateAsync(UserFilter filter);
     Task<User> FindByEmailAsync(string email);
     Task<List<User>> GetUsersWithJobNotificationsEnabledAsync();
+    Task<List<User>> GetAdminUsersWithJobNotificationsEnabledAsync();
 }
