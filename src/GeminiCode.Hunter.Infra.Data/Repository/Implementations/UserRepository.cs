@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,14 @@ public sealed class UserRepository(DataContext context) : BaseEntityRepository<U
         return await DataContext.Users
             .AsNoTracking()
             .Where(u => u.ReceiveJobChangeNotifications)
+            .ToListAsync();
+    }
+    
+    public async Task<List<User>> GetAdminUsersWithJobNotificationsEnabledAsync()
+    {
+        return await DataContext.Users
+            .AsNoTracking()
+            .Where(u => u.ReceiveJobChangeNotifications && u.Profile == UserProfile.Admin)
             .ToListAsync();
     }
 }
