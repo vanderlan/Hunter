@@ -1,10 +1,11 @@
-﻿using System.Net;
-using System.Net.Mail;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
 using static GeminiCode.Hunter.Domain.Core.Constants.DomainConstants;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
 
@@ -19,6 +20,7 @@ public class EmailService : IEmailService
     private readonly string _password;
     private readonly bool _enableSsl;
     private readonly string _applicationUrl;
+    private readonly string _smtpLogin;
 
     public EmailService(
         IConfiguration configuration, 
@@ -50,6 +52,9 @@ public class EmailService : IEmailService
         _password = emailConfig["Password"] ?? throw new InvalidOperationException("Email:Password is required");
         _enableSsl = bool.Parse(emailConfig["EnableSsl"] ?? "true");
         _applicationUrl = emailConfig["ApplicationUrl"] ?? "https://hunter.geminicode.com.br";
+        
+        // For SMTP providers like Brevo that use different login than FromEmail
+        _smtpLogin = emailConfig["SmtpLogin"] ?? _fromEmail;
     }
 
     public async Task SendJobChangesNotificationAsync(
@@ -96,32 +101,31 @@ public class EmailService : IEmailService
             {
                 try
                 {
-                    var mail = new MailMessage
+                    var message = new MimeMessage();
+                    message.From.Add(new MailboxAddress("Hunter Job Monitor", _fromEmail));
+                    message.To.Add(new MailboxAddress("", email));
+                    message.Subject = $"Hunter Job Alert – {newJobs.Count} New, {closedJobs.Count} Closed";
+                    
+                    var bodyBuilder = new BodyBuilder
                     {
-                        From = new MailAddress(_fromEmail, "Hunter Job Monitor"),
-                        Subject = $"Hunter Job Alert – {newJobs.Count} New, {closedJobs.Count} Closed",
-                        Body = htmlBody,
-                        IsBodyHtml = true,
-                        BodyEncoding = Encoding.UTF8,
-                        SubjectEncoding = Encoding.UTF8
+                        HtmlBody = htmlBody
                     };
+                    message.Body = bodyBuilder.ToMessageBody();
 
-                    mail.To.Add(email);
-
-                    using var smtp = new SmtpClient(_smtpHost, _smtpPort)
-                    {
-                        Credentials = new NetworkCredential(_fromEmail, _password),
-                        EnableSsl = _enableSsl
-                    };
-
-                    await smtp.SendMailAsync(mail);
+                    using var smtp = new SmtpClient();
+                    await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+                    await smtp.AuthenticateAsync(_smtpLogin, _password);
+                    await smtp.SendAsync(message);
+                    await smtp.DisconnectAsync(true);
+                    
                     successCount++;
                     _logger.LogDebug("Job changes notification sent successfully to {Email}", email);
                 }
                 catch (Exception ex)
                 {
                     failureCount++;
-                    _logger.LogError(ex, "Failed to send job changes notification to {Email}", email);
+                    _logger.LogError(ex, "Failed to send job changes notification to {Email}. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                        email, ex.Message, ex.InnerException?.Message ?? "None");
                 }
             }
 
@@ -162,35 +166,33 @@ public class EmailService : IEmailService
 
             var htmlBody = _templateService.RenderCandidateMatchesTemplate(templateData);
 
-            var mail = new MailMessage
-            {
-                From = new MailAddress(_fromEmail, "Hunter CV Matcher"),
-                Subject = $"Hunter Candidate Matches - {totalMatches} Matches for {positions.Count} Position(s)",
-                Body = htmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-                SubjectEncoding = Encoding.UTF8
-            };
-
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter CV Matcher", _fromEmail));
             foreach (var email in _toEmails)
             {
-                mail.To.Add(email);
+                message.To.Add(new MailboxAddress("", email));
             }
-
-            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            message.Subject = $"Hunter Candidate Matches - {totalMatches} Matches for {positions.Count} Position(s)";
+            
+            var bodyBuilder = new BodyBuilder
             {
-                Credentials = new NetworkCredential(_fromEmail, _password),
-                EnableSsl = _enableSsl
+                HtmlBody = htmlBody
             };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            await smtp.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
 
             _logger.LogInformation("Candidate matching notification email sent successfully to {Emails}",
                 string.Join(", ", _toEmails));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send candidate matching notification email");
+            _logger.LogError(ex, "Failed to send candidate matching notification email. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
         }
     }
 
@@ -214,31 +216,29 @@ public class EmailService : IEmailService
 
             var htmlBody = _templateService.RenderWelcomeEmailTemplate(templateData);
 
-            var mail = new MailMessage
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
+            message.To.Add(new MailboxAddress("", userEmail));
+            message.Subject = "Welcome to Hunter!";
+            
+            var bodyBuilder = new BodyBuilder
             {
-                From = new MailAddress(_fromEmail, "Hunter"),
-                Subject = "Welcome to Hunter!",
-                Body = htmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-                SubjectEncoding = Encoding.UTF8
+                HtmlBody = htmlBody
             };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            mail.To.Add(userEmail);
-
-            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
-            {
-                Credentials = new NetworkCredential(_fromEmail, _password),
-                EnableSsl = _enableSsl
-            };
-
-            await smtp.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
 
             _logger.LogInformation("Welcome email sent successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send welcome email");
+            _logger.LogError(ex, "Failed to send welcome email. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
         }
     }
 
@@ -275,35 +275,33 @@ public class EmailService : IEmailService
 
             var htmlBody = _templateService.RenderCandidateReferralTemplate(templateData);
 
-            var mail = new MailMessage
-            {
-                From = new MailAddress(_fromEmail, "Hunter"),
-                Subject = $"New Candidate Referral - {candidateName} for {jobTitle}",
-                Body = htmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-                SubjectEncoding = Encoding.UTF8
-            };
-
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
             foreach (var email in toEmails)
             {
-                mail.To.Add(email);
+                message.To.Add(new MailboxAddress("", email));
             }
-
-            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
+            message.Subject = $"New Candidate Referral - {candidateName} for {jobTitle}";
+            
+            var bodyBuilder = new BodyBuilder
             {
-                Credentials = new NetworkCredential(_fromEmail, _password),
-                EnableSsl = _enableSsl
+                HtmlBody = htmlBody
             };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            await smtp.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
 
             _logger.LogInformation("Candidate referral notification sent successfully to {Emails}", 
                 string.Join(", ", toEmails));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send candidate referral notification");
+            _logger.LogError(ex, "Failed to send candidate referral notification. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
         }
     }
 
@@ -334,31 +332,29 @@ public class EmailService : IEmailService
 
             var htmlBody = _templateService.RenderStatusChangeTemplate(templateData);
 
-            var mail = new MailMessage
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
+            message.To.Add(new MailboxAddress("", toEmail));
+            message.Subject = $"Status Update - {candidateName} moved to {newStatus}";
+            
+            var bodyBuilder = new BodyBuilder
             {
-                From = new MailAddress(_fromEmail, "Hunter"),
-                Subject = $"Status Update - {candidateName} moved to {newStatus}",
-                Body = htmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-                SubjectEncoding = Encoding.UTF8
+                HtmlBody = htmlBody
             };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            mail.To.Add(toEmail);
-
-            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
-            {
-                Credentials = new NetworkCredential(_fromEmail, _password),
-                EnableSsl = _enableSsl
-            };
-
-            await smtp.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
 
             _logger.LogInformation("Status change notification sent successfully to {Email}", toEmail);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send status change notification");
+            _logger.LogError(ex, "Failed to send status change notification. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
         }
     }
 
@@ -384,31 +380,29 @@ public class EmailService : IEmailService
 
             var htmlBody = _templateService.RenderNoteAddedTemplate(templateData);
 
-            var mail = new MailMessage
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
+            message.To.Add(new MailboxAddress("", toEmail));
+            message.Subject = $"New Note Added - {candidateName}";
+            
+            var bodyBuilder = new BodyBuilder
             {
-                From = new MailAddress(_fromEmail, "Hunter"),
-                Subject = $"New Note Added - {candidateName}",
-                Body = htmlBody,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8,
-                SubjectEncoding = Encoding.UTF8
+                HtmlBody = htmlBody
             };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            mail.To.Add(toEmail);
-
-            using var smtp = new SmtpClient(_smtpHost, _smtpPort)
-            {
-                Credentials = new NetworkCredential(_fromEmail, _password),
-                EnableSsl = _enableSsl
-            };
-
-            await smtp.SendMailAsync(mail);
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
 
             _logger.LogInformation("Note added notification sent successfully to {Email}", toEmail);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send note added notification");
+            _logger.LogError(ex, "Failed to send note added notification. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
         }
     }
 
