@@ -10,11 +10,12 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { JobPositionService } from '../../services/job-position.service';
 import { JobPosition } from '../../models/job.model';
+import { NotificationService } from '../../services/notification.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -56,7 +57,7 @@ export class JobPositionsComponent implements OnInit {
 
   constructor(
     private jobPositionService: JobPositionService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private fb: FormBuilder,
     public dialog: MatDialog
   ) {
@@ -98,7 +99,7 @@ export class JobPositionsComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open('Error loading job positions', 'Close', { duration: 3000 });
+          this.notificationService.error('Error loading job positions');
         }
       });
   }
@@ -134,7 +135,7 @@ export class JobPositionsComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open('Error loading job position details', 'Close', { duration: 3000 });
+          this.notificationService.error('Error loading job position details');
           this.cancelEdit();
         }
       });
@@ -148,7 +149,7 @@ export class JobPositionsComponent implements OnInit {
 
   saveJobPosition(): void {
     if (this.jobPositionForm.invalid) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      this.notificationService.warning('Please fill in all required fields');
       return;
     }
 
@@ -161,13 +162,13 @@ export class JobPositionsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.loading = false;
-            this.snackBar.open('Job position updated successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Job position updated successfully');
             this.cancelEdit();
             this.loadJobPositions();
           },
           error: (error) => {
             this.loading = false;
-            this.snackBar.open(error.error?.message || 'Error updating job position', 'Close', { duration: 3000 });
+            this.notificationService.error(error.error?.message || 'Error updating job position');
           }
         });
     } else {
@@ -176,13 +177,13 @@ export class JobPositionsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.loading = false;
-            this.snackBar.open('Job position created successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Job position created successfully');
             this.cancelEdit();
             this.loadJobPositions();
           },
           error: (error) => {
             this.loading = false;
-            this.snackBar.open(error.error?.message || 'Error creating job position', 'Close', { duration: 3000 });
+            this.notificationService.error(error.error?.message || 'Error creating job position');
           }
         });
     }
@@ -195,12 +196,12 @@ export class JobPositionsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.loading = false;
-            this.snackBar.open('Job position deleted successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Job position deleted successfully');
             this.loadJobPositions();
           },
           error: (error) => {
             this.loading = false;
-            this.snackBar.open('Error deleting job position', 'Close', { duration: 3000 });
+            this.notificationService.error('Error deleting job position');
           }
         });
     }

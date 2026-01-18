@@ -10,12 +10,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { CvAnalysisService } from '../../services/cv-analysis.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.model';
 
 @Component({
@@ -67,7 +68,7 @@ export class HiringProcessDetailComponent implements OnInit {
     private hiringProcessService: HiringProcessService,
     private cvAnalysisService: CvAnalysisService,
     private authService: AuthService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
 
@@ -90,7 +91,7 @@ export class HiringProcessDetailComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.snackBar.open('Error loading hiring process', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading hiring process');
         console.error('Error loading process:', error);
         this.router.navigate(['/hiring-process']);
       }
@@ -127,7 +128,7 @@ export class HiringProcessDetailComponent implements OnInit {
 
     const currentStatusEnum = this.mapStringToEnum(this.process.status);
     if (this.selectedStatus === currentStatusEnum) {
-      this.snackBar.open('Please select a different status', 'Close', { duration: 3000 });
+      this.notificationService.warning('Please select a different status');
       return;
     }
 
@@ -138,13 +139,13 @@ export class HiringProcessDetailComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.updatingStatus = false;
-        this.snackBar.open('Status updated successfully', 'Close', { duration: 3000 });
+        this.notificationService.success('Status updated successfully');
         this.statusNotes = '';
         this.loadProcess(this.process!.publicId);
       },
       error: (error) => {
         this.updatingStatus = false;
-        this.snackBar.open('Error updating status', 'Close', { duration: 3000 });
+        this.notificationService.error('Error updating status');
         console.error('Error updating status:', error);
       }
     });
@@ -161,13 +162,13 @@ export class HiringProcessDetailComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.addingNote = false;
-        this.snackBar.open('Note added successfully', 'Close', { duration: 3000 });
+        this.notificationService.success('Note added successfully');
         this.newNote = '';
         this.loadProcess(this.process!.publicId);
       },
       error: (error) => {
         this.addingNote = false;
-        this.snackBar.open('Error adding note', 'Close', { duration: 3000 });
+        this.notificationService.error('Error adding note');
         console.error('Error adding note:', error);
       }
     });
@@ -182,7 +183,7 @@ export class HiringProcessDetailComponent implements OnInit {
     this.hiringProcessService.generateAIInsights(this.process.publicId).subscribe({
       next: (response) => {
         this.generatingInsights = false;
-        this.snackBar.open('AI insights generated successfully!', 'Close', { duration: 3000 });
+        this.notificationService.success('AI insights generated successfully!');
         // Update the local process object with the new referral reason
         if (this.process) {
           this.process.referralReason = response.referralReason;
@@ -191,7 +192,7 @@ export class HiringProcessDetailComponent implements OnInit {
       error: (error) => {
         this.generatingInsights = false;
         const errorMessage = error.error?.message || 'Error generating AI insights. Please try again.';
-        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+        this.notificationService.error(errorMessage);
         console.error('Error generating AI insights:', error);
       }
     });
@@ -277,7 +278,7 @@ export class HiringProcessDetailComponent implements OnInit {
         });
       },
       error: (error) => {
-        this.snackBar.open('Error loading AI analysis', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading AI analysis');
         console.error('Error loading AI analysis:', error);
       }
     });
