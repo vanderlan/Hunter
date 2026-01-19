@@ -7,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
@@ -15,6 +15,7 @@ import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-fi
 import { JobService } from '../../services/job.service';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { CvAnalysisService, CvAnalysisHistoryItem } from '../../services/cv-analysis.service';
+import { NotificationService } from '../../services/notification.service';
 import { JobMatch, CandidateInfo } from '../../models/job.model';
 
 @Component({
@@ -57,7 +58,7 @@ export class CvAnalyzerComponent implements OnInit {
     private jobService: JobService,
     private hiringProcessService: HiringProcessService,
     private cvAnalysisService: CvAnalysisService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     public dialog: MatDialog
   ) {}
 
@@ -89,18 +90,14 @@ export class CvAnalyzerComponent implements OnInit {
         this.totalPositions = response.totalPositionsAnalyzed;
         this.candidateInfo = response.candidateInfo;
         this.selectedFile = null;
-        this.snackBar.open(
-          `Loaded analysis from ${new Date(response.analyzedAt).toLocaleDateString()}`,
-          'Close',
-          { duration: 3000 }
+        this.notificationService.info(
+          `Loaded analysis from ${new Date(response.analyzedAt).toLocaleDateString()}`
         );
       },
       error: (error) => {
         this.analyzing = false;
-        this.snackBar.open(
-          error.error?.message || 'Error loading analysis',
-          'Close',
-          { duration: 5000 }
+        this.notificationService.error(
+          error.error?.message || 'Error loading analysis'
         );
       }
     });
@@ -135,12 +132,12 @@ export class CvAnalyzerComponent implements OnInit {
 
   private handleFile(file: File): void {
     if (file.type !== 'application/pdf') {
-      this.snackBar.open('Please select a PDF file', 'Close', { duration: 3000 });
+      this.notificationService.warning('Please select a PDF file');
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      this.snackBar.open('File size must be less than 10MB', 'Close', { duration: 3000 });
+      this.notificationService.warning('File size must be less than 10MB');
       return;
     }
 
@@ -162,20 +159,16 @@ export class CvAnalyzerComponent implements OnInit {
         this.matches = response.matches;
         this.totalPositions = response.totalPositionsAnalyzed;
         this.candidateInfo = response.candidateInfo || null;
-        this.snackBar.open(
-          `Found ${response.matchesFound} matches out of ${response.totalPositionsAnalyzed} positions`,
-          'Close',
-          { duration: 5000 }
+        this.notificationService.success(
+          `Found ${response.matchesFound} matches out of ${response.totalPositionsAnalyzed} positions`
         );
         // Reload history to show new analysis
         this.loadAnalysisHistory();
       },
       error: (error) => {
         this.analyzing = false;
-        this.snackBar.open(
-          error.error?.message || 'Error analyzing CV. Please try again.',
-          'Close',
-          { duration: 5000 }
+        this.notificationService.error(
+          error.error?.message || 'Error analyzing CV. Please try again.'
         );
       }
     });
@@ -217,13 +210,13 @@ export class CvAnalyzerComponent implements OnInit {
     console.log('Starting hiring process for match:', match);
     
     if (!this.candidateInfo) {
-      this.snackBar.open('Candidate information not available', 'Close', { duration: 3000 });
+      this.notificationService.warning('Candidate information not available');
       return;
     }
 
     if (!match.jobPositionId) {
       console.error('Job position ID is missing from match:', match);
-      this.snackBar.open('Job position information not available. Please analyze the CV again.', 'Close', { duration: 5000 });
+      this.notificationService.error('Job position information not available. Please analyze the CV again.');
       return;
     }
 
@@ -254,16 +247,14 @@ export class CvAnalyzerComponent implements OnInit {
           }).subscribe({
             next: (response) => {
               console.log('Referral successful:', response);
-              this.snackBar.open(
-                `Candidate referral submitted successfully! Admin will review and decide whether to start the hiring process.`,
-                'Close',
-                { duration: 6000 }
+              this.notificationService.success(
+                `Candidate referral submitted successfully! Admin will review and decide whether to start the hiring process.`
               );
             },
             error: (error) => {
               console.error('Referral error:', error);
               const message = error.error?.message || 'Error submitting referral. It may already exist.';
-              this.snackBar.open(message, 'Close', { duration: 5000 });
+              this.notificationService.error(message);
             }
           });
         } else {

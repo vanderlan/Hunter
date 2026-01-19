@@ -9,12 +9,13 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { CandidateService } from '../../services/candidate.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { Candidate } from '../../models/candidate.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -55,7 +56,7 @@ export class CandidatesComponent implements OnInit {
   constructor(
     private candidateService: CandidateService,
     private authService: AuthService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     public dialog: MatDialog
   ) {
     this.searchSubject.pipe(
@@ -82,7 +83,7 @@ export class CandidatesComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open('Error loading candidates', 'Close', { duration: 3000 });
+          this.notificationService.error('Error loading candidates');
         }
       });
   }
@@ -112,12 +113,12 @@ export class CandidatesComponent implements OnInit {
           this.candidateService.updateCandidate(result.publicId, result).subscribe({
             next: () => {
               this.loading = false;
-              this.snackBar.open('Candidate updated successfully', 'Close', { duration: 3000 });
+              this.notificationService.success('Candidate updated successfully');
               this.loadCandidates();
             },
             error: (error) => {
               this.loading = false;
-              this.snackBar.open(error.error?.message || 'Error updating candidate', 'Close', { duration: 3000 });
+              this.notificationService.error(error.error?.message || 'Error updating candidate');
             }
           });
         }
@@ -147,14 +148,14 @@ export class CandidatesComponent implements OnInit {
       
       // Validate file type
       if (file.type !== 'application/pdf') {
-        this.snackBar.open('Only PDF files are allowed', 'Close', { duration: 3000 });
+        this.notificationService.warning('Only PDF files are allowed');
         input.value = '';
         return;
       }
 
       // Validate file size (10MB)
       if (file.size > 10 * 1024 * 1024) {
-        this.snackBar.open('File size must not exceed 10 MB', 'Close', { duration: 3000 });
+        this.notificationService.warning('File size must not exceed 10 MB');
         input.value = '';
         return;
       }
@@ -170,12 +171,12 @@ export class CandidatesComponent implements OnInit {
     this.candidateService.uploadResume(candidate.publicId, file).subscribe({
       next: (response) => {
         this.uploadingResumeFor = null;
-        this.snackBar.open('Resume uploaded successfully', 'Close', { duration: 3000 });
+        this.notificationService.success('Resume uploaded successfully');
         this.loadCandidates();
       },
       error: (error) => {
         this.uploadingResumeFor = null;
-        this.snackBar.open(error.error?.message || 'Error uploading resume', 'Close', { duration: 3000 });
+        this.notificationService.error(error.error?.message || 'Error uploading resume');
       }
     });
   }
@@ -198,7 +199,7 @@ export class CandidatesComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: (error) => {
-        this.snackBar.open('Error downloading resume', 'Close', { duration: 3000 });
+        this.notificationService.error('Error downloading resume');
       }
     });
   }
@@ -215,10 +216,8 @@ export class CandidatesComponent implements OnInit {
 
   deleteCandidate(candidate: Candidate): void {
     if (!this.canDeleteCandidate(candidate)) {
-      this.snackBar.open(
-        'Only Admin users can delete candidates with existing hiring processes',
-        'Close',
-        { duration: 5000 }
+      this.notificationService.warning(
+        'Only Admin users can delete candidates with existing hiring processes'
       );
       return;
     }
@@ -243,13 +242,13 @@ export class CandidatesComponent implements OnInit {
           this.candidateService.deleteCandidate(candidate.publicId).subscribe({
             next: () => {
               this.loading = false;
-              this.snackBar.open('Candidate deleted successfully', 'Close', { duration: 3000 });
+              this.notificationService.success('Candidate deleted successfully');
               this.loadCandidates();
             },
             error: (error) => {
               this.loading = false;
               const message = error.error?.message || error.message || 'Error deleting candidate';
-              this.snackBar.open(message, 'Close', { duration: 5000 });
+              this.notificationService.error(message);
             }
           });
         }

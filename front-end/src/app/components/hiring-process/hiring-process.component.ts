@@ -9,11 +9,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { HiringProcessListItem, DashboardStats } from '../../models/hiring-process.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -60,7 +61,7 @@ export class HiringProcessComponent implements OnInit {
   constructor(
     private hiringProcessService: HiringProcessService,
     private authService: AuthService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private router: Router
   ) {
     // Setup auto-search with debounce
@@ -106,7 +107,7 @@ export class HiringProcessComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.snackBar.open('Error loading hiring processes', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading hiring processes');
         console.error('Error loading processes:', error);
       }
     });
