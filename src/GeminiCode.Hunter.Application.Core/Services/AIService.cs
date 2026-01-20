@@ -320,7 +320,9 @@ public class AIService : IAIService
         sb.AppendLine("   - Specific skills, experiences, or qualifications the candidate needs to develop");
         sb.AppendLine("   - Areas where the candidate could improve to reach 100% match");
         sb.AppendLine("   - Be constructive and actionable");
-        sb.AppendLine("   - If match is already very high (95%+), mention minor improvements or continued development");
+        sb.AppendLine("5. Be critical about the required primary skill stack");
+        sb.AppendLine("   - Example 01: If the position requires full-stack development, but the candidate only has experience with front-end or only with back-end, he needs to be severely penalized");
+        sb.AppendLine("   - Example 02: If the candidate is a Java specialist but the position requires C#, even if they are very experienced, he needs to be severely penalized");
         sb.AppendLine();
         sb.AppendLine($"Return ONLY positions with match percentage > {AIMatching.MinimumMatchPercentage}%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");

@@ -40,16 +40,16 @@ import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../m
   styleUrl: './user-management.component.scss'
 })
 export class UserManagementComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'email', 'profile', 'createdAt', 'actions'];
-  dataSource: User[] = [];
-  totalCount = 0;
-  pageSize = 10;
-  pageIndex = 0;
-  searchQuery = '';
-  loading = false;
-  isEditing = false;
-  userForm: FormGroup;
-  currentUserId: string | null = null;
+displayedColumns: string[] = ['name', 'email', 'profile', 'createdAt', 'lastLoginAt', 'actions'];
+dataSource: User[] = [];
+totalCount = 0;
+pageSize = 10;
+pageIndex = 0;
+searchQuery = '';
+loading = false;
+isEditing = false;
+userForm: FormGroup;
+currentUserId: string | null = null;
 
   userProfiles = [
     { value: UserProfile.Admin, label: 'Admin' },

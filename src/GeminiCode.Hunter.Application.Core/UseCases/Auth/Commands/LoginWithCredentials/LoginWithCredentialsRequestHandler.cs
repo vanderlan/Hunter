@@ -17,6 +17,11 @@ public class LoginWithCredentialsRequestHandler(IUnitOfWork unitOfWork, IStringL
 
         if (user is not null)
         {
+            // Update last login timestamp
+            user.LastLoginAt = DateTime.UtcNow;
+            unitOfWork.UserRepository.Update(user);
+            await unitOfWork.CommitAsync();
+
             var refreshToken = await AddRefreshTokenAsync(user.Email);
 
             return new LoginWithCredentialsResponse
