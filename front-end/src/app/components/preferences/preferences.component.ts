@@ -5,9 +5,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-preferences',
@@ -32,7 +33,7 @@ export class PreferencesComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private fb: FormBuilder
   ) {
     this.preferencesForm = this.fb.group({
@@ -53,7 +54,7 @@ export class PreferencesComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.snackBar.open('Error loading preferences', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading preferences');
       }
     });
   }
@@ -69,11 +70,11 @@ export class PreferencesComponent implements OnInit {
     this.userService.updatePreferences(preferences).subscribe({
       next: () => {
         this.saving = false;
-        this.snackBar.open('Preferences saved successfully', 'Close', { duration: 3000 });
+        this.notificationService.success('Preferences saved successfully');
       },
       error: (error) => {
         this.saving = false;
-        this.snackBar.open('Error saving preferences', 'Close', { duration: 3000 });
+        this.notificationService.error('Error saving preferences');
       }
     });
   }

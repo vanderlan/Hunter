@@ -7,8 +7,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { JobService } from '../../services/job.service';
+import { NotificationService } from '../../services/notification.service';
 import { JobPosition } from '../../models/job.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -39,7 +40,7 @@ export class OpenPositionsComponent implements OnInit {
 
   constructor(
     private jobService: JobService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     public dialog: MatDialog
   ) {
     // Setup auto-search with debounce
@@ -65,7 +66,7 @@ export class OpenPositionsComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.snackBar.open('Error loading positions', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading positions');
         console.error('Error loading positions:', error);
       }
     });

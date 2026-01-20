@@ -8,12 +8,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from '../../services/notification.service';
 import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../models/user.model';
 
 @Component({
@@ -58,7 +59,7 @@ currentUserId: string | null = null;
 
   constructor(
     private userService: UserService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private fb: FormBuilder
   ) {
     this.userForm = this.fb.group({
@@ -84,7 +85,7 @@ currentUserId: string | null = null;
       },
       error: (error) => {
         this.loading = false;
-        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading users');
       }
     });
   }
@@ -155,7 +156,7 @@ currentUserId: string | null = null;
 
   saveUser(): void {
     if (this.userForm.invalid) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      this.notificationService.warning('Please fill in all required fields');
       return;
     }
 
@@ -167,13 +168,13 @@ currentUserId: string | null = null;
       this.userService.updateUser(this.currentUserId, userData).subscribe({
         next: () => {
           this.loading = false;
-          this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('User updated successfully');
           this.cancelEdit();
           this.loadUsers();
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open(error.error?.message || 'Error updating user', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.message || 'Error updating user');
         }
       });
     } else {
@@ -182,13 +183,13 @@ currentUserId: string | null = null;
       this.userService.createUser(userData).subscribe({
         next: () => {
           this.loading = false;
-          this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('User created successfully');
           this.cancelEdit();
           this.loadUsers();
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open(error.error?.message || 'Error creating user', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.message || 'Error creating user');
         }
       });
     }
@@ -200,12 +201,12 @@ currentUserId: string | null = null;
       this.userService.deleteUser(user.publicId!).subscribe({
         next: () => {
           this.loading = false;
-          this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('User deleted successfully');
           this.loadUsers();
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open(error.error?.message || 'Error deleting user', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.message || 'Error deleting user');
         }
       });
     }
