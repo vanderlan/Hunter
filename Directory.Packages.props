@@ -15,7 +15,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.2" />
     <PackageVersion Include="Microsoft.FeatureManagement" Version="4.4.0" />
-    <PackageVersion Include="NewRelic.Agent" Version="10.47.2" />
+    <PackageVersion Include="NewRelic.Agent" Version="10.48.0" />
     <PackageVersion Include="OpenAI" Version="2.8.0" />
     <PackageVersion Include="PdfPig" Version="0.1.13" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
