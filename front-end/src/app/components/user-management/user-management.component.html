@@ -16,7 +16,10 @@
     <div class="actions-row">
       <mat-form-field appearance="outline" class="search-field">
         <mat-label>Search</mat-label>
-        <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by name or email">
+        <input matInput 
+               [(ngModel)]="searchQuery" 
+               (ngModelChange)="onSearchChange($event)"
+               placeholder="Search by name or email">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
       <button mat-raised-button color="primary" (click)="showCreateForm()">

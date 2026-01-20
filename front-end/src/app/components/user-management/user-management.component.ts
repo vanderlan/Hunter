@@ -16,6 +16,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { UserService } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
 import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../models/user.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-management',
@@ -51,6 +53,7 @@ loading = false;
 isEditing = false;
 userForm: FormGroup;
 currentUserId: string | null = null;
+private searchSubject = new Subject<string>();
 
   userProfiles = [
     { value: UserProfile.Admin, label: 'Admin' },
@@ -68,6 +71,15 @@ currentUserId: string | null = null;
       profile: [UserProfile.Partner, Validators.required],
       sendWelcomeEmail: [true],
       receiveJobChangeNotifications: [true]
+    });
+
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.pageIndex = 0;
+      this.loadUsers();
     });
   }
 
@@ -96,9 +108,9 @@ currentUserId: string | null = null;
     this.loadUsers();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadUsers();
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   showCreateForm(): void {
