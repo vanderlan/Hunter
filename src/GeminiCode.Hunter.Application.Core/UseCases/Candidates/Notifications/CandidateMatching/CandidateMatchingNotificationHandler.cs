@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
-using Newtonsoft.Json;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
@@ -93,7 +92,7 @@ public class CandidateMatchingNotificationHandler(
 
                         var match = analysisResult.Matches.FirstOrDefault();
                         
-                        if (match != null && match.MatchPercentage > 20)
+                        if (match != null && match.MatchPercentage > 85)
                         {
                             candidateMatches.Add(new CandidateMatchInfo
                             {

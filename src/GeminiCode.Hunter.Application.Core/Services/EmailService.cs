@@ -181,13 +181,13 @@ public class EmailService : IEmailService
             message.Body = bodyBuilder.ToMessageBody();
 
             using var smtp = new SmtpClient();
+
             await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
             await smtp.AuthenticateAsync(_smtpLogin, _password);
             await smtp.SendAsync(message);
             await smtp.DisconnectAsync(true);
 
-            _logger.LogInformation("Candidate matching notification email sent successfully to {Emails}",
-                string.Join(", ", _toEmails));
+            _logger.LogInformation("Candidate matching notification email sent successfully to {Emails}", string.Join(", ", _toEmails));
         }
         catch (Exception ex)
         {
