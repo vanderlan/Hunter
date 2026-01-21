@@ -508,7 +508,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Property<string>("Responsibilities")
                         .HasColumnType("text");
 
-                    b.Property<string>("Skills")
+                    b.Property<string>("Requirements")
                         .HasColumnType("text");
 
                     b.Property<string>("Summary")

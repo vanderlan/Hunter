@@ -6,6 +6,7 @@ public record JobPositionSummary(
   string CompanyCode,
   string? Summary,
   string? Responsibilities,
+  string? Requirements,
   string? MustHaveSkills,
   string? NiceToHaveSkills
 );

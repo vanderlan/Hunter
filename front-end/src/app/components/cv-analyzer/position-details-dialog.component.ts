@@ -57,15 +57,15 @@ import { JobPosition } from '../../models/job.model';
 
         <mat-divider class="position-section-divider" *ngIf="data.responsibilities"></mat-divider>
 
-        <div class="position-info-section" *ngIf="data.skills">
+        <div class="position-info-section" *ngIf="data.requirements">
           <h3 class="position-section-heading">
-            <mat-icon class="position-section-icon">lightbulb</mat-icon>
-            <span>Skills</span>
+            <mat-icon class="position-section-icon">checklist</mat-icon>
+            <span>Requirements</span>
           </h3>
-          <p class="position-section-text">{{ data.skills }}</p>
+          <p class="position-section-text">{{ data.requirements }}</p>
         </div>
 
-        <mat-divider class="position-section-divider" *ngIf="data.skills"></mat-divider>
+        <mat-divider class="position-section-divider" *ngIf="data.requirements"></mat-divider>
 
         <div class="position-info-section" *ngIf="data.mustHaveSkills">
           <h3 class="position-section-heading">

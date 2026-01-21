@@ -74,6 +74,7 @@ public class CandidateMatchingNotificationHandler(
                     position.CompanyCode,
                     position.Summary,
                     position.Responsibilities,
+                    position.Requirements,
                     position.MustHaveSkills,
                     position.NiceToHaveSkills
                 );

@@ -82,7 +82,7 @@ public class JobPositionRepository(DataContext dataContext) : BaseEntityReposito
             query = query.Where(x => 
                                 x.Title.ToLower().Contains(searchTerm) 
                                 || x.CompanyCode.ToLower().Contains(searchTerm)
-                                || x.Skills.ToLower().Contains(searchTerm)
+                                || x.Requirements.ToLower().Contains(searchTerm)
                                 || x.Responsibilities.ToLower().Contains(searchTerm)
                                 || x.MustHaveSkills.ToLower().Contains(searchTerm)
                                 || x.NiceToHaveSkills.ToLower().Contains(searchTerm)                             

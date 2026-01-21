@@ -68,7 +68,7 @@ export class JobPositionsComponent implements OnInit {
       jobCode: ['', Validators.required],
       summary: [''],
       responsibilities: [''],
-      skills: [''],
+      requirements: [''],
       mustHaveSkills: [''],
       niceToHaveSkills: [''],
       isActive: [true]

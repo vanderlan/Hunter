@@ -11,7 +11,7 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
     public string JobCode { get; set; }
     public string? Summary { get; set; }
     public string? Responsibilities { get; set; }
-    public string? Skills { get; set; }
+    public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
 
@@ -29,7 +29,7 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
             JobCode = request.JobCode,
             Summary = request.Summary,
             Responsibilities = request.Responsibilities,
-            Skills = request.Skills,
+            Requirements = request.Requirements,
             MustHaveSkills = request.MustHaveSkills,
             NiceToHaveSkills = request.NiceToHaveSkills,
             IsActive = true,

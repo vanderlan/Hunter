@@ -77,7 +77,7 @@ public class SyncJobsRequestHandler(
                         JobCode = newJob.JobCode,
                         Summary = enrichedDetails.Summary,
                         Responsibilities = enrichedDetails.Responsibilities,
-                        Skills = enrichedDetails.Skills,
+                        Requirements = enrichedDetails.Requirements,
                         MustHaveSkills = enrichedDetails.MustHaveSkills,
                         NiceToHaveSkills = enrichedDetails.NiceToHaveSkills,
                         IsActive = true,
@@ -124,12 +124,52 @@ public class SyncJobsRequestHandler(
 
                 if (scrapedJob != null && scrapedJob.Title == position.Title)
                 {
-                    // Title hasn't changed, just update LastCheckedAt
-                    position.LastCheckedAt = now;
-                    unitOfWork.JobPositionRepository.Update(position);
-                    response.UpdatedPositions++;
+                    // Check if position is missing Requirements field and update if necessary
+                    if (string.IsNullOrWhiteSpace(position.Requirements))
+                    {
+                        try
+                        {
+                            logger.LogInformation("Position {Title} is missing Requirements field, enriching with AI", position.Title);
+                            
+                            // Scrape raw HTML content
+                            var scrapedDetails = await scraperService.ScrapeJobDetailsAsync(position.ExternalUrl);
 
-                    logger.LogDebug("Updated LastCheckedAt for: {Title}", position.Title);
+                            // Use AI to extract and enrich job details
+                            var enrichedDetails = await openAIService.EnrichJobDetailsAsync(
+                                position.Title,
+                                scrapedDetails.RawHtmlContent
+                            );
+
+                            // Update position with all enriched details
+                            position.Summary = enrichedDetails.Summary;
+                            position.Responsibilities = enrichedDetails.Responsibilities;
+                            position.Requirements = enrichedDetails.Requirements;
+                            position.MustHaveSkills = enrichedDetails.MustHaveSkills;
+                            position.NiceToHaveSkills = enrichedDetails.NiceToHaveSkills;
+                            position.LastCheckedAt = now;
+                            
+                            unitOfWork.JobPositionRepository.Update(position);
+                            response.UpdatedPositions++;
+
+                            logger.LogInformation("Updated position {Title} with Requirements field", position.Title);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Error enriching position {Title} with Requirements", position.Title);
+                            // Continue with just updating LastCheckedAt
+                            position.LastCheckedAt = now;
+                            unitOfWork.JobPositionRepository.Update(position);
+                        }
+                    }
+                    else
+                    {
+                        // Title hasn't changed and has Requirements, just update LastCheckedAt
+                        position.LastCheckedAt = now;
+                        unitOfWork.JobPositionRepository.Update(position);
+                        response.UpdatedPositions++;
+
+                        logger.LogDebug("Updated LastCheckedAt for: {Title}", position.Title);
+                    }
                 }
                 else if (scrapedJob != null && scrapedJob.Title != position.Title)
                 {

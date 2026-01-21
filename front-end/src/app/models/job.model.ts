@@ -7,7 +7,7 @@ export interface JobPosition {
   jobCode: string;
   summary?: string;
   responsibilities?: string;
-  skills?: string;
+  requirements?: string;
   mustHaveSkills?: string;
   niceToHaveSkills?: string;
   isActive?: boolean;

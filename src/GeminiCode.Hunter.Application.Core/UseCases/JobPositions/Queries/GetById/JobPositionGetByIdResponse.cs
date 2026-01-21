@@ -13,7 +13,7 @@ public class JobPositionGetByIdResponse
     public string JobCode { get; set; }
     public string? Summary { get; set; }
     public string? Responsibilities { get; set; }
-    public string? Skills { get; set; }
+    public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
     public bool IsActive { get; set; }
@@ -37,7 +37,7 @@ public class JobPositionGetByIdResponse
             JobCode = jobPosition.JobCode,
             Summary = jobPosition.Summary,
             Responsibilities = jobPosition.Responsibilities,
-            Skills = jobPosition.Skills,
+            Requirements = jobPosition.Requirements,
             MustHaveSkills = jobPosition.MustHaveSkills,
             NiceToHaveSkills = jobPosition.NiceToHaveSkills,
             IsActive = jobPosition.IsActive,

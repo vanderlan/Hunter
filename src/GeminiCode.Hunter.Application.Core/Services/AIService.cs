@@ -87,7 +87,7 @@ public class AIService : IAIService
             return new JobEnrichmentResult(
                 Summary: result.Summary ?? string.Empty,
                 Responsibilities: result.Responsibilities ?? string.Empty,
-                Skills: result.Skills ?? string.Empty,
+                Requirements: result.Requirements ?? string.Empty,
                 MustHaveSkills: result.MustHaveSkills ?? string.Empty,
                 NiceToHaveSkills: result.NiceToHaveSkills ?? string.Empty
             );
@@ -232,17 +232,17 @@ public class AIService : IAIService
         sb.AppendLine();
         sb.AppendLine("1. **Summary**: A concise 2-3 sentence overview of the position");
         sb.AppendLine("2. **Responsibilities**: Key duties and responsibilities (bullet points or paragraphs)");
-        sb.AppendLine("3. **Skills**: ALL technical and soft skills mentioned, comma-separated");
-        sb.AppendLine("   - Example: \"Java, C#, SQL Server, Kubernetes, Docker, Agile, Team Leadership\"");
-        sb.AppendLine("4. **Must-Have Skills**: Essential/required skills only, comma-separated");
+        sb.AppendLine("3. **Requirements**: ALL position requirements including education, experience level, certifications, and general qualifications");
+        sb.AppendLine("   - Example: \"Bachelor's degree in Computer Science, 5+ years of experience, AWS certification, Strong problem-solving skills\"");
+        sb.AppendLine("4. **Must-Have Skills**: Essential/required technical and soft skills only, comma-separated");
         sb.AppendLine("5. **Nice-to-Have Skills**: Preferred/optional skills, comma-separated");
         sb.AppendLine();
         sb.AppendLine("# IMPORTANT RULES");
         sb.AppendLine("- Extract ONLY information present in the HTML content");
         sb.AppendLine("- Do NOT invent or assume information");
         sb.AppendLine("- If a section has no data, return empty string");
-        sb.AppendLine("- For Skills: include ALL skills mentioned (technical, soft, tools, technologies)");
-        sb.AppendLine("- Format skills as comma-separated values");
+        sb.AppendLine("- For Requirements: include education, experience level, years, certifications, and general qualifications");
+        sb.AppendLine("- Format requirements as comma-separated values or structured text");
         sb.AppendLine("- Keep text concise and professional");
         sb.AppendLine();
         sb.AppendLine("# OUTPUT FORMAT");
@@ -251,7 +251,7 @@ public class AIService : IAIService
         sb.AppendLine("{");
         sb.AppendLine("  \"summary\": \"string\",");
         sb.AppendLine("  \"responsibilities\": \"string\",");
-        sb.AppendLine("  \"skills\": \"string\",");
+        sb.AppendLine("  \"requirements\": \"string\",");
         sb.AppendLine("  \"mustHaveSkills\": \"string\",");
         sb.AppendLine("  \"niceToHaveSkills\": \"string\"");
         sb.AppendLine("}");
@@ -291,6 +291,11 @@ public class AIService : IAIService
             if (!string.IsNullOrWhiteSpace(job.Responsibilities))
             {
                 sb.AppendLine($"**Responsibilities:** {job.Responsibilities}");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(job.Requirements))
+            {
+                sb.AppendLine($"**Requirements:** {job.Requirements}");
             }
             
             if (!string.IsNullOrWhiteSpace(job.MustHaveSkills))
@@ -356,11 +361,11 @@ public class AIService : IAIService
           "properties": {
             "summary": { "type": "string" },
             "responsibilities": { "type": "string" },
-            "skills": { "type": "string" },
+            "requirements": { "type": "string" },
             "mustHaveSkills": { "type": "string" },
             "niceToHaveSkills": { "type": "string" }
           },
-          "required": ["summary", "responsibilities", "skills", "mustHaveSkills", "niceToHaveSkills"],
+          "required": ["summary", "responsibilities", "requirements", "mustHaveSkills", "niceToHaveSkills"],
           "additionalProperties": false
         }
         """;
@@ -405,7 +410,7 @@ public class AIService : IAIService
     private record OpenAIJobEnrichmentResponse(
         string? Summary,
         string? Responsibilities,
-        string? Skills,
+        string? Requirements,
         string? MustHaveSkills,
         string? NiceToHaveSkills
     );

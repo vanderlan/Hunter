@@ -11,6 +11,5 @@ public class Candidate : BaseEntity
     public string? PhoneNumber { get; set; }
     public required string CvText { get; set; }
     public DateTime AnalyzedAt { get; set; }
-    
     public virtual User? User { get; set; }
 }

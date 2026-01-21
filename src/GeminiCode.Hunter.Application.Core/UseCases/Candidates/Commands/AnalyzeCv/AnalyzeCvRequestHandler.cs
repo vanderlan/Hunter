@@ -87,6 +87,7 @@ public class AnalyzeCvRequestHandler(
                 j.CompanyCode,
                 j.Summary,
                 j.Responsibilities,
+                j.Requirements,
                 j.MustHaveSkills,
                 j.NiceToHaveSkills
             )).ToList();
