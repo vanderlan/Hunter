@@ -90,9 +90,6 @@ export class CvAnalyzerComponent implements OnInit {
         this.totalPositions = response.totalPositionsAnalyzed;
         this.candidateInfo = response.candidateInfo;
         this.selectedFile = null;
-        this.notificationService.info(
-          `Loaded analysis from ${new Date(response.analyzedAt).toLocaleDateString()}`
-        );
       },
       error: (error) => {
         this.analyzing = false;

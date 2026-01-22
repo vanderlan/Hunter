@@ -202,7 +202,7 @@ export class HiringProcessComponent implements OnInit {
       case 'ReferredInternally':
         return 'Referred Internally';
       case 'ConsultantTechnicalInterview':
-        return 'Consultant Technical Interview';
+        return 'Technical Interview';
       case 'ClientInterview':
         return 'Client Interview';
       default:

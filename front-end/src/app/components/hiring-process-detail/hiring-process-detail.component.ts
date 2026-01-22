@@ -56,7 +56,7 @@ export class HiringProcessDetailComponent implements OnInit {
     { value: HiringProcessStatus.ReferredByPartner, label: 'Referred by Partner' },
     { value: HiringProcessStatus.ReferredInternally, label: 'Referred Internally' },
     { value: HiringProcessStatus.Screening, label: 'Screening' },
-    { value: HiringProcessStatus.ConsultantTechnicalInterview, label: 'Consultant Technical Interview' },
+    { value: HiringProcessStatus.ConsultantTechnicalInterview, label: 'Technical Interview' },
     { value: HiringProcessStatus.ClientInterview, label: 'Client Interview' },
     { value: HiringProcessStatus.Hired, label: 'Hired' },
     { value: HiringProcessStatus.Reproved, label: 'Reproved' }
@@ -227,7 +227,7 @@ export class HiringProcessDetailComponent implements OnInit {
       case 'ReferredInternally':
         return 'Referred Internally';
       case 'ConsultantTechnicalInterview':
-        return 'Consultant Technical Interview';
+        return 'Technical Interview';
       case 'ClientInterview':
         return 'Client Interview';
       default:

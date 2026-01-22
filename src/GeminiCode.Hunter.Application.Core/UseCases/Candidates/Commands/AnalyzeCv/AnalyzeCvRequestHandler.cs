@@ -55,11 +55,8 @@ public class AnalyzeCvRequestHandler(
 
             logger.LogInformation("Extracted {Length} characters from CV", cvText.Length);
 
-            // Extract basic candidate information
-            var (_, email, phone) = cvInfoExtractionService.ExtractBasicInfo(cvText);
-            
-            // Extract name using OpenAI (more accurate than regex)
-            var name = await cvInfoExtractionService.ExtractNameWithAIAsync(cvText);
+            // Extract basic candidate information using AI
+            var (name, email, phone) = await cvInfoExtractionService.ExtractBasicInfoWithAIAsync(cvText);
 
             // Store or update candidate information BEFORE analysis
             var candidate = await StoreCandidateAsync(name, email, phone, cvText, user.UserId);

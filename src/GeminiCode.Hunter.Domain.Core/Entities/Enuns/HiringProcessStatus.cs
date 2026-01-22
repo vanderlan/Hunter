@@ -16,7 +16,7 @@ public enum HiringProcessStatus
     [Description("Screening")]
     Screening = 3,
 
-    [Description("Consultant Technical Interview")]
+    [Description("Technical Interview")]
     ConsultantTechnicalInterview = 4,
 
     [Description("Client Interview")]

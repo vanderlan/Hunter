@@ -17,8 +17,6 @@ public class SyncJobsRequestHandler(
 {
     public async Task<SyncJobsResponse> Handle(SyncJobsRequest request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Starting job synchronization");
-
         var response = new SyncJobsResponse();
         var syncTimestamp = DateTime.UtcNow;
 
@@ -48,21 +46,15 @@ public class SyncJobsRequestHandler(
             {
                 try
                 {
-                    logger.LogInformation("Processing new job: {Title}", newJob.Title);
-
                     // Double-check if position already exists in database (prevents race conditions)
                     var existingPosition = await unitOfWork.JobPositionRepository.GetByExternalUrlAsync(newJob.Url);
                     if (existingPosition != null)
-                    {
-                        logger.LogWarning("Job position with URL {Url} already exists, skipping", newJob.Url);
                         continue;
-                    }
 
                     // Scrape raw HTML content
                     var scrapedDetails = await scraperService.ScrapeJobDetailsAsync(newJob.Url);
 
                     // Use OpenAI to extract and enrich job details
-                    logger.LogInformation("Enriching job details with AI for: {Title}", newJob.Title);
                     var enrichedDetails = await openAIService.EnrichJobDetailsAsync(
                         newJob.Title,
                         scrapedDetails.RawHtmlContent
@@ -87,8 +79,6 @@ public class SyncJobsRequestHandler(
                     await unitOfWork.JobPositionRepository.AddAsync(position);
                     response.NewPositions++;
                     response.NewJobTitles.Add(newJob.Title);
-
-                    logger.LogInformation("Added new job position: {Title}", newJob.Title);
                 }
                 catch (Exception ex)
                 {

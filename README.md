@@ -467,7 +467,7 @@ The Hunter provides a complete hiring process management system to track candida
    ↓
 2. Screening
    ↓
-3. Consultant Technical Interview
+3. Technical Interview
    ↓
 4. Client Interview
    ↓
