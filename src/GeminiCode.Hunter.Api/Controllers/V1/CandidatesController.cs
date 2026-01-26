@@ -73,7 +73,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     [HttpPost("Analyze")]
     [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AnalyzeCvResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AnalyzeCv(IFormFile cvFile)
@@ -81,11 +81,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
         var request = new AnalyzeCvRequest { CvFile = cvFile };
         var response = await Mediator.Send(request);
 
-        return Ok(new
-        {
-            message = "CV analysis completed successfully",
-            data = response
-        });
+        return Ok(response);
     }
 
     /// <summary>
@@ -95,7 +91,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("{id}/ReAnalyze")]
     [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ReAnalyzeCvResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -104,11 +100,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
         var request = new ReAnalyzeCvRequest { CandidateId = id };
         var response = await Mediator.Send(request);
 
-        return Ok(new
-        {
-            message = "CV re-analysis completed successfully",
-            data = response
-        });
+        return Ok(response);
     }
 
     /// <summary>

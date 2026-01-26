@@ -23,26 +23,22 @@ export class JobService {
     const formData = new FormData();
     formData.append('cvFile', file);
 
-    return this.http.post<ApiResponse<AnalyzeCvResponse>>(
+    return this.http.post<AnalyzeCvResponse>(
       `${this.apiUrl}/Candidates/Analyze`,
       formData,
       {
         headers: this.getHeaders()
       }
-    ).pipe(
-      map(response => response.data)
     );
   }
 
   reAnalyzeCv(candidateId: string): Observable<AnalyzeCvResponse> {
-    return this.http.post<ApiResponse<AnalyzeCvResponse>>(
+    return this.http.post<AnalyzeCvResponse>(
       `${this.apiUrl}/Candidates/${candidateId}/ReAnalyze`,
       {},
       {
         headers: this.getHeaders()
       }
-    ).pipe(
-      map(response => response.data)
     );
   }
 
