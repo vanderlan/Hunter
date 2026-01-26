@@ -15,6 +15,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.ReAnal
 public class ReAnalyzeCvRequestHandler(
     IUnitOfWork unitOfWork,
     IAIService openAIService,
+    IPdfService pdfService,
     ICurrentUser currentUser,
     ILogger<ReAnalyzeCvRequestHandler> logger)
     : IRequestHandler<ReAnalyzeCvRequest, ReAnalyzeCvResponse>
@@ -30,17 +31,27 @@ public class ReAnalyzeCvRequestHandler(
             var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
                 ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
 
-            // Get existing candidate with CV text
+            // Get existing candidate
             var candidate = await unitOfWork.CandidateRepository.GetByIdAsync(request.CandidateId)
                 ?? throw new NotFoundException($"Candidate with ID {request.CandidateId} not found");
 
-            if (string.IsNullOrWhiteSpace(candidate.CvText))
+            // Get the candidate's CV file
+            var candidateFile = await unitOfWork.CandidateFileRepository
+                .GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
+                
+            if (candidateFile == null || candidateFile.File == null || candidateFile.File.FileData == null)
             {
-                throw new BusinessException("Candidate does not have CV text stored. Please upload a CV first.");
+                throw new BusinessException("Candidate does not have a CV file stored. Please upload a CV first.");
             }
 
-            var cvText = candidate.CvText;
-            logger.LogInformation("Found candidate with {Length} characters of CV text", cvText.Length);
+            // Extract text from the stored PDF
+            string cvText;
+            using (var stream = new System.IO.MemoryStream(candidateFile.File.FileData))
+            {
+                cvText = await pdfService.ExtractTextFromPdfAsync(stream);
+            }
+            
+            logger.LogInformation("Extracted {Length} characters from CV file", cvText.Length);
 
             // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
@@ -91,9 +102,7 @@ public class ReAnalyzeCvRequestHandler(
             // Save analysis history (overwrites previous analysis)
             await SaveAnalysisHistoryAsync(candidate.CandidateId, user.UserId, analyzedAt, jobPositions.Count, filteredMatches, jobPositions);
 
-            // Check if candidate has a resume file
-            var candidateFile = await unitOfWork.CandidateFileRepository
-                .GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
+            // Check if candidate has a resume file (reusing candidateFile from earlier)
             var hasResume = candidateFile != null;
 
             // Map to response DTOs with full job details
