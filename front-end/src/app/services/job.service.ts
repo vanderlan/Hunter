@@ -13,6 +13,12 @@ export class JobService {
 
   constructor(private http: HttpClient) {}
 
+  private getHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'x-api-version': environment.apiVersion
+    });
+  }
+
   analyzeCv(file: File): Observable<AnalyzeCvResponse> {
     const formData = new FormData();
     formData.append('cvFile', file);
@@ -21,9 +27,7 @@ export class JobService {
       `${this.apiUrl}/Candidates/Analyze`,
       formData,
       {
-        headers: new HttpHeaders({
-          'x-api-version': environment.apiVersion
-        })
+        headers: this.getHeaders()
       }
     ).pipe(
       map(response => response.data)
@@ -35,9 +39,7 @@ export class JobService {
       `${this.apiUrl}/Candidates/${candidateId}/ReAnalyze`,
       {},
       {
-        headers: new HttpHeaders({
-          'x-api-version': environment.apiVersion
-        })
+        headers: this.getHeaders()
       }
     ).pipe(
       map(response => response.data)
@@ -52,9 +54,7 @@ export class JobService {
     return this.http.get<{ jobs: JobPosition[], totalCount: number }>(
       url,
       {
-        headers: new HttpHeaders({
-          'x-api-version': environment.apiVersion
-        })
+        headers: this.getHeaders()
       }
     ).pipe(
       map(response => response.jobs)
@@ -66,9 +66,7 @@ export class JobService {
       `${this.apiUrl}/JobPositions/Sync`,
       {},
       {
-        headers: new HttpHeaders({
-          'x-api-version': environment.apiVersion
-        })
+        headers: this.getHeaders()
       }
     );
   }

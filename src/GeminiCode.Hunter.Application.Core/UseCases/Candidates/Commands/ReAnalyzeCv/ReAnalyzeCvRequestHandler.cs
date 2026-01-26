@@ -42,12 +42,6 @@ public class ReAnalyzeCvRequestHandler(
             var cvText = candidate.CvText;
             logger.LogInformation("Found candidate with {Length} characters of CV text", cvText.Length);
 
-            // Update analyzed timestamp
-            candidate.AnalyzedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
-            candidate.UserId = user.UserId; // Update to current analyzing user
-            unitOfWork.CandidateRepository.Update(candidate);
-            await unitOfWork.CommitAsync();
-
             // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
             
@@ -87,8 +81,15 @@ public class ReAnalyzeCvRequestHandler(
 
             logger.LogInformation("Found {Count} matches with >60% adherence", filteredMatches.Count);
 
+            // Update analyzed timestamp after successful analysis
+            var analyzedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
+            candidate.AnalyzedAt = analyzedAt;
+            candidate.UserId = user.UserId; // Update to current analyzing user
+            unitOfWork.CandidateRepository.Update(candidate);
+            await unitOfWork.CommitAsync();
+
             // Save analysis history (overwrites previous analysis)
-            await SaveAnalysisHistoryAsync(candidate.CandidateId, user.UserId, jobPositions.Count, filteredMatches, jobPositions);
+            await SaveAnalysisHistoryAsync(candidate.CandidateId, user.UserId, analyzedAt, jobPositions.Count, filteredMatches, jobPositions);
 
             // Check if candidate has a resume file
             var candidateFile = await unitOfWork.CandidateFileRepository
@@ -143,7 +144,8 @@ public class ReAnalyzeCvRequestHandler(
 
     private async Task SaveAnalysisHistoryAsync(
         long candidateId, 
-        long userId, 
+        long userId,
+        DateTime analyzedAt,
         int totalPositions, 
         List<JobMatchResult> matches,
         List<JobPosition> jobPositions)
@@ -160,7 +162,7 @@ public class ReAnalyzeCvRequestHandler(
             {
                 CandidateId = candidateId,
                 UserId = userId,
-                AnalyzedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified),
+                AnalyzedAt = analyzedAt,
                 TotalPositionsAnalyzed = totalPositions,
                 MatchesFound = matches.Count
             };
