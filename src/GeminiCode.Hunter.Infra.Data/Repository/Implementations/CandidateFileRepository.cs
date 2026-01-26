@@ -26,6 +26,7 @@ public sealed class CandidateFileRepository(DataContext context) : BaseEntityRep
         return await DataContext.CandidateFiles
             .Include(cf => cf.File)
             .Include(cf => cf.Candidate)
+            .AsNoTracking()
             .FirstOrDefaultAsync(cf => cf.CandidateId == candidateId && cf.FileType == fileType);
     }
 }

@@ -175,7 +175,6 @@ public class AnalyzeCvRequestHandler(
             
             existingCandidate.Name = formattedName;
             existingCandidate.PhoneNumber = trimmedPhone;
-            existingCandidate.CvText = cvText;
             existingCandidate.AnalyzedAt = now;
             existingCandidate.UserId = userId;
             
@@ -196,7 +195,6 @@ public class AnalyzeCvRequestHandler(
                 Name = formattedName,
                 Email = trimmedEmail,
                 PhoneNumber = trimmedPhone,
-                CvText = cvText,
                 AnalyzedAt = now
             };
 

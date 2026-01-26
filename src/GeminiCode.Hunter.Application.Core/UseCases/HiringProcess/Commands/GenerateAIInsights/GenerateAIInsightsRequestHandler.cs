@@ -10,6 +10,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Gen
 public class GenerateAIInsightsRequestHandler(
     IUnitOfWork unitOfWork,
     IAIService aiService,
+    IPdfService pdfService,
     ILogger<GenerateAIInsightsRequestHandler> logger)
     : IRequestHandler<GenerateAIInsightsRequest, GenerateAIInsightsResponse>
 {
@@ -33,11 +34,26 @@ public class GenerateAIInsightsRequestHandler(
             throw new BusinessException("Candidate or job position information is missing");
         }
 
-        // Get the candidate's CV text
+        // Get the candidate's CV from file
         var candidate = await unitOfWork.CandidateRepository.GetByIdAsync(hiringProcess.Candidate.PublicId);
-        if (candidate == null || string.IsNullOrWhiteSpace(candidate.CvText))
+        if (candidate == null)
         {
-            throw new BusinessException("Candidate CV information is not available");
+            throw new BusinessException("Candidate information is not available");
+        }
+
+        var candidateFile = await unitOfWork.CandidateFileRepository
+            .GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
+            
+        if (candidateFile == null || candidateFile.File == null || candidateFile.File.FileData == null)
+        {
+            throw new BusinessException("Candidate CV file is not available");
+        }
+
+        // Extract text from the stored PDF
+        string cvText;
+        using (var stream = new System.IO.MemoryStream(candidateFile.File.FileData))
+        {
+            cvText = await pdfService.ExtractTextFromPdfAsync(stream);
         }
 
         // Get the job position details
@@ -62,7 +78,7 @@ JOB REQUIREMENTS:
 {jobPosition.MustHaveSkills}
 
 CANDIDATE CV SUMMARY:
-{(candidate.CvText.Length > 2000 ? candidate.CvText.Substring(0, 2000) + "..." : candidate.CvText)}
+{(cvText.Length > 2000 ? cvText.Substring(0, 2000) + "..." : cvText)}
 
 Write the referral reason in first person as if you're the recruiter referring them.
 Example format: ""I consider [Name] a strong potential talent for [Company] because...""

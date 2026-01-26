@@ -75,7 +75,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
@@ -133,7 +132,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
@@ -206,7 +204,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
@@ -261,7 +258,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
