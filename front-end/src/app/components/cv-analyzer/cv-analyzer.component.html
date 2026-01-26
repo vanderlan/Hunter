@@ -76,13 +76,17 @@
           <p class="analysis-info">Out of {{ totalPositions }} analyzed positions</p>
           
           <div class="summary-actions">
-            <button mat-raised-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume" class="action-btn">
+            <button mat-button color="accent" (click)="viewResume()" *ngIf="candidateInfo?.hasResume">
               <mat-icon>description</mat-icon>
-              View Uploaded Resume
+              View CV
             </button>
-            <button mat-raised-button (click)="clearFile()" class="action-btn">
+            <button mat-button color="primary" (click)="reAnalyzeCv()">
+              <mat-icon>refresh</mat-icon>
+              Run analysis again
+            </button>
+            <button mat-button (click)="clearFile()">
               <mat-icon>upload_file</mat-icon>
-              Analyze Another CV
+              Analyze Another
             </button>
           </div>
         </div>

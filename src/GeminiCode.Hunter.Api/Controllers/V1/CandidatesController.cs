@@ -3,6 +3,7 @@ using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Delete;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.ReAnalyzeCv;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.UploadResume;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.DownloadResume;
@@ -72,7 +73,7 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     [HttpPost("Analyze")]
     [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AnalyzeCvResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AnalyzeCv(IFormFile cvFile)
@@ -80,11 +81,26 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
         var request = new AnalyzeCvRequest { CvFile = cvFile };
         var response = await Mediator.Send(request);
 
-        return Ok(new
-        {
-            message = "CV analysis completed successfully",
-            data = response
-        });
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Re-analyzes an existing candidate's CV against all active job positions
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <returns>List of matching job positions with match percentages and analysis</returns>
+    [HttpPost("{id}/ReAnalyze")]
+    [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
+    [ProducesResponseType(typeof(ReAnalyzeCvResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ReAnalyzeCv(string id)
+    {
+        var request = new ReAnalyzeCvRequest { CandidateId = id };
+        var response = await Mediator.Send(request);
+
+        return Ok(response);
     }
 
     /// <summary>
