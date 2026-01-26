@@ -8,7 +8,6 @@ using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
-using System.IO;
 using FileEntity = GeminiCode.Hunter.Domain.Core.Entities.File;
 using CvAnalysisEntity = GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis;
 using CvAnalysisMatchEntity = GeminiCode.Hunter.Domain.Core.Entities.CvAnalysisMatch;

@@ -3,7 +3,6 @@ using GeminiCode.Hunter.Api.Configuration;
 using GeminiCode.Hunter.Api.Filters;
 using GeminiCode.Hunter.Api.Middleware;
 using FluentValidation;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

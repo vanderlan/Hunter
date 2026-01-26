@@ -1,5 +1,4 @@
 using GeminiCode.Hunter.Domain.Core.Exceptions;
-using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using MediatR;

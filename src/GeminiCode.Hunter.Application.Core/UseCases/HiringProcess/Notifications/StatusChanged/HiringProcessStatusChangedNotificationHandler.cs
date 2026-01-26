@@ -1,4 +1,3 @@
-using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;

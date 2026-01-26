@@ -3,10 +3,6 @@ using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using FileEntity = GeminiCode.Hunter.Domain.Core.Entities.File;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.UploadResume;
