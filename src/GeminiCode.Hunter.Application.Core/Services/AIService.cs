@@ -69,10 +69,7 @@ public class AIService : IAIService
             }
 
             var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
-
             var responseContent = chatCompletion.Value.Content[0].Text;
-            
-            _logger.LogDebug("{Provider} Job Enrichment Response: {Response}", _provider, responseContent);
 
             var result = JsonSerializer.Deserialize<OpenAIJobEnrichmentResponse>(responseContent, new JsonSerializerOptions
             {
@@ -81,8 +78,6 @@ public class AIService : IAIService
 
             if (result == null)
                 throw new InvalidOperationException($"Failed to deserialize {_provider} job enrichment response");
-
-            _logger.LogInformation("Successfully enriched job details for: {JobTitle} using {Provider}", jobTitle, _provider);
 
             return new JobEnrichmentResult(
                 Summary: result.Summary ?? string.Empty,
@@ -105,8 +100,8 @@ public class AIService : IAIService
     {
         try
         {
-            _logger.LogInformation("Starting CV analysis against {JobCount} positions using {Provider} ({Model})", 
-                jobPositions.Count, _provider, _model);
+            _logger.LogInformation("Analyzing CV against {JobCount} positions using {Provider}", 
+                jobPositions.Count, _provider);
 
             var prompt = BuildAnalysisPrompt(cvText, jobPositions);
 
@@ -144,10 +139,7 @@ public class AIService : IAIService
             }
 
             var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
-
             var responseContent = chatCompletion.Value.Content[0].Text;
-            
-            _logger.LogDebug("{Provider} CV Analysis Response: {Response}", _provider, responseContent);
 
             var result = JsonSerializer.Deserialize<OpenAICvAnalysisResponse>(responseContent, new JsonSerializerOptions
             {
@@ -170,9 +162,6 @@ public class AIService : IAIService
                 )).ToList()
             );
 
-            _logger.LogInformation("CV analysis completed using {Provider}. Found {MatchCount} matches", 
-                _provider, cvAnalysisResult.Matches.Count);
-
             return cvAnalysisResult;
         }
         catch (Exception ex)
@@ -186,8 +175,6 @@ public class AIService : IAIService
     {
         try
         {
-            _logger.LogInformation("Getting {Provider} completion with max tokens: {MaxTokens}", _provider, maxTokens);
-
             var messages = new List<ChatMessage>
             {
                 new UserChatMessage(prompt)

@@ -27,15 +27,12 @@ public class ReAnalyzeCvRequestHandler(
 
         try
         {
-            // Get current user entity to obtain UserId
             var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
                 ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
 
-            // Get existing candidate
             var candidate = await unitOfWork.CandidateRepository.GetByIdAsync(request.CandidateId)
                 ?? throw new NotFoundException($"Candidate with ID {request.CandidateId} not found");
 
-            // Get the candidate's CV file
             var candidateFile = await unitOfWork.CandidateFileRepository
                 .GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
                 
@@ -44,16 +41,12 @@ public class ReAnalyzeCvRequestHandler(
                 throw new BusinessException("Candidate does not have a CV file stored. Please upload a CV first.");
             }
 
-            // Extract text from the stored PDF
             string cvText;
             using (var stream = new System.IO.MemoryStream(candidateFile.File.FileData))
             {
                 cvText = await pdfService.ExtractTextFromPdfAsync(stream);
             }
-            
-            logger.LogInformation("Extracted {Length} characters from CV file", cvText.Length);
 
-            // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
             
             if (!jobPositions.Any())
@@ -67,9 +60,6 @@ public class ReAnalyzeCvRequestHandler(
                 };
             }
 
-            logger.LogInformation("Found {Count} active job positions to analyze", jobPositions.Count);
-
-            // Prepare job summaries for AI
             var jobSummaries = jobPositions.Select(j => new JobPositionSummary(
                 j.JobCode,
                 j.Title,
@@ -81,31 +71,22 @@ public class ReAnalyzeCvRequestHandler(
                 j.NiceToHaveSkills
             )).ToList();
 
-            // Analyze CV against jobs using AI
             var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(cvText, jobSummaries);
-
-            // Filter matches > 60% and order by match percentage descending
             var filteredMatches = analysisResult.Matches
                 .Where(m => m.MatchPercentage > 60)
                 .OrderByDescending(m => m.MatchPercentage)
                 .ToList();
 
-            logger.LogInformation("Found {Count} matches with >60% adherence", filteredMatches.Count);
-
-            // Update analyzed timestamp after successful analysis
             var analyzedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
             candidate.AnalyzedAt = analyzedAt;
-            candidate.UserId = user.UserId; // Update to current analyzing user
+            candidate.UserId = user.UserId;
             unitOfWork.CandidateRepository.Update(candidate);
             await unitOfWork.CommitAsync();
 
-            // Save analysis history (overwrites previous analysis)
             await SaveAnalysisHistoryAsync(candidate.CandidateId, user.UserId, analyzedAt, jobPositions.Count, filteredMatches, jobPositions);
 
-            // Check if candidate has a resume file (reusing candidateFile from earlier)
             var hasResume = candidateFile != null;
 
-            // Map to response DTOs with full job details
             var response = new ReAnalyzeCvResponse
             {
                 TotalPositionsAnalyzed = jobPositions.Count,
@@ -140,7 +121,8 @@ public class ReAnalyzeCvRequestHandler(
                 }).ToList()
             };
 
-            logger.LogInformation("CV re-analysis completed successfully");
+            logger.LogInformation("CV re-analysis completed: {MatchCount} matches found for candidate: {CandidateId}", 
+                filteredMatches.Count, request.CandidateId);
 
             return response;
         }
@@ -161,10 +143,6 @@ public class ReAnalyzeCvRequestHandler(
     {
         try
         {
-            logger.LogInformation("Saving CV analysis history for candidate {CandidateId}", candidateId);
-
-            // Delete previous analysis records for this candidate (overwrite)
-            logger.LogInformation("Deleting previous analysis records for candidate {CandidateId}", candidateId);
             await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidateId);
 
             var cvAnalysis = new CvAnalysisEntity
@@ -179,7 +157,6 @@ public class ReAnalyzeCvRequestHandler(
             await unitOfWork.CvAnalysisRepository.AddAsync(cvAnalysis);
             await unitOfWork.CommitAsync();
 
-            // Save matches
             foreach (var match in matches)
             {
                 var job = jobPositions.First(j => j.JobCode == match.JobCode);
@@ -205,13 +182,10 @@ public class ReAnalyzeCvRequestHandler(
             }
 
             await unitOfWork.CommitAsync();
-
-            logger.LogInformation("CV analysis history saved successfully. Analysis ID: {AnalysisId}", cvAnalysis.PublicId);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error saving CV analysis history for candidate {CandidateId}", candidateId);
-            // Don't throw - we don't want to fail the entire analysis if history save fails
         }
     }
 }

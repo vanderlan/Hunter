@@ -18,9 +18,6 @@ public class CvInfoExtractionService(
 
         try
         {
-            logger.LogInformation("Extracting candidate information using AI");
-
-            // Take first 2000 characters of CV for extraction (usually contains all basic info)
             var cvSample = cvText.Length > 2000 ? cvText.Substring(0, 2000) : cvText;
 
             var prompt = $@"Extract the following information from this CV text and return it as a JSON object with these exact fields: ""name"", ""email"", ""phone"".
@@ -45,17 +42,14 @@ JSON Response:";
                 return (null, null, null);
             }
 
-            // Clean up the response to extract JSON
             response = response.Trim();
             
-            // Remove markdown code blocks if present
             if (response.StartsWith("```"))
             {
                 var lines = response.Split('\n');
                 response = string.Join('\n', lines.Skip(1).Take(lines.Length - 2));
             }
 
-            // Parse the JSON response
             var extractedInfo = JsonSerializer.Deserialize<CvExtractedInfo>(response, new JsonSerializerOptions 
             { 
                 PropertyNameCaseInsensitive = true 
@@ -67,15 +61,9 @@ JSON Response:";
                 return (null, null, null);
             }
 
-            // Clean up the extracted values
             var name = CleanValue(extractedInfo.Name);
             var email = CleanValue(extractedInfo.Email);
             var phone = CleanValue(extractedInfo.Phone);
-
-            logger.LogInformation("Extracted CV info using AI - Name: {Name}, Email: {Email}, Phone: {Phone}", 
-                name ?? "Not found", 
-                email ?? "Not found", 
-                phone ?? "Not found");
 
             return (name, email, phone);
         }
