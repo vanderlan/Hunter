@@ -30,6 +30,20 @@ export class JobService {
     );
   }
 
+  reAnalyzeCv(candidateId: string): Observable<AnalyzeCvResponse> {
+    return this.http.post<ApiResponse<AnalyzeCvResponse>>(
+      `${this.apiUrl}/Candidates/${candidateId}/ReAnalyze`,
+      {},
+      {
+        headers: new HttpHeaders({
+          'x-api-version': environment.apiVersion
+        })
+      }
+    ).pipe(
+      map(response => response.data)
+    );
+  }
+
   getActiveJobs(companyCode?: string): Observable<JobPosition[]> {
     const url = companyCode 
       ? `${this.apiUrl}/JobPositions/Active?companyCode=${companyCode}`

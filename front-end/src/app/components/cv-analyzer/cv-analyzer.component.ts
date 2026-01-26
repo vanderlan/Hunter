@@ -171,6 +171,35 @@ export class CvAnalyzerComponent implements OnInit {
     });
   }
 
+  reAnalyzeCv(): void {
+    if (!this.candidateInfo?.candidateId) {
+      return;
+    }
+
+    this.analyzing = true;
+    this.matches = [];
+
+    this.jobService.reAnalyzeCv(this.candidateInfo.candidateId).subscribe({
+      next: (response) => {
+        this.analyzing = false;
+        this.matches = response.matches;
+        this.totalPositions = response.totalPositionsAnalyzed;
+        this.candidateInfo = response.candidateInfo || null;
+        this.notificationService.success(
+          `Found ${response.matchesFound} matches out of ${response.totalPositionsAnalyzed} positions`
+        );
+        // Reload history to show updated analysis
+        this.loadAnalysisHistory();
+      },
+      error: (error) => {
+        this.analyzing = false;
+        this.notificationService.error(
+          error.error?.message || 'Error re-analyzing CV. Please try again.'
+        );
+      }
+    });
+  }
+
   clearFile(): void {
     this.selectedFile = null;
     this.matches = [];
