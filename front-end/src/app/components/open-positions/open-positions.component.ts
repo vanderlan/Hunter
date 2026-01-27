@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -13,7 +13,7 @@ import { JobService } from '../../services/job.service';
 import { NotificationService } from '../../services/notification.service';
 import { JobPosition } from '../../models/job.model';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-open-positions',
@@ -32,12 +32,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
   templateUrl: './open-positions.component.html',
   styleUrl: './open-positions.component.scss'
 })
-export class OpenPositionsComponent implements OnInit {
+export class OpenPositionsComponent implements OnInit, OnDestroy {
   positions: JobPosition[] = [];
   filteredPositions: JobPosition[] = [];
   loading = false;
   searchQuery = '';
   private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   constructor(
     private jobService: JobService,
@@ -48,7 +49,8 @@ export class OpenPositionsComponent implements OnInit {
     // Setup auto-search with debounce
     this.searchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
     ).subscribe(searchTerm => {
       this.filterPositions();
     });
@@ -57,13 +59,20 @@ export class OpenPositionsComponent implements OnInit {
   ngOnInit(): void {
     this.loadPositions();
 
-    // Check for jobId query parameter
-    this.route.queryParams.subscribe(params => {
+    // Listen for jobId query parameter changes
+    this.route.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
       const jobId = params['jobId'];
       if (jobId && this.positions.length > 0) {
         this.openPositionByPublicId(jobId);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadPositions(): void {
@@ -74,11 +83,8 @@ export class OpenPositionsComponent implements OnInit {
         this.filteredPositions = positions;
         this.loading = false;
 
-        // Check again for jobId after positions are loaded
-        const jobId = this.route.snapshot.queryParams['jobId'];
-        if (jobId) {
-          this.openPositionByPublicId(jobId);
-        }
+        // Check for jobId after positions are loaded
+        this.checkAndOpenJobFromUrl();
       },
       error: (error) => {
         this.loading = false;
@@ -86,6 +92,13 @@ export class OpenPositionsComponent implements OnInit {
         console.error('Error loading positions:', error);
       }
     });
+  }
+
+  private checkAndOpenJobFromUrl(): void {
+    const jobId = this.route.snapshot.queryParams['jobId'];
+    if (jobId) {
+      this.openPositionByPublicId(jobId);
+    }
   }
 
   onSearchChange(searchTerm: string): void {
