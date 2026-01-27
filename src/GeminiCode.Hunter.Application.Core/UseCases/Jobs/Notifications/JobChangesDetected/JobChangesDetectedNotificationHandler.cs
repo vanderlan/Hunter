@@ -50,6 +50,8 @@ public class JobChangesDetectedNotificationHandler(
                 emailAddresses,
                 [.. notification.NewJobTitles],
                 [],
+                notification.NewJobPositions,
+                [],
                 DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
         }
         else
@@ -78,6 +80,8 @@ public class JobChangesDetectedNotificationHandler(
                 emailAddresses,
                 [],
                 [.. notification.ClosedJobTitles],
+                [],
+                notification.ClosedJobPositions,
                 DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
         }
         else

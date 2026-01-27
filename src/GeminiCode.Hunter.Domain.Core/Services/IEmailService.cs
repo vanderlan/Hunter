@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GeminiCode.Hunter.Domain.Core.Models;
 
 namespace GeminiCode.Hunter.Domain.Core.Services;
 
@@ -10,6 +11,8 @@ public interface IEmailService
         List<string> toEmails,
         List<string> newJobs,
         List<string> closedJobs,
+        List<JobPositionEmailData> newJobPositions,
+        List<JobPositionEmailData> closedJobPositions,
         DateTime syncTime);
     
     Task SendCandidateMatchingNotificationAsync(

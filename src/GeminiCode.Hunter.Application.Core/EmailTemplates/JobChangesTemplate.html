@@ -81,6 +81,9 @@
             border-radius: 4px;
             font-size: 14px;
             color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .job-item.new {
             background-color: #e8f5e9;
@@ -90,8 +93,7 @@
             background-color: #ffebee;
             border-left-color: #f44336;
         }
-        .job-item::before {
-            content: '✓';
+        .job-item-icon {
             display: inline-block;
             width: 20px;
             height: 20px;
@@ -103,10 +105,40 @@
             margin-right: 10px;
             font-size: 12px;
             font-weight: bold;
+            flex-shrink: 0;
         }
-        .job-item.closed::before {
-            content: '✗';
+        .job-item.closed .job-item-icon {
             background-color: #f44336;
+        }
+        .job-item-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .job-item-title {
+            font-weight: 600;
+            color: #333;
+        }
+        .job-item-meta {
+            font-size: 12px;
+            color: #666;
+        }
+        .job-item-link {
+            display: inline-block;
+            padding: 6px 16px;
+            background-color: #5f1f1f;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .job-item-link:hover {
+            background-color: #8a2c23;
         }
         .empty-state {
             text-align: center;
@@ -166,8 +198,15 @@
                 <div class="section-title">✓ New Positions Opened</div>
                 <div class="section-subtitle">Total: {{NewJobsCount}}</div>
                 <ul class="job-list">
-                    {{#each NewJobs}}
-                    <li class="job-item new">{{this}}</li>
+                    {{#each NewJobPositions}}
+                    <li class="job-item new">
+                        <span class="job-item-icon">✓</span>
+                        <div class="job-item-content">
+                            <span class="job-item-title">{{Title}}</span>
+                            <span class="job-item-meta">{{CompanyCode}} - {{JobCode}}</span>
+                        </div>
+                        <a href="{{Url}}" class="job-item-link">View Details</a>
+                    </li>
                     {{/each}}
                 </ul>
             </div>
@@ -178,8 +217,15 @@
                 <div class="section-title">✗ Positions Closed</div>
                 <div class="section-subtitle">Total: {{ClosedJobsCount}}</div>
                 <ul class="job-list">
-                    {{#each ClosedJobs}}
-                    <li class="job-item closed">{{this}}</li>
+                    {{#each ClosedJobPositions}}
+                    <li class="job-item closed">
+                        <span class="job-item-icon">✗</span>
+                        <div class="job-item-content">
+                            <span class="job-item-title">{{Title}}</span>
+                            <span class="job-item-meta">{{CompanyCode}} - {{JobCode}}</span>
+                        </div>
+                        <a href="{{Url}}" class="job-item-link">View Details</a>
+                    </li>
                     {{/each}}
                 </ul>
             </div>

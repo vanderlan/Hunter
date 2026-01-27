@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Models;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
@@ -19,6 +20,8 @@ public class SyncJobsRequestHandler(
     {
         var response = new SyncJobsResponse();
         var syncTimestamp = DateTime.UtcNow;
+        var newJobPositions = new List<JobPositionEmailData>();
+        var closedJobPositions = new List<JobPositionEmailData>();
 
         try
         {
@@ -79,6 +82,15 @@ public class SyncJobsRequestHandler(
                     await unitOfWork.JobPositionRepository.AddAsync(position);
                     response.NewPositions++;
                     response.NewJobTitles.Add(newJob.Title);
+                    
+                    // Add to email data list
+                    newJobPositions.Add(new JobPositionEmailData
+                    {
+                        PublicId = position.PublicId,
+                        Title = position.Title,
+                        JobCode = position.JobCode,
+                        CompanyCode = position.CompanyCode
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -98,6 +110,15 @@ public class SyncJobsRequestHandler(
                 await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
                 response.ClosedPositions++;
                 response.ClosedJobTitles.Add(position.Title);
+                
+                // Add to email data list
+                closedJobPositions.Add(new JobPositionEmailData
+                {
+                    PublicId = position.PublicId,
+                    Title = position.Title,
+                    JobCode = position.JobCode,
+                    CompanyCode = position.CompanyCode
+                });
             }
 
             // Update LastCheckedAt ONLY for active positions with same title
@@ -156,6 +177,15 @@ public class SyncJobsRequestHandler(
                     await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
                     response.ClosedPositions++;
                     response.ClosedJobTitles.Add(position.Title);
+                    
+                    // Add to closed email data list
+                    closedJobPositions.Add(new JobPositionEmailData
+                    {
+                        PublicId = position.PublicId,
+                        Title = position.Title,
+                        JobCode = position.JobCode,
+                        CompanyCode = position.CompanyCode
+                    });
                 }
             }
 
@@ -180,6 +210,8 @@ public class SyncJobsRequestHandler(
                     TotalScraped = response.TotalScraped,
                     NewJobTitles = response.NewJobTitles,
                     ClosedJobTitles = response.ClosedJobTitles,
+                    NewJobPositions = newJobPositions,
+                    ClosedJobPositions = closedJobPositions,
                     SyncTimestamp = syncTimestamp
                 }, cancellationToken);
             }

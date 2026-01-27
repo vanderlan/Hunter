@@ -8,6 +8,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
 import { JobService } from '../../services/job.service';
 import { NotificationService } from '../../services/notification.service';
 import { JobPosition } from '../../models/job.model';
@@ -41,6 +42,7 @@ export class OpenPositionsComponent implements OnInit {
   constructor(
     private jobService: JobService,
     private notificationService: NotificationService,
+    private route: ActivatedRoute,
     public dialog: MatDialog
   ) {
     // Setup auto-search with debounce
@@ -54,6 +56,14 @@ export class OpenPositionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPositions();
+
+    // Check for jobId query parameter
+    this.route.queryParams.subscribe(params => {
+      const jobId = params['jobId'];
+      if (jobId && this.positions.length > 0) {
+        this.openPositionByPublicId(jobId);
+      }
+    });
   }
 
   loadPositions(): void {
@@ -63,6 +73,12 @@ export class OpenPositionsComponent implements OnInit {
         this.positions = positions;
         this.filteredPositions = positions;
         this.loading = false;
+
+        // Check again for jobId after positions are loaded
+        const jobId = this.route.snapshot.queryParams['jobId'];
+        if (jobId) {
+          this.openPositionByPublicId(jobId);
+        }
       },
       error: (error) => {
         this.loading = false;
@@ -101,5 +117,12 @@ export class OpenPositionsComponent implements OnInit {
         panelClass: 'position-details-dialog-container'
       });
     });
+  }
+
+  openPositionByPublicId(publicId: string): void {
+    const position = this.positions.find(p => p.publicId === publicId);
+    if (position) {
+      this.openPositionDetails(position);
+    }
   }
 }
