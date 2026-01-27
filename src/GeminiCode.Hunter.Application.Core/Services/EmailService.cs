@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
+using GeminiCode.Hunter.Domain.Core.Models;
 using static GeminiCode.Hunter.Domain.Core.Constants.DomainConstants;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -60,6 +61,8 @@ public class EmailService : IEmailService
         List<string> toEmails,
         List<string> newJobs,
         List<string> closedJobs,
+        List<JobPositionEmailData> newJobPositions,
+        List<JobPositionEmailData> closedJobPositions,
         DateTime syncTime)
     {
         try
@@ -87,7 +90,24 @@ public class EmailService : IEmailService
                 ["HasClosedJobs"] = closedJobs.Any(),
                 ["HasChanges"] = newJobs.Any() || closedJobs.Any(),
                 ["NewJobs"] = newJobs.Cast<object>().ToList(),
-                ["ClosedJobs"] = closedJobs.Cast<object>().ToList()
+                ["ClosedJobs"] = closedJobs.Cast<object>().ToList(),
+                ["ApplicationUrl"] = _applicationUrl,
+                ["NewJobPositions"] = newJobPositions.Select(j => new Dictionary<string, object>
+                {
+                    ["PublicId"] = j.PublicId,
+                    ["Title"] = j.Title,
+                    ["JobCode"] = j.JobCode,
+                    ["CompanyCode"] = j.CompanyCode,
+                    ["Url"] = $"{_applicationUrl}/open-positions?jobId={j.PublicId}"
+                }).Cast<object>().ToList(),
+                ["ClosedJobPositions"] = closedJobPositions.Select(j => new Dictionary<string, object>
+                {
+                    ["PublicId"] = j.PublicId,
+                    ["Title"] = j.Title,
+                    ["JobCode"] = j.JobCode,
+                    ["CompanyCode"] = j.CompanyCode,
+                    ["Url"] = $"{_applicationUrl}/open-positions?jobId={j.PublicId}"
+                }).Cast<object>().ToList()
             };
 
             var htmlBody = _templateService.RenderJobChangesTemplate(templateData);
