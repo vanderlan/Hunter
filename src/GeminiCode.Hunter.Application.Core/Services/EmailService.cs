@@ -87,7 +87,8 @@ public class EmailService : IEmailService
                 ["HasClosedJobs"] = closedJobs.Any(),
                 ["HasChanges"] = newJobs.Any() || closedJobs.Any(),
                 ["NewJobs"] = newJobs.Cast<object>().ToList(),
-                ["ClosedJobs"] = closedJobs.Cast<object>().ToList()
+                ["ClosedJobs"] = closedJobs.Cast<object>().ToList(),
+                ["ApplicationUrl"] = _applicationUrl
             };
 
             var htmlBody = _templateService.RenderJobChangesTemplate(templateData);
