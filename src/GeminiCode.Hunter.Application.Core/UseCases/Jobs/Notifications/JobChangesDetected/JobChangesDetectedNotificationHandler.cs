@@ -21,10 +21,6 @@ public class JobChangesDetectedNotificationHandler(
             notification.UpdatedPositionsCount,
             notification.SyncTimestamp);
 
-        logger.LogDebug(
-            "Job changes details: {Notification}",
-            JsonConvert.SerializeObject(notification, Formatting.Indented));
-
         // Send separate notifications for new and closed positions
         await SendNewPositionsNotificationsAsync(notification);
         await SendClosedPositionsNotificationsAsync(notification);

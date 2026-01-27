@@ -80,6 +80,8 @@ public class SyncJobsRequestHandler(
                     };
 
                     await unitOfWork.JobPositionRepository.AddAsync(position);
+                    await unitOfWork.CommitAsync();
+
                     response.NewPositions++;
                     response.NewJobTitles.Add(newJob.Title);
                     

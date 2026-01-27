@@ -33,7 +33,6 @@ public class LoginWithRefreshTokenRequestHandler(IUnitOfWork unitOfWork, IString
 
             if (user is not null)
             {
-                // Update last login timestamp
                 user.LastLoginAt = DateTime.UtcNow;
                 unitOfWork.UserRepository.Update(user);
                 

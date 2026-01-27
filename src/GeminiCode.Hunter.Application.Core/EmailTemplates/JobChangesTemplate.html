@@ -147,16 +147,19 @@
         .footer a:hover {
             text-decoration: underline;
         }
+        .cta-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
         .cta-button {
             display: inline-block;
-            margin-top: 20px;
             padding: 12px 30px;
             background-color: #5f1f1f;
-            color: #ffffff;
+            color: #ffffff !important;
             text-decoration: none;
             border-radius: 4px;
             font-weight: 600;
-            transition: background-color 0.3s;
         }
         .cta-button:hover {
             background-color: #8a2c23;
@@ -185,7 +188,6 @@
                     <li class="job-item new">
                         <span class="job-item-icon">✓</span>
                         <a href="{{Url}}" class="job-item-title-link">{{Title}}</a>
-                        <span class="job-item-meta">{{CompanyCode}} - {{JobCode}}</span>
                     </li>
                     {{/each}}
                 </ul>
@@ -201,7 +203,6 @@
                     <li class="job-item closed">
                         <span class="job-item-icon">✗</span>
                         <a href="{{Url}}" class="job-item-title-link">{{Title}}</a>
-                        <span class="job-item-meta">{{CompanyCode}} - {{JobCode}}</span>
                     </li>
                     {{/each}}
                 </ul>
@@ -214,7 +215,7 @@
             </div>
             {{/unless}}
 
-            <div style="text-align: center;">
+            <div class="cta-section">
                 <a href="{{ApplicationUrl}}/open-positions" class="cta-button">View Job Positions</a>
             </div>
         </div>
