@@ -151,6 +151,7 @@ body.dark-theme {
     min-width: 344px !important;
     max-width: 568px !important;
     padding: 0 !important;
+    position: relative;
   }
 
   .mat-mdc-snack-bar-label {
@@ -160,12 +161,11 @@ body.dark-theme {
     position: relative;
   }
 
-  .mat-mdc-button.mat-mdc-snack-bar-action {
-    color: currentColor !important;
-    font-weight: 700 !important;
-    font-size: 18px !important;
-    min-width: 40px !important;
-    padding: 0 12px !important;
+  // Hide the action button completely
+  .mat-mdc-button.mat-mdc-snack-bar-action,
+  .mat-mdc-snack-bar-action,
+  button[matsnackbaraction] {
+    display: none !important;
   }
 }
 
@@ -173,11 +173,8 @@ body.dark-theme {
 .success-notification {
   .mdc-snackbar__surface {
     background-color: #4caf50 !important;
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
     
+    // Add icon using ::before on the surface to avoid duplication
     &::before {
       content: '✓';
       position: absolute;
@@ -186,14 +183,19 @@ body.dark-theme {
       transform: translateY(-50%);
       font-size: 24px;
       font-weight: bold;
+      color: #ffffff;
       background-color: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       width: 32px;
       height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      line-height: 32px;
+      text-align: center;
+      z-index: 1;
     }
+  }
+
+  .mat-mdc-snack-bar-label {
+    color: #ffffff !important;
   }
 
   .mat-mdc-button.mat-mdc-snack-bar-action {
@@ -205,11 +207,8 @@ body.dark-theme {
 .error-notification {
   .mdc-snackbar__surface {
     background-color: #f44336 !important;
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
     
+    // Add icon using ::before on the surface to avoid duplication
     &::before {
       content: '✕';
       position: absolute;
@@ -218,14 +217,19 @@ body.dark-theme {
       transform: translateY(-50%);
       font-size: 24px;
       font-weight: bold;
+      color: #ffffff;
       background-color: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       width: 32px;
       height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      line-height: 32px;
+      text-align: center;
+      z-index: 1;
     }
+  }
+
+  .mat-mdc-snack-bar-label {
+    color: #ffffff !important;
   }
 
   .mat-mdc-button.mat-mdc-snack-bar-action {
@@ -237,11 +241,8 @@ body.dark-theme {
 .warning-notification {
   .mdc-snackbar__surface {
     background-color: #ff9800 !important;
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
     
+    // Add icon using ::before on the surface to avoid duplication
     &::before {
       content: '⚠';
       position: absolute;
@@ -250,14 +251,19 @@ body.dark-theme {
       transform: translateY(-50%);
       font-size: 24px;
       font-weight: bold;
+      color: #ffffff;
       background-color: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       width: 32px;
       height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      line-height: 32px;
+      text-align: center;
+      z-index: 1;
     }
+  }
+
+  .mat-mdc-snack-bar-label {
+    color: #ffffff !important;
   }
 
   .mat-mdc-button.mat-mdc-snack-bar-action {
@@ -269,11 +275,8 @@ body.dark-theme {
 .info-notification {
   .mdc-snackbar__surface {
     background-color: #2196f3 !important;
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
     
+    // Add icon using ::before on the surface to avoid duplication
     &::before {
       content: 'ℹ';
       position: absolute;
@@ -282,14 +285,19 @@ body.dark-theme {
       transform: translateY(-50%);
       font-size: 24px;
       font-weight: bold;
+      color: #ffffff;
       background-color: rgba(255, 255, 255, 0.2);
       border-radius: 50%;
       width: 32px;
       height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      line-height: 32px;
+      text-align: center;
+      z-index: 1;
     }
+  }
+
+  .mat-mdc-snack-bar-label {
+    color: #ffffff !important;
   }
 
   .mat-mdc-button.mat-mdc-snack-bar-action {
