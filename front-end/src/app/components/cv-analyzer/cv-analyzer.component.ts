@@ -19,25 +19,24 @@ import { NotificationService } from '../../services/notification.service';
 import { JobMatch, CandidateInfo } from '../../models/job.model';
 
 @Component({
-  selector: 'app-cv-analyzer',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatProgressBarModule,
-    MatChipsModule,
-    MatExpansionModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatDividerModule,
-    MatListModule,
-    NgxFileDropModule
-  ],
-  templateUrl: './cv-analyzer.component.html',
-  styleUrl: './cv-analyzer.component.scss'
+    selector: 'app-cv-analyzer',
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatProgressSpinnerModule,
+        MatProgressBarModule,
+        MatChipsModule,
+        MatExpansionModule,
+        MatSnackBarModule,
+        MatDialogModule,
+        MatDividerModule,
+        MatListModule,
+        NgxFileDropModule
+    ],
+    templateUrl: './cv-analyzer.component.html',
+    styleUrl: './cv-analyzer.component.scss'
 })
 export class CvAnalyzerComponent implements OnInit {
   selectedFile: File | null = null;
@@ -166,6 +165,35 @@ export class CvAnalyzerComponent implements OnInit {
         this.analyzing = false;
         this.notificationService.error(
           error.error?.message || 'Error analyzing CV. Please try again.'
+        );
+      }
+    });
+  }
+
+  reAnalyzeCv(): void {
+    if (!this.candidateInfo?.candidateId) {
+      return;
+    }
+
+    this.analyzing = true;
+    this.matches = [];
+
+    this.jobService.reAnalyzeCv(this.candidateInfo.candidateId).subscribe({
+      next: (response) => {
+        this.analyzing = false;
+        this.matches = response.matches;
+        this.totalPositions = response.totalPositionsAnalyzed;
+        this.candidateInfo = response.candidateInfo || null;
+        this.notificationService.success(
+          `Found ${response.matchesFound} matches out of ${response.totalPositionsAnalyzed} positions`
+        );
+        // Reload history to show updated analysis
+        this.loadAnalysisHistory();
+      },
+      error: (error) => {
+        this.analyzing = false;
+        this.notificationService.error(
+          error.error?.message || 'Error re-analyzing CV. Please try again.'
         );
       }
     });

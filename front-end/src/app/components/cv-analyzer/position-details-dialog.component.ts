@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,22 +7,20 @@ import { MatDividerModule } from '@angular/material/divider';
 import { JobPosition } from '../../models/job.model';
 
 @Component({
-  selector: 'app-position-details-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-position-details-dialog',
+    imports: [
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule
-  ],
-  template: `
+],
+    template: `
     <div class="position-details-wrapper">
       <h2 mat-dialog-title class="position-details-header">
         <mat-icon class="position-details-icon">work_outline</mat-icon>
         <span class="position-details-header-text">{{ data.title }}</span>
       </h2>
-
+    
       <mat-dialog-content class="position-details-body">
         <div class="position-meta-info">
           <div class="position-meta-item">
@@ -34,66 +32,84 @@ import { JobPosition } from '../../models/job.model';
             <span class="position-meta-text">{{ data.jobCode }}</span>
           </div>
         </div>
-
+    
         <mat-divider class="position-section-divider"></mat-divider>
-
-        <div class="position-info-section" *ngIf="data.summary">
-          <h3 class="position-section-heading">
-            <mat-icon class="position-section-icon">description</mat-icon>
-            <span>Summary</span>
-          </h3>
-          <p class="position-section-text">{{ data.summary }}</p>
-        </div>
-
-        <mat-divider class="position-section-divider" *ngIf="data.summary"></mat-divider>
-
-        <div class="position-info-section" *ngIf="data.responsibilities">
-          <h3 class="position-section-heading">
-            <mat-icon class="position-section-icon">assignment</mat-icon>
-            <span>Responsibilities</span>
-          </h3>
-          <p class="position-section-text">{{ data.responsibilities }}</p>
-        </div>
-
-        <mat-divider class="position-section-divider" *ngIf="data.responsibilities"></mat-divider>
-
-        <div class="position-info-section" *ngIf="data.requirements">
-          <h3 class="position-section-heading">
-            <mat-icon class="position-section-icon">checklist</mat-icon>
-            <span>Requirements</span>
-          </h3>
-          <p class="position-section-text">{{ data.requirements }}</p>
-        </div>
-
-        <mat-divider class="position-section-divider" *ngIf="data.requirements"></mat-divider>
-
-        <div class="position-info-section" *ngIf="data.mustHaveSkills">
-          <h3 class="position-section-heading">
-            <mat-icon class="position-section-icon">star</mat-icon>
-            <span>Must-Have Skills</span>
-          </h3>
-          <p class="position-section-text">{{ data.mustHaveSkills }}</p>
-        </div>
-
-        <mat-divider class="position-section-divider" *ngIf="data.mustHaveSkills"></mat-divider>
-
-        <div class="position-info-section" *ngIf="data.niceToHaveSkills">
-          <h3 class="position-section-heading">
-            <mat-icon class="position-section-icon">star_half</mat-icon>
-            <span>Nice-to-Have Skills</span>
-          </h3>
-          <p class="position-section-text">{{ data.niceToHaveSkills }}</p>
-        </div>
+    
+        @if (data.summary) {
+          <div class="position-info-section">
+            <h3 class="position-section-heading">
+              <mat-icon class="position-section-icon">description</mat-icon>
+              <span>Summary</span>
+            </h3>
+            <p class="position-section-text">{{ data.summary }}</p>
+          </div>
+        }
+    
+        @if (data.summary) {
+          <mat-divider class="position-section-divider"></mat-divider>
+        }
+    
+        @if (data.responsibilities) {
+          <div class="position-info-section">
+            <h3 class="position-section-heading">
+              <mat-icon class="position-section-icon">assignment</mat-icon>
+              <span>Responsibilities</span>
+            </h3>
+            <p class="position-section-text">{{ data.responsibilities }}</p>
+          </div>
+        }
+    
+        @if (data.responsibilities) {
+          <mat-divider class="position-section-divider"></mat-divider>
+        }
+    
+        @if (data.requirements) {
+          <div class="position-info-section">
+            <h3 class="position-section-heading">
+              <mat-icon class="position-section-icon">checklist</mat-icon>
+              <span>Requirements</span>
+            </h3>
+            <p class="position-section-text">{{ data.requirements }}</p>
+          </div>
+        }
+    
+        @if (data.requirements) {
+          <mat-divider class="position-section-divider"></mat-divider>
+        }
+    
+        @if (data.mustHaveSkills) {
+          <div class="position-info-section">
+            <h3 class="position-section-heading">
+              <mat-icon class="position-section-icon">star</mat-icon>
+              <span>Must-Have Skills</span>
+            </h3>
+            <p class="position-section-text">{{ data.mustHaveSkills }}</p>
+          </div>
+        }
+    
+        @if (data.mustHaveSkills) {
+          <mat-divider class="position-section-divider"></mat-divider>
+        }
+    
+        @if (data.niceToHaveSkills) {
+          <div class="position-info-section">
+            <h3 class="position-section-heading">
+              <mat-icon class="position-section-icon">star_half</mat-icon>
+              <span>Nice-to-Have Skills</span>
+            </h3>
+            <p class="position-section-text">{{ data.niceToHaveSkills }}</p>
+          </div>
+        }
       </mat-dialog-content>
-
+    
       <mat-dialog-actions class="position-details-actions" align="end">
         <button mat-raised-button color="primary" (click)="closeDialog()" class="position-close-btn">
           Close
         </button>
       </mat-dialog-actions>
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     .position-details-wrapper {
       .position-details-header {
         display: flex;

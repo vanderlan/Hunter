@@ -2,7 +2,6 @@ using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
-using System.Linq;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
 

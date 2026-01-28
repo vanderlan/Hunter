@@ -2,7 +2,6 @@ using GeminiCode.Hunter.Api.Controllers.Base;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;

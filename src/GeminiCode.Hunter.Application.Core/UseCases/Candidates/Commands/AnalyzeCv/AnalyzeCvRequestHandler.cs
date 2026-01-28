@@ -8,7 +8,6 @@ using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
-using System.IO;
 using FileEntity = GeminiCode.Hunter.Domain.Core.Entities.File;
 using CvAnalysisEntity = GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis;
 using CvAnalysisMatchEntity = GeminiCode.Hunter.Domain.Core.Entities.CvAnalysisMatch;
@@ -31,11 +30,9 @@ public class AnalyzeCvRequestHandler(
 
         try
         {
-            // Get current user entity to obtain UserId
             var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id) 
                 ?? throw new NotFoundException($"User with PublicId {currentUser.Id} not found");
 
-            // Validate file
             if (request.CvFile.ContentType != "application/pdf")
             {
                 throw new InvalidOperationException("Only PDF files are supported");
@@ -46,22 +43,14 @@ public class AnalyzeCvRequestHandler(
                 throw new InvalidOperationException("The uploaded file is empty");
             }
 
-            // Extract text from PDF
             string cvText;
             using (var stream = request.CvFile.OpenReadStream())
             {
                 cvText = await pdfService.ExtractTextFromPdfAsync(stream);
             }
 
-            logger.LogInformation("Extracted {Length} characters from CV", cvText.Length);
-
-            // Extract basic candidate information using AI
             var (name, email, phone) = await cvInfoExtractionService.ExtractBasicInfoWithAIAsync(cvText);
-
-            // Store or update candidate information BEFORE analysis
             var candidate = await StoreCandidateAsync(name, email, phone, cvText, user.UserId);
-
-            // Get all active job positions
             var jobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
             
             if (!jobPositions.Any())
@@ -75,9 +64,6 @@ public class AnalyzeCvRequestHandler(
                 };
             }
 
-            logger.LogInformation("Found {Count} active job positions to analyze", jobPositions.Count);
-
-            // Prepare job summaries for OpenAI
             var jobSummaries = jobPositions.Select(j => new JobPositionSummary(
                 j.JobCode,
                 j.Title,
@@ -89,24 +75,15 @@ public class AnalyzeCvRequestHandler(
                 j.NiceToHaveSkills
             )).ToList();
 
-            // Analyze CV against jobs using OpenAI
             var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(cvText, jobSummaries);
-
-            // Filter matches > 60% and order by match percentage descending
             var filteredMatches = analysisResult.Matches
                 .Where(m => m.MatchPercentage > 60)
                 .OrderByDescending(m => m.MatchPercentage)
                 .ToList();
 
-            logger.LogInformation("Found {Count} matches with >60% adherence", filteredMatches.Count);
-
-            // Store the PDF file after successful analysis
             await StoreCvPdfAsync(request.CvFile, candidate.CandidateId);
-
-            // Save analysis history
             await SaveAnalysisHistoryAsync(candidate.CandidateId, user.UserId, jobPositions.Count, filteredMatches, jobPositions);
 
-            // Map to response DTOs with full job details
             var response = new AnalyzeCvResponse
             {
                 TotalPositionsAnalyzed = jobPositions.Count,
@@ -141,13 +118,14 @@ public class AnalyzeCvRequestHandler(
                 }).ToList()
             };
 
-            logger.LogInformation("CV analysis completed successfully");
+            logger.LogInformation("CV analysis completed: {MatchCount} matches found for candidate {CandidateName}", 
+                filteredMatches.Count, candidate.Name);
 
             return response;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error analyzing CV");
+            logger.LogError(ex, "Error analyzing CV for file: {FileName}", request.CvFile.FileName);
             throw;
         }
     }
@@ -155,7 +133,6 @@ public class AnalyzeCvRequestHandler(
     private async Task<Candidate> StoreCandidateAsync(string? name, string? email, string? phone, string cvText, long userId)
     {
         var now = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
-
         var formattedName = name.FormatName();
         var trimmedEmail = email?.Trim();
         var trimmedPhone = phone?.Trim();
@@ -169,41 +146,30 @@ public class AnalyzeCvRequestHandler(
 
         if (existingCandidate != null)
         {
-            // Update existing candidate with latest CV
-            logger.LogInformation("Updating existing candidate with email: {Email}, analyzed by user: {UserId}", 
-                trimmedEmail, userId);
-            
             existingCandidate.Name = formattedName;
             existingCandidate.PhoneNumber = trimmedPhone;
-            existingCandidate.CvText = cvText;
             existingCandidate.AnalyzedAt = now;
             existingCandidate.UserId = userId;
             
             unitOfWork.CandidateRepository.Update(existingCandidate);
             await unitOfWork.CommitAsync();
             
-            logger.LogInformation("Candidate information updated successfully with name: {Name}", formattedName);
             return existingCandidate;
         }
         else
         {
-            // Create new candidate
-            logger.LogInformation("Creating new candidate analyzed by user: {UserId}", userId);
-            
             var candidate = new Candidate
             {
                 UserId = userId,
                 Name = formattedName,
                 Email = trimmedEmail,
                 PhoneNumber = trimmedPhone,
-                CvText = cvText,
                 AnalyzedAt = now
             };
 
             await unitOfWork.CandidateRepository.AddAsync(candidate);
             await unitOfWork.CommitAsync();
             
-            logger.LogInformation("Candidate information stored successfully with name: {Name}", formattedName);
             return candidate;
         }
     }
@@ -212,20 +178,15 @@ public class AnalyzeCvRequestHandler(
     {
         try
         {
-            logger.LogInformation("Storing CV PDF for candidate {CandidateId}", candidateId);
-
-            // Delete existing resume if any
             var existingCandidateFile = await unitOfWork.CandidateFileRepository
                 .GetByCandidateAndFileTypeAsync(candidateId, "Resume");
 
             if (existingCandidateFile != null)
             {
-                logger.LogInformation("Deleting existing resume for candidate {CandidateId}", candidateId);
                 await unitOfWork.CandidateFileRepository.DeleteAsync(existingCandidateFile.PublicId);
                 await unitOfWork.FileRepository.DeleteAsync(existingCandidateFile.File.PublicId);
             }
 
-            // Read file data
             byte[] fileData;
             using (var memoryStream = new MemoryStream())
             {
@@ -233,7 +194,6 @@ public class AnalyzeCvRequestHandler(
                 fileData = memoryStream.ToArray();
             }
 
-            // Create File entity
             var file = new FileEntity
             {
                 FileName = cvFile.FileName,
@@ -245,7 +205,6 @@ public class AnalyzeCvRequestHandler(
 
             await unitOfWork.FileRepository.AddAsync(file);
 
-            // Create CandidateFile relationship
             var candidateFile = new CandidateFile
             {
                 CandidateId = candidateId,
@@ -255,15 +214,10 @@ public class AnalyzeCvRequestHandler(
 
             await unitOfWork.CandidateFileRepository.AddAsync(candidateFile);
             await unitOfWork.CommitAsync();
-
-            logger.LogInformation("CV PDF stored successfully for candidate {CandidateId}, File ID: {FileId}", 
-                candidateId, file.PublicId);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error storing CV PDF for candidate {CandidateId}", candidateId);
-            // Don't throw - we don't want to fail the entire analysis if file storage fails
-            // The CV text and analysis results are already stored
         }
     }
 
@@ -276,9 +230,6 @@ public class AnalyzeCvRequestHandler(
     {
         try
         {
-            logger.LogInformation("Saving CV analysis history for candidate {CandidateId}", candidateId);
-
-            logger.LogInformation("Deleting previous analysis records for candidate {CandidateId}", candidateId);
             await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidateId);
 
             var cvAnalysis = new CvAnalysisEntity
@@ -293,7 +244,6 @@ public class AnalyzeCvRequestHandler(
             await unitOfWork.CvAnalysisRepository.AddAsync(cvAnalysis);
             await unitOfWork.CommitAsync();
 
-            // Save matches
             foreach (var match in matches)
             {
                 var job = jobPositions.First(j => j.JobCode == match.JobCode);
@@ -319,13 +269,10 @@ public class AnalyzeCvRequestHandler(
             }
 
             await unitOfWork.CommitAsync();
-
-            logger.LogInformation("CV analysis history saved successfully. Analysis ID: {AnalysisId}", cvAnalysis.PublicId);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error saving CV analysis history for candidate {CandidateId}", candidateId);
-            // Don't throw - we don't want to fail the entire analysis if history save fails
         }
     }
 }

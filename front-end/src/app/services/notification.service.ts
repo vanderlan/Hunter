@@ -64,6 +64,6 @@ export class NotificationService {
       panelClass: [`${type}-notification`, 'custom-notification']
     };
 
-    this.snackBar.open(message, '✕', config);
+    this.snackBar.open(message, '', config);
   }
 }

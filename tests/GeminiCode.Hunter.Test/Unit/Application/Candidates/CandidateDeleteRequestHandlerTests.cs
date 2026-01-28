@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -75,7 +74,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
@@ -133,7 +131,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
@@ -206,7 +203,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 
@@ -261,7 +257,6 @@ public class CandidateDeleteRequestHandlerTests
             UserId = 1,
             Name = "Test Candidate",
             Email = "candidate@test.com",
-            CvText = "CV content",
             AnalyzedAt = DateTime.UtcNow
         };
 

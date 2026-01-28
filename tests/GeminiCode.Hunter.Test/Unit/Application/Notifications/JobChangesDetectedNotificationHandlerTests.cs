@@ -1,6 +1,7 @@
 using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
+using GeminiCode.Hunter.Domain.Core.Models;
 using GeminiCode.Hunter.Domain.Core.Repositories;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
@@ -75,6 +76,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.Is<List<string>>(emails => emails.Count == 2 && emails.Contains("admin@test.com") && emails.Contains("partner@test.com")),
                 It.Is<List<string>>(newJobs => newJobs.Count == 2),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 0),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Once);
     }
@@ -118,6 +121,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.Is<List<string>>(emails => emails.Count == 1 && emails.Contains("admin@test.com")),
                 It.Is<List<string>>(newJobs => newJobs.Count == 0),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 2),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Once);
     }
@@ -162,6 +167,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.Is<List<string>>(emails => emails.Count == 2),
                 It.Is<List<string>>(newJobs => newJobs.Count == 1),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 0),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Once);
 
@@ -171,6 +178,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.Is<List<string>>(emails => emails.Count == 1 && emails.Contains("admin@test.com")),
                 It.Is<List<string>>(newJobs => newJobs.Count == 0),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 1),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Once);
 
@@ -180,6 +189,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.IsAny<List<string>>(),
                 It.IsAny<List<string>>(),
                 It.IsAny<List<string>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Exactly(2));
     }
@@ -215,6 +226,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.IsAny<List<string>>(),
                 It.IsAny<List<string>>(),
                 It.IsAny<List<string>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Never);
     }
@@ -242,6 +255,8 @@ public class JobChangesDetectedNotificationHandlerTests
                 It.IsAny<List<string>>(),
                 It.IsAny<List<string>>(),
                 It.IsAny<List<string>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
+                It.IsAny<List<JobPositionEmailData>>(),
                 It.IsAny<DateTime>()),
             Times.Never);
     }

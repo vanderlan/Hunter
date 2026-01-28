@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Models;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
@@ -19,6 +20,8 @@ public class SyncJobsRequestHandler(
     {
         var response = new SyncJobsResponse();
         var syncTimestamp = DateTime.UtcNow;
+        var newJobPositions = new List<JobPositionEmailData>();
+        var closedJobPositions = new List<JobPositionEmailData>();
 
         try
         {
@@ -77,8 +80,19 @@ public class SyncJobsRequestHandler(
                     };
 
                     await unitOfWork.JobPositionRepository.AddAsync(position);
+                    await unitOfWork.CommitAsync();
+
                     response.NewPositions++;
                     response.NewJobTitles.Add(newJob.Title);
+                    
+                    // Add to email data list
+                    newJobPositions.Add(new JobPositionEmailData
+                    {
+                        PublicId = position.PublicId,
+                        Title = position.Title,
+                        JobCode = position.JobCode,
+                        CompanyCode = position.CompanyCode
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -98,8 +112,15 @@ public class SyncJobsRequestHandler(
                 await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
                 response.ClosedPositions++;
                 response.ClosedJobTitles.Add(position.Title);
-
-                logger.LogInformation("Marked job as closed: {Title}", position.Title);
+                
+                // Add to email data list
+                closedJobPositions.Add(new JobPositionEmailData
+                {
+                    PublicId = position.PublicId,
+                    Title = position.Title,
+                    JobCode = position.JobCode,
+                    CompanyCode = position.CompanyCode
+                });
             }
 
             // Update LastCheckedAt ONLY for active positions with same title
@@ -114,23 +135,16 @@ public class SyncJobsRequestHandler(
 
                 if (scrapedJob != null && scrapedJob.Title == position.Title)
                 {
-                    // Check if position is missing Requirements field and update if necessary
                     if (string.IsNullOrWhiteSpace(position.Requirements))
                     {
                         try
                         {
-                            logger.LogInformation("Position {Title} is missing Requirements field, enriching with AI", position.Title);
-                            
-                            // Scrape raw HTML content
                             var scrapedDetails = await scraperService.ScrapeJobDetailsAsync(position.ExternalUrl);
-
-                            // Use AI to extract and enrich job details
                             var enrichedDetails = await openAIService.EnrichJobDetailsAsync(
                                 position.Title,
                                 scrapedDetails.RawHtmlContent
                             );
 
-                            // Update position with all enriched details
                             position.Summary = enrichedDetails.Summary;
                             position.Responsibilities = enrichedDetails.Responsibilities;
                             position.Requirements = enrichedDetails.Requirements;
@@ -140,31 +154,24 @@ public class SyncJobsRequestHandler(
                             
                             unitOfWork.JobPositionRepository.Update(position);
                             response.UpdatedPositions++;
-
-                            logger.LogInformation("Updated position {Title} with Requirements field", position.Title);
                         }
                         catch (Exception ex)
                         {
                             logger.LogError(ex, "Error enriching position {Title} with Requirements", position.Title);
-                            // Continue with just updating LastCheckedAt
                             position.LastCheckedAt = now;
                             unitOfWork.JobPositionRepository.Update(position);
                         }
                     }
                     else
                     {
-                        // Title hasn't changed and has Requirements, just update LastCheckedAt
                         position.LastCheckedAt = now;
                         unitOfWork.JobPositionRepository.Update(position);
                         response.UpdatedPositions++;
-
-                        logger.LogDebug("Updated LastCheckedAt for: {Title}", position.Title);
                     }
                 }
                 else if (scrapedJob != null && scrapedJob.Title != position.Title)
                 {
-                    // Title changed - treat as closed and new position
-                    logger.LogInformation(
+                    logger.LogWarning(
                         "Job title changed from '{OldTitle}' to '{NewTitle}'. Treating as closed and new.",
                         position.Title, scrapedJob.Title
                     );
@@ -172,8 +179,15 @@ public class SyncJobsRequestHandler(
                     await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
                     response.ClosedPositions++;
                     response.ClosedJobTitles.Add(position.Title);
-
-                    // Will be picked up as new in next sync
+                    
+                    // Add to closed email data list
+                    closedJobPositions.Add(new JobPositionEmailData
+                    {
+                        PublicId = position.PublicId,
+                        Title = position.Title,
+                        JobCode = position.JobCode,
+                        CompanyCode = position.CompanyCode
+                    });
                 }
             }
 
@@ -198,6 +212,8 @@ public class SyncJobsRequestHandler(
                     TotalScraped = response.TotalScraped,
                     NewJobTitles = response.NewJobTitles,
                     ClosedJobTitles = response.ClosedJobTitles,
+                    NewJobPositions = newJobPositions,
+                    ClosedJobPositions = closedJobPositions,
                     SyncTimestamp = syncTimestamp
                 }, cancellationToken);
             }

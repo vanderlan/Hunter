@@ -193,13 +193,16 @@
 
   .summary-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 12px;
-    max-width: 400px;
+    justify-content: center;
+    max-width: 600px;
     margin: 0 auto;
 
-    .action-btn {
-      width: 100%;
+    button {
+      flex: 0 1 auto;
+      min-width: 140px;
 
       mat-icon {
         margin-right: 8px;

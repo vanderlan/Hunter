@@ -20,31 +20,30 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-hiring-process',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatChipsModule,
-    MatProgressSpinnerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSnackBarModule,
-    FormsModule
-  ],
-  templateUrl: './hiring-process.component.html',
-  styleUrl: './hiring-process.component.scss'
+    selector: 'app-hiring-process',
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatChipsModule,
+        MatProgressSpinnerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSnackBarModule,
+        FormsModule
+    ],
+    templateUrl: './hiring-process.component.html',
+    styleUrl: './hiring-process.component.scss'
 })
 export class HiringProcessComponent implements OnInit {
   processes: HiringProcessListItem[] = [];
   loading = false;
   totalCount = 0;
   pageSize = 10;
-  currentPage = 1;
+  pageIndex = 0;
   searchQuery = '';
   dashboard: DashboardStats | null = null;
   private searchSubject = new Subject<string>();
@@ -69,7 +68,7 @@ export class HiringProcessComponent implements OnInit {
       debounceTime(400),
       distinctUntilChanged()
     ).subscribe(searchTerm => {
-      this.currentPage = 1;
+      this.pageIndex = 0;
       this.loadProcesses();
     });
   }
@@ -93,7 +92,7 @@ export class HiringProcessComponent implements OnInit {
   loadProcesses(): void {
     this.loading = true;
     this.hiringProcessService.getHiringProcesses(
-      this.currentPage,
+      this.pageIndex + 1,
       this.pageSize,
       undefined,
       undefined,
@@ -150,7 +149,7 @@ export class HiringProcessComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex + 1;
+    this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadProcesses();
   }

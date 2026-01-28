@@ -21,10 +21,6 @@ public class JobChangesDetectedNotificationHandler(
             notification.UpdatedPositionsCount,
             notification.SyncTimestamp);
 
-        logger.LogDebug(
-            "Job changes details: {Notification}",
-            JsonConvert.SerializeObject(notification, Formatting.Indented));
-
         // Send separate notifications for new and closed positions
         await SendNewPositionsNotificationsAsync(notification);
         await SendClosedPositionsNotificationsAsync(notification);
@@ -49,6 +45,8 @@ public class JobChangesDetectedNotificationHandler(
             await emailService.SendJobChangesNotificationAsync(
                 emailAddresses,
                 [.. notification.NewJobTitles],
+                [],
+                notification.NewJobPositions,
                 [],
                 DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
         }
@@ -78,6 +76,8 @@ public class JobChangesDetectedNotificationHandler(
                 emailAddresses,
                 [],
                 [.. notification.ClosedJobTitles],
+                [],
+                notification.ClosedJobPositions,
                 DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
         }
         else

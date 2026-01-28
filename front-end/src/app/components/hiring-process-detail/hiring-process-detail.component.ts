@@ -20,25 +20,24 @@ import { NotificationService } from '../../services/notification.service';
 import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.model';
 
 @Component({
-  selector: 'app-hiring-process-detail',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatChipsModule,
-    MatDividerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    FormsModule
-  ],
-  templateUrl: './hiring-process-detail.component.html',
-  styleUrl: './hiring-process-detail.component.scss'
+    selector: 'app-hiring-process-detail',
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatProgressSpinnerModule,
+        MatChipsModule,
+        MatDividerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        MatDialogModule,
+        FormsModule
+    ],
+    templateUrl: './hiring-process-detail.component.html',
+    styleUrl: './hiring-process-detail.component.scss'
 })
 export class HiringProcessDetailComponent implements OnInit {
   process: HiringProcess | null = null;
