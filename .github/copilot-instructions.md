@@ -6,14 +6,14 @@
 
 - **Repository Size**: ~120 files across 7 projects
 - **Primary Language**: C# (.NET 10)
-- **Secondary Language**: TypeScript (Angular 17)
+- **Secondary Language**: TypeScript (Angular 21)
 - **Database**: PostgreSQL 16.3
 - **Architecture**: Clean Architecture with CQRS pattern
 - **Deployment**: Docker Compose (3 services)
 
 ### Tech Stack
 - Backend: ASP.NET Core Web API (.NET 10), Entity Framework Core 10, MediatR, FluentValidation
-- Frontend: Angular 17 (standalone components), Angular Material
+- Frontend: Angular 21 (standalone components), Angular Material
 - Infrastructure: PostgreSQL 16.3, New Relic APM, Docker
 - AI Integration: OpenAI GPT-4o OR DeepSeek (dual provider support)
 - Additional: PdfPig (PDF extraction), HtmlAgilityPack (web scraping)
@@ -195,7 +195,7 @@ Hunter/
 ?       ??? Api/V1/                         # API integration tests
 ?       ??? Shared/Faker/                   # Bogus test data generators
 ?
-??? front-end/                              # Angular 17 application
+??? front-end/                              # Angular 21 application
 ?   ??? src/app/                            # Angular components
 ?   ?   ??? features/                       # Feature modules
 ?   ?   ??? core/                           # Services, guards, interceptors

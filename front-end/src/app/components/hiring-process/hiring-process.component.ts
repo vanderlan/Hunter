@@ -20,24 +20,23 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-hiring-process',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatChipsModule,
-    MatProgressSpinnerModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSnackBarModule,
-    FormsModule
-  ],
-  templateUrl: './hiring-process.component.html',
-  styleUrl: './hiring-process.component.scss'
+    selector: 'app-hiring-process',
+    imports: [
+        CommonModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatChipsModule,
+        MatProgressSpinnerModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSnackBarModule,
+        FormsModule
+    ],
+    templateUrl: './hiring-process.component.html',
+    styleUrl: './hiring-process.component.scss'
 })
 export class HiringProcessComponent implements OnInit {
   processes: HiringProcessListItem[] = [];
