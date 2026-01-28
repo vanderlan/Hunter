@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
-using Newtonsoft.Json;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
@@ -13,6 +12,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Notifications.C
 public class CandidateMatchingNotificationHandler(
     IUnitOfWork unitOfWork,
     IAIService openAIService,
+    IPdfService pdfService,
     IEmailService emailService,
     IFeatureManager featureManager,
     ILogger<CandidateMatchingNotificationHandler> logger)
@@ -75,6 +75,7 @@ public class CandidateMatchingNotificationHandler(
                     position.CompanyCode,
                     position.Summary,
                     position.Responsibilities,
+                    position.Requirements,
                     position.MustHaveSkills,
                     position.NiceToHaveSkills
                 );
@@ -85,15 +86,32 @@ public class CandidateMatchingNotificationHandler(
                 {
                     try
                     {
+                        // Get the candidate's CV file
+                        var candidateFile = await unitOfWork.CandidateFileRepository
+                            .GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
+                        
+                        if (candidateFile == null || candidateFile.File == null || candidateFile.File.FileData == null)
+                        {
+                            logger.LogWarning("Candidate {CandidateId} does not have a CV file stored, skipping", candidate.CandidateId);
+                            continue;
+                        }
+
+                        // Extract text from the stored PDF
+                        string cvText;
+                        using (var stream = new System.IO.MemoryStream(candidateFile.File.FileData))
+                        {
+                            cvText = await pdfService.ExtractTextFromPdfAsync(stream);
+                        }
+
                         // Analyze this candidate against this position
                         var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(
-                            candidate.CvText,
+                            cvText,
                             [positionSummary]
                         );
 
                         var match = analysisResult.Matches.FirstOrDefault();
                         
-                        if (match != null && match.MatchPercentage > 20)
+                        if (match != null && match.MatchPercentage > 85)
                         {
                             candidateMatches.Add(new CandidateMatchInfo
                             {

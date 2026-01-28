@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Candidate, PagedCandidates } from '../models/candidate.model';
+import { Candidate, PagedCandidates, ResumeUploadResponse } from '../models/candidate.model';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +41,49 @@ export class CandidateService {
 
   updateCandidate(id: string, candidate: Candidate): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, candidate, {
+      headers: this.getHeaders()
+    });
+  }
+
+  uploadResume(candidateId: string, file: File): Observable<ResumeUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<ResumeUploadResponse>(
+      `${this.apiUrl}/${candidateId}/Resume`, 
+      formData, 
+      {
+        headers: this.getHeaders()
+      }
+    );
+  }
+
+  getResumeUrl(candidateId: string): string {
+    return `${this.apiUrl}/${candidateId}/Resume`;
+  }
+
+  downloadResume(candidateId: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${candidateId}/Resume`, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
+
+  hasResume(candidateId: string): Observable<boolean> {
+    return new Observable(observer => {
+      this.http.head(`${this.apiUrl}/${candidateId}/Resume`, {
+        headers: this.getHeaders(),
+        observe: 'response'
+      }).subscribe({
+        next: () => observer.next(true),
+        error: () => observer.next(false),
+        complete: () => observer.complete()
+      });
+    });
+  }
+
+  deleteCandidate(candidateId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${candidateId}`, {
       headers: this.getHeaders()
     });
   }

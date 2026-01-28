@@ -8,6 +8,8 @@ using GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Create;
 using GeminiCode.Hunter.Application.Core.BackgroundServices;
 using GeminiCode.Hunter.Crosscutting.Ioc.Dependencies;
 using GeminiCode.Hunter.Domain.Core.Authentication;
+using GeminiCode.Hunter.Domain.Core.Configuration;
+using GeminiCode.Hunter.Domain.Core.Extensions;
 using Microsoft.FeatureManagement;
 
 namespace GeminiCode.Hunter.Api;
@@ -46,6 +48,13 @@ public static class Bootstrapper
     public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCors();
+
+        // Register ApplicationSettings
+        var applicationSettings = configuration.GetSection("ApplicationSettings").Get<ApplicationSettings>() ?? new ApplicationSettings();
+        services.AddSingleton(applicationSettings);
+        
+        // Initialize DateTimeExtensions with ApplicationSettings
+        DateTimeExtensions.Initialize(applicationSettings);
 
         services.ConfigureAuthentication(configuration);
 

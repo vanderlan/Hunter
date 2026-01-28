@@ -1,4 +1,3 @@
-
 export interface JobPosition {
   publicId?: string;
   jobPositionId?: number;
@@ -8,7 +7,7 @@ export interface JobPosition {
   jobCode: string;
   summary?: string;
   responsibilities?: string;
-  skills?: string;
+  requirements?: string;
   mustHaveSkills?: string;
   niceToHaveSkills?: string;
   isActive?: boolean;
@@ -24,6 +23,7 @@ export interface PagedList<T> {
 }
 
 export interface JobMatch {
+  jobPositionId?: string;
   jobCode: string;
   jobTitle: string;
   companyCode: string;
@@ -35,12 +35,22 @@ export interface JobMatch {
   summary?: string;
   mustHaveSkills?: string;
   niceToHaveSkills?: string;
+  referralReason?: string;
+  whatIsMissingForPerfectMatch?: string;
+}
+
+export interface CandidateInfo {
+  candidateId: string;
+  name?: string;
+  email?: string;
+  hasResume: boolean;
 }
 
 export interface AnalyzeCvResponse {
   totalPositionsAnalyzed: number;
   matchesFound: number;
   matches: JobMatch[];
+  candidateInfo?: CandidateInfo;
 }
 
 export interface ApiResponse<T> {

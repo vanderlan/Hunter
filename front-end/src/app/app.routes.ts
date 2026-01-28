@@ -13,6 +13,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'open-positions',
+    loadComponent: () => import('./components/open-positions/open-positions.component').then(m => m.OpenPositionsComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'admin',
     loadComponent: () => import('./components/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [AuthGuard, AdminGuard]
@@ -30,6 +35,16 @@ export const routes: Routes = [
   {
     path: 'candidates',
     loadComponent: () => import('./components/candidates/candidates.component').then(m => m.CandidatesComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'hiring-process',
+    loadComponent: () => import('./components/hiring-process/hiring-process.component').then(m => m.HiringProcessComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'hiring-process/:id',
+    loadComponent: () => import('./components/hiring-process-detail/hiring-process-detail.component').then(m => m.HiringProcessDetailComponent),
     canActivate: [AuthGuard]
   },
   {

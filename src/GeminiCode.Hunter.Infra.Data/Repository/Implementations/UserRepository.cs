@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,8 @@ public sealed class UserRepository(DataContext context) : BaseEntityRepository<U
     private static IQueryable<User> ApplyFilters(UserFilter filter, IQueryable<User> query)
     {
         if (!string.IsNullOrWhiteSpace(filter.Query))
-            query = query.Where(x => x.Name.Contains(filter.Query));
+            query = query.Where(x => x.Name.ToLower().Contains(filter.Query.ToLower()) || 
+                                     x.Email.ToLower().Contains(filter.Query.ToLower()));
 
         return query;
     }
@@ -43,7 +45,7 @@ public sealed class UserRepository(DataContext context) : BaseEntityRepository<U
 
         var pagination = (filter.Page * filter.Quantity) - filter.Quantity;
 
-        var entityList = await query.OrderBy(x => x.CreatedAt)
+        var entityList = await query.OrderByDescending(x => x.LastLoginAt)
             .AsNoTracking()
             .Skip(pagination)
             .Take(filter.Quantity)
@@ -57,6 +59,14 @@ public sealed class UserRepository(DataContext context) : BaseEntityRepository<U
         return await DataContext.Users
             .AsNoTracking()
             .Where(u => u.ReceiveJobChangeNotifications)
+            .ToListAsync();
+    }
+    
+    public async Task<List<User>> GetAdminUsersWithJobNotificationsEnabledAsync()
+    {
+        return await DataContext.Users
+            .AsNoTracking()
+            .Where(u => u.ReceiveJobChangeNotifications && u.Profile == UserProfile.Admin)
             .ToListAsync();
     }
 }

@@ -1,0 +1,288 @@
+<div class="detail-container">
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading && process) {
+    <div class="content">
+      <!-- Header Card -->
+      <mat-card class="header-card">
+        <mat-card-header>
+          <div class="header-content">
+            <button mat-icon-button (click)="goBack()" class="back-button">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div class="header-text">
+              <mat-card-title>Referral Details</mat-card-title>
+              <mat-card-subtitle>
+                {{ process.candidate.name }} - {{ process.jobPosition.title }}
+              </mat-card-subtitle>
+            </div>
+            <mat-chip [color]="getStatusColor(process.status)" selected class="status-chip">
+              {{ getStatusLabel(process.status) }}
+            </mat-chip>
+          </div>
+        </mat-card-header>
+      </mat-card>
+      <!-- Main Content Grid -->
+      <div class="content-grid">
+        <!-- Left Column -->
+        <div class="left-column">
+          <!-- Candidate & Job Info -->
+          <mat-card class="info-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>person</mat-icon>
+                Candidate Information
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="info-item">
+                <span class="label">Name:</span>
+                <span class="value">{{ process.candidate.name || 'N/A' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Email:</span>
+                <span class="value">{{ process.candidate.email || 'N/A' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Phone:</span>
+                <span class="value">{{ process.candidate.phoneNumber || 'N/A' }}</span>
+              </div>
+              @if (process.candidate.hasResume) {
+                <div class="info-item resume-viewer">
+                  <span class="label">Resume:</span>
+                  <button mat-button color="primary" (click)="viewResume()">
+                    <mat-icon>description</mat-icon>
+                    View CV
+                  </button>
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="info-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>work</mat-icon>
+                Position Information
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="info-item">
+                <span class="label">Title:</span>
+                <span class="value">{{ process.jobPosition.title }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Company:</span>
+                <span class="value">{{ process.jobPosition.companyCode }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Job Code:</span>
+                <span class="value">{{ process.jobPosition.jobCode }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <!-- AI Insights Card (Admin Only) -->
+          @if (isAdmin) {
+            <mat-card class="ai-insights-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>psychology</mat-icon>
+                  AI Insights
+                </mat-card-title>
+                @if (process.referralReason) {
+                  <mat-card-subtitle>Why this referral?</mat-card-subtitle>
+                }
+              </mat-card-header>
+              <mat-card-content>
+                <!-- No Insights State -->
+                @if (!process.referralReason) {
+                  <div class="no-insights">
+                    <mat-icon class="no-insights-icon">info_outline</mat-icon>
+                    <p class="no-insights-text">No AI insights available for this referral</p>
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      (click)="generateAIInsights()"
+                      [disabled]="generatingInsights"
+                      class="generate-button">
+                      @if (!generatingInsights) {
+                        <mat-icon>auto_awesome</mat-icon>
+                      }
+                      @if (generatingInsights) {
+                        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                      }
+                      {{ generatingInsights ? 'Generating...' : 'Generate AI Insights' }}
+                    </button>
+                  </div>
+                }
+                <!-- Insights Available State -->
+                @if (process.referralReason) {
+                  <div>
+                    <!-- Last AI Analysis Link -->
+                    @if (process.lastAIAnalysis) {
+                      <div class="last-analysis-link">
+                        <button
+                          mat-stroked-button
+                          color="primary"
+                          (click)="viewAIAnalysis(process.lastAIAnalysis.cvAnalysisPublicId)"
+                          class="analysis-button">
+                          <mat-icon>analytics</mat-icon>
+                          AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'short' }}
+                          ({{ process.lastAIAnalysis.matchPercentage }}%)
+                          <mat-icon class="external-icon">open_in_new</mat-icon>
+                        </button>
+                      </div>
+                    }
+                    <div class="insights-content">
+                      <mat-icon class="insights-icon">lightbulb</mat-icon>
+                      <p class="referral-reason">{{ process.referralReason }}</p>
+                    </div>
+                  </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          }
+          <!-- Update Status (Admin Only) -->
+          @if (isAdmin) {
+            <mat-card class="status-update-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>update</mat-icon>
+                  Update Status
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>New Status</mat-label>
+                  <mat-select [(ngModel)]="selectedStatus" [disabled]="updatingStatus">
+                    @for (option of availableStatusOptions; track option) {
+                      <mat-option [value]="option.value">
+                        {{ option.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Notes (Optional)</mat-label>
+                  <textarea matInput [(ngModel)]="statusNotes" rows="3" maxlength="1000" [disabled]="updatingStatus"></textarea>
+                </mat-form-field>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="updateStatus()"
+                  [disabled]="updatingStatus"
+                  class="full-width">
+                  @if (!updatingStatus) {
+                    <mat-icon>check</mat-icon>
+                  }
+                  @if (updatingStatus) {
+                    <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                  }
+                  {{ updatingStatus ? 'Updating...' : 'Update Status' }}
+                </button>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+        <!-- Right Column -->
+        <div class="right-column">
+          <!-- Status History Timeline -->
+          <mat-card class="timeline-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>timeline</mat-icon>
+                Status History
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="timeline">
+                @for (history of process.statusHistory; track history; let last = $last) {
+                  <div class="timeline-item">
+                    <div class="timeline-marker" [class.active]="last"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-header">
+                        <span class="status-change">
+                          <mat-chip [color]="getStatusColor(history.fromStatus)" selected>
+                            {{ getStatusLabel(history.fromStatus) }}
+                          </mat-chip>
+                          <mat-icon>arrow_forward</mat-icon>
+                          <mat-chip [color]="getStatusColor(history.toStatus)" selected>
+                            {{ getStatusLabel(history.toStatus) }}
+                          </mat-chip>
+                        </span>
+                      </div>
+                      <div class="timeline-meta">
+                        <span class="user">{{ history.changedByUserName }}</span>
+                        <span class="date">{{ history.createdAt | date:'medium' }}</span>
+                      </div>
+                      @if (history.notes) {
+                        <div class="timeline-notes">
+                          <p>{{ history.notes }}</p>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <!-- Notes Section -->
+          <mat-card class="notes-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>note</mat-icon>
+                Notes
+              </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <!-- Add Note Form -->
+              <div class="add-note">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Add a note...</mat-label>
+                  <textarea matInput [(ngModel)]="newNote" rows="3" maxlength="2000" [disabled]="addingNote"></textarea>
+                </mat-form-field>
+                <button
+                  mat-raised-button
+                  color="accent"
+                  (click)="addNote()"
+                  [disabled]="!newNote.trim() || addingNote">
+                  @if (!addingNote) {
+                    <mat-icon>add</mat-icon>
+                  }
+                  @if (addingNote) {
+                    <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                  }
+                  {{ addingNote ? 'Adding...' : 'Add Note' }}
+                </button>
+              </div>
+              <mat-divider></mat-divider>
+              <!-- Notes List -->
+              <div class="notes-list">
+                @for (note of process.notes; track note) {
+                  <div class="note-item">
+                    <div class="note-header">
+                      <span class="note-user">{{ note.userName }}</span>
+                      <span class="note-date">{{ note.createdAt | date:'medium' }}</span>
+                    </div>
+                    <p class="note-text">{{ note.note }}</p>
+                  </div>
+                }
+                @if (process.notes.length === 0) {
+                  <div class="no-notes">
+                    <mat-icon>info_outline</mat-icon>
+                    <p>No notes yet</p>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  }
+</div>

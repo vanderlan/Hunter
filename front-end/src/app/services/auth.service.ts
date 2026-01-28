@@ -11,9 +11,9 @@ import { LoginRequest, LoginResponse, RefreshTokenRequest } from '../models/auth
 export class AuthService {
   private readonly TOKEN_KEY = 'hunter_token';
   private readonly REFRESH_TOKEN_KEY = 'hunter_refresh_token';
-  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  private readonly apiUrl = `${environment.apiUrl}/Auth`;
   
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.isAuthenticated());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(
@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials, {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/Login`, credentials, {
       headers: new HttpHeaders({
         'x-api-version': environment.apiVersion
       })
@@ -45,7 +45,7 @@ export class AuthService {
     }
 
     const request: RefreshTokenRequest = { refreshToken };
-    return this.http.post<LoginResponse>(`${this.apiUrl}/refresh-token`, request, {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/RefreshToken`, request, {
       headers: new HttpHeaders({
         'x-api-version': environment.apiVersion
       })

@@ -12,5 +12,7 @@ public record JobMatchResult(
     decimal MatchPercentage,
     string MatchReason,
     List<string> MatchingSkills,
-    List<string> MissingSkills
+    List<string> MissingSkills,
+    string ReferralReason,
+    string WhatIsMissingForPerfectMatch
 );

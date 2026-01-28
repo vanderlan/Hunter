@@ -28,6 +28,24 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private ICandidateRepository _candidateRepository;
     public ICandidateRepository CandidateRepository => _candidateRepository ??= new CandidateRepository(DbContext);
 
+    private IFileRepository _fileRepository;
+    public IFileRepository FileRepository => _fileRepository ??= new FileRepository(DbContext);
+
+    private ICandidateFileRepository _candidateFileRepository;
+    public ICandidateFileRepository CandidateFileRepository => _candidateFileRepository ??= new CandidateFileRepository(DbContext);
+
+    private IHiringProcessRepository _hiringProcessRepository;
+    public IHiringProcessRepository HiringProcessRepository => _hiringProcessRepository ??= new HiringProcessRepository(DbContext);
+
+    private IHiringProcessNoteRepository _hiringProcessNoteRepository;
+    public IHiringProcessNoteRepository HiringProcessNoteRepository => _hiringProcessNoteRepository ??= new HiringProcessNoteRepository(DbContext);
+
+    private IHiringProcessStatusHistoryRepository _hiringProcessStatusHistoryRepository;
+    public IHiringProcessStatusHistoryRepository HiringProcessStatusHistoryRepository => _hiringProcessStatusHistoryRepository ??= new HiringProcessStatusHistoryRepository(DbContext);
+
+    private ICvAnalysisRepository _cvAnalysisRepository;
+    public ICvAnalysisRepository CvAnalysisRepository => _cvAnalysisRepository ??= new CvAnalysisRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try

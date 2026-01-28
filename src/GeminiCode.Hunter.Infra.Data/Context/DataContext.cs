@@ -17,6 +17,13 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<JobPosition> JobPositions { get; set; }
     public DbSet<Candidate> Candidates { get; set; }
+    public DbSet<File> Files { get; set; }
+    public DbSet<CandidateFile> CandidateFiles { get; set; }
+    public DbSet<HiringProcess> HiringProcesses { get; set; }
+    public DbSet<HiringProcessStatusHistory> HiringProcessStatusHistories { get; set; }
+    public DbSet<HiringProcessNote> HiringProcessNotes { get; set; }
+    public DbSet<CvAnalysis> CvAnalyses { get; set; }
+    public DbSet<CvAnalysisMatch> CvAnalysisMatches { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -32,6 +39,13 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new RefreshTokenMapping());
         modelBuilder.ApplyConfiguration(new JobPositionMapping());
         modelBuilder.ApplyConfiguration(new CandidateMapping());
+        modelBuilder.ApplyConfiguration(new FileMapping());
+        modelBuilder.ApplyConfiguration(new CandidateFileMapping());
+        modelBuilder.ApplyConfiguration(new HiringProcessMapping());
+        modelBuilder.ApplyConfiguration(new HiringProcessStatusHistoryMapping());
+        modelBuilder.ApplyConfiguration(new HiringProcessNoteMapping());
+        modelBuilder.ApplyConfiguration(new CvAnalysisMapping());
+        modelBuilder.ApplyConfiguration(new CvAnalysisMatchMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

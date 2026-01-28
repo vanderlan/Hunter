@@ -14,10 +14,8 @@ public class CandidateGetPaginatedRequestHandler(
         CandidateGetPaginatedRequest request, 
         CancellationToken cancellationToken)
     {
-        // Get current user to check if admin
         var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id);
         
-        // If not admin, filter by current user's candidates only
         if (user != null && !currentUser.Profile.Equals("admin", StringComparison.OrdinalIgnoreCase))
         {
             request.UserId = user.UserId;
@@ -25,9 +23,15 @@ public class CandidateGetPaginatedRequestHandler(
 
         var candidates = await unitOfWork.CandidateRepository.ListPaginateAsync(request);
 
-        var candidatesPaginated = candidates.Items
-            .Select(candidate => (CandidateGetPaginatedResponse)candidate)
-            .ToList();
+        var candidatesPaginated = new List<CandidateGetPaginatedResponse>();
+
+        foreach (var candidate in candidates.Items)
+        {
+            var hiringProcesses = await unitOfWork.HiringProcessRepository.GetByCandidateIdAsync(candidate.CandidateId);
+            var hasHiringProcess = hiringProcesses.Any();
+            
+            candidatesPaginated.Add(CandidateGetPaginatedResponse.From(candidate, hasHiringProcess));
+        }
 
         return new PagedList<CandidateGetPaginatedResponse>(candidatesPaginated, candidates.Count);
     }

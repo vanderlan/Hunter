@@ -33,6 +33,9 @@ public class LoginWithRefreshTokenRequestHandler(IUnitOfWork unitOfWork, IString
 
             if (user is not null)
             {
+                user.LastLoginAt = DateTime.UtcNow;
+                unitOfWork.UserRepository.Update(user);
+                
                 await unitOfWork.RefreshTokenRepository.DeleteAsync(userRefreshToken.PublicId);
                 var newRefreshToken = await AddRefreshTokenAsync(user.Email);
 

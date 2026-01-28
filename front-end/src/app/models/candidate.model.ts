@@ -6,9 +6,18 @@ export interface Candidate {
   analyzedAt: Date;
   analyzedByUserName: string;
   createdAt: Date;
+  hasResume?: boolean;
+  resumeFileName?: string;
+  hasHiringProcess?: boolean;
 }
 
 export interface PagedCandidates {
   items: Candidate[];
   count: number;
+}
+
+export interface ResumeUploadResponse {
+  fileId: string;
+  fileName: string;
+  fileSize: number;
 }

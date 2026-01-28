@@ -1,4 +1,5 @@
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Extensions;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Queries.GetById;
 
@@ -12,7 +13,7 @@ public class JobPositionGetByIdResponse
     public string JobCode { get; set; }
     public string? Summary { get; set; }
     public string? Responsibilities { get; set; }
-    public string? Skills { get; set; }
+    public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
     public bool IsActive { get; set; }
@@ -36,14 +37,14 @@ public class JobPositionGetByIdResponse
             JobCode = jobPosition.JobCode,
             Summary = jobPosition.Summary,
             Responsibilities = jobPosition.Responsibilities,
-            Skills = jobPosition.Skills,
+            Requirements = jobPosition.Requirements,
             MustHaveSkills = jobPosition.MustHaveSkills,
             NiceToHaveSkills = jobPosition.NiceToHaveSkills,
             IsActive = jobPosition.IsActive,
-            ClosedAt = jobPosition.ClosedAt,
-            LastCheckedAt = jobPosition.LastCheckedAt,
-            LastUpdated = jobPosition.LastUpdated,
-            CreatedAt = jobPosition.CreatedAt
+            ClosedAt = jobPosition.ClosedAt?.ToApplicationTime(), // Convert to configured timezone
+            LastCheckedAt = jobPosition.LastCheckedAt.ToApplicationTime(), // Convert to configured timezone
+            LastUpdated = jobPosition.LastUpdated.ToApplicationTime(), // Convert to configured timezone
+            CreatedAt = jobPosition.CreatedAt.ToApplicationTime() // Convert to configured timezone
         };
     }
 }

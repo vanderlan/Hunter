@@ -5,19 +5,30 @@ using GeminiCode.Hunter.Domain.Core.Extensions;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Crosscutting.Resources;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using static GeminiCode.Hunter.Crosscutting.Resources.Messages.MessagesKeys;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Auth.Commands.LoginWithCredentials;
 
-public class LoginWithCredentialsRequestHandler(IUnitOfWork unitOfWork, IStringLocalizer<HunterResources> resourceMessages) : IRequestHandler<LoginWithCredentialsRequest, LoginWithCredentialsResponse>
+public class LoginWithCredentialsRequestHandler(IUnitOfWork unitOfWork, IStringLocalizer<HunterResources> resourceMessages, ILogger<LoginWithCredentialsRequestHandler> logger) : IRequestHandler<LoginWithCredentialsRequest, LoginWithCredentialsResponse>
 {
     public async Task<LoginWithCredentialsResponse> Handle(LoginWithCredentialsRequest request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Login attempt for user: {Email}", request.Email);
+
         var user = await unitOfWork.UserRepository.LoginAsync(request.Email, request.Password.ToSha512());
 
         if (user is not null)
         {
+            logger.LogInformation("User authenticated successfully: {Email}, UserId: {UserId}", user.Email, user.PublicId);
+
+            user.LastLoginAt = DateTime.UtcNow;
+            unitOfWork.UserRepository.Update(user);
+            await unitOfWork.CommitAsync();
+
             var refreshToken = await AddRefreshTokenAsync(user.Email);
+
+            logger.LogInformation("Login completed successfully for user: {Email}", user.Email);
 
             return new LoginWithCredentialsResponse
             {
@@ -29,6 +40,7 @@ public class LoginWithCredentialsRequestHandler(IUnitOfWork unitOfWork, IStringL
             };
         }
 
+        logger.LogWarning("Failed login attempt for user: {Email} - Invalid credentials", request.Email);
         throw new UnauthorizedUserException(resourceMessages[UserMessages.InvalidCredentials], resourceMessages[ExceptionsTitles.AuthenticationError]);
     }
 

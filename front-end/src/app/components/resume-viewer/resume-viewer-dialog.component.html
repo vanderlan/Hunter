@@ -1,0 +1,42 @@
+<div class="resume-viewer-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Resume - {{ data.candidateName }}</h2>
+    <div class="actions">
+      @if (!loading && !error) {
+        <button mat-icon-button (click)="download()" matTooltip="Download PDF">
+          <mat-icon>download</mat-icon>
+        </button>
+      }
+      <button mat-icon-button (click)="close()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-dialog-content>
+    @if (loading) {
+      <div class="spinner-container">
+        <mat-spinner></mat-spinner>
+        <p>Loading resume...</p>
+      </div>
+    }
+
+    @if (error && !loading) {
+      <div class="error-container">
+        <mat-icon>error</mat-icon>
+        <p>Failed to load resume</p>
+        <button mat-raised-button color="primary" (click)="loadResume()">
+          <mat-icon>refresh</mat-icon>
+          Retry
+        </button>
+      </div>
+    }
+
+    @if (!loading && !error && resumeUrl) {
+      <iframe
+        [src]="resumeUrl"
+        class="pdf-viewer">
+      </iframe>
+    }
+  </mat-dialog-content>
+</div>

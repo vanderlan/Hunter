@@ -6,5 +6,6 @@ public interface ICurrentUser
     public string Id { get; }
     public string Email { get; }
     public string Profile { get; }
+    public bool IsAdmin { get; }
     bool IsAuthenticated();
 }

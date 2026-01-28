@@ -15,10 +15,10 @@
   <div class="search-container">
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Search</mat-label>
-      <input matInput 
-             [(ngModel)]="searchQuery" 
-             (ngModelChange)="onSearchChange($event)"
-             placeholder="Search by name or email">
+      <input matInput
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search by name or email">
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
   </div>
@@ -26,82 +26,121 @@
   <!-- Candidates Table -->
   <mat-card class="table-card">
     <mat-card-content>
-      <div class="spinner-container" *ngIf="loading">
-        <mat-spinner></mat-spinner>
-      </div>
+      @if (loading) {
+        <div class="spinner-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      }
 
-      <table mat-table [dataSource]="dataSource" class="candidates-table" *ngIf="!loading">
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.name || 'N/A' }}
-          </td>
-        </ng-container>
+      @if (!loading) {
+        <table mat-table [dataSource]="dataSource" class="candidates-table">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.name || 'N/A' }}
+            </td>
+          </ng-container>
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.email || 'N/A' }}
+            </td>
+          </ng-container>
+          <!-- Phone Number Column -->
+          <ng-container matColumnDef="phoneNumber">
+            <th mat-header-cell *matHeaderCellDef>Phone</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.phoneNumber || 'N/A' }}
+            </td>
+          </ng-container>
+          <!-- Analyzed At Column -->
+          <ng-container matColumnDef="analyzedAt">
+            <th mat-header-cell *matHeaderCellDef>Analyzed At</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.analyzedAt | date:'short' }}
+            </td>
+          </ng-container>
+          <!-- Analyzed By Column -->
+          <ng-container matColumnDef="analyzedByUserName">
+            <th mat-header-cell *matHeaderCellDef>Analyzed By</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.analyzedByUserName }}
+            </td>
+          </ng-container>
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <input
+                type="file"
+                [id]="'resume-upload-' + element.publicId"
+                accept=".pdf"
+                (change)="onResumeFileSelected($event, element)"
+                style="display: none;">
+              <button mat-icon-button
+                color="primary"
+                (click)="editCandidate(element)"
+                matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button
+                [matMenuTriggerFor]="resumeMenu"
+                matTooltip="Resume"
+                color="accent">
+                <mat-icon>description</mat-icon>
+              </button>
+              <mat-menu #resumeMenu="matMenu">
+                <button mat-menu-item (click)="triggerFileUpload(element)">
+                  <mat-icon>upload</mat-icon>
+                  <span>Upload Resume</span>
+                </button>
+                <button mat-menu-item (click)="viewResume(element)">
+                  <mat-icon>visibility</mat-icon>
+                  <span>View Resume</span>
+                </button>
+                <button mat-menu-item (click)="downloadResume(element)">
+                  <mat-icon>download</mat-icon>
+                  <span>Download Resume</span>
+                </button>
+              </mat-menu>
+              <button mat-icon-button
+                color="warn"
+                (click)="deleteCandidate(element)"
+                [disabled]="!canDeleteCandidate(element)"
+                [matTooltip]="canDeleteCandidate(element) ? 'Delete candidate' : 'Only Admin can delete candidates with hiring processes'">
+                <mat-icon>delete</mat-icon>
+              </button>
+              @if (uploadingResumeFor === element.publicId) {
+                <mat-spinner
+                  diameter="24"
+                  class="inline-spinner">
+                </mat-spinner>
+              }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <!-- No Data Row -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="6" style="text-align: center; padding: 20px;">
+              No candidates found
+            </td>
+          </tr>
+        </table>
+      }
 
-        <!-- Email Column -->
-        <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.email || 'N/A' }}
-          </td>
-        </ng-container>
-
-        <!-- Phone Number Column -->
-        <ng-container matColumnDef="phoneNumber">
-          <th mat-header-cell *matHeaderCellDef>Phone</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.phoneNumber || 'N/A' }}
-          </td>
-        </ng-container>
-
-        <!-- Analyzed At Column -->
-        <ng-container matColumnDef="analyzedAt">
-          <th mat-header-cell *matHeaderCellDef>Analyzed At</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.analyzedAt | date:'short' }}
-          </td>
-        </ng-container>
-
-        <!-- Analyzed By Column -->
-        <ng-container matColumnDef="analyzedByUserName">
-          <th mat-header-cell *matHeaderCellDef>Analyzed By</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.analyzedByUserName }}
-          </td>
-        </ng-container>
-
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
-          <td mat-cell *matCellDef="let element">
-            <button mat-icon-button 
-                    color="primary" 
-                    (click)="editCandidate(element)" 
-                    matTooltip="Edit">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-        <!-- No Data Row -->
-        <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" colspan="6" style="text-align: center; padding: 20px;">
-            No candidates found
-          </td>
-        </tr>
-      </table>
-
-      <mat-paginator 
-        [length]="totalCount"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 25, 50]"
-        (page)="onPageChange($event)"
-        *ngIf="!loading">
-      </mat-paginator>
+      @if (!loading) {
+        <mat-paginator
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          (page)="onPageChange($event)"
+          >
+        </mat-paginator>
+      }
     </mat-card-content>
   </mat-card>
 </div>

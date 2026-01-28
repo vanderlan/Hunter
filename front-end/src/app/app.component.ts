@@ -10,21 +10,20 @@ import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatDividerModule
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        RouterLink,
+        RouterLinkActive,
+        MatSidenavModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatDividerModule
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   isAuthenticated$ = this.authService.isAuthenticated$;
@@ -80,6 +79,8 @@ export class AppComponent {
   getPageTitle(): string {
     const route = this.currentRoute;
     if (route === '/' || route === '') return 'Analyze CV';
+    if (route.includes('/open-positions')) return 'Open Positions';
+    if (route.includes('/hiring-process')) return this.getReferralsLabel();
     if (route.includes('/candidates')) return 'Candidates';
     if (route.includes('/admin')) return 'Admin Panel';
     if (route.includes('/job-positions')) return 'Job Positions';
@@ -87,5 +88,9 @@ export class AppComponent {
     if (route.includes('/change-password')) return 'Change Password';
     if (route.includes('/preferences')) return 'Preferences';
     return 'Hunter';
+  }
+
+  getReferralsLabel(): string {
+    return this.isAdmin() ? 'Referrals' : 'My Referrals';
   }
 }

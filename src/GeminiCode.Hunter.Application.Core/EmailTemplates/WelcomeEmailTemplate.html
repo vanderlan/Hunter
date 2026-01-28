@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Hunter</title>
     <style>
@@ -46,6 +47,11 @@
             color: #5f1f1f;
             font-size: 22px;
             margin-bottom: 15px;
+        }
+        .emoji-icon {
+            display: inline-block;
+            margin-right: 5px;
+            font-size: 20px;
         }
         .credentials-box {
             background-color: #f9f9f9;
@@ -116,7 +122,7 @@
             display: inline-block;
             padding: 15px 40px;
             background-color: #5f1f1f;
-            color: #ffffff;
+            color: #ffffff !important;
             text-decoration: none;
             border-radius: 4px;
             font-weight: 600;
@@ -141,13 +147,13 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>🎯 Welcome to Hunter!</h1>
+            <h1>&#127919; Welcome to Hunter!</h1>
             <p>Your AI-Powered CV Analysis Platform</p>
         </div>
         
         <div class="content">
             <div class="welcome-message">
-                <h2>Hello {{UserName}}! 👋</h2>
+                <h2>Hello {{UserName}}! &#128075;</h2>
                 <p>
                     We're excited to have you join Hunter! Your account has been successfully created, 
                     and you're now ready to revolutionize the way you match candidates with job positions.
@@ -159,13 +165,13 @@
             </div>
 
             <div class="credentials-box">
-                <h3>🔑 Your Login Credentials</h3>
+                <h3><span class="emoji-icon">&#128273;</span>Your Login Credentials</h3>
                 <p><strong>Email:</strong> {{UserEmail}}</p>
                 <p><strong>Temporary Password:</strong> {{Password}}</p>
             </div>
 
             <div class="highlight-box">
-                <p><strong>⚠️ Important Security Note:</strong></p>
+                <p><strong><span class="emoji-icon">&#9888;</span>Important Security Note:</strong></p>
                 <p>
                     For your security, we strongly recommend changing your password after your first login. 
                     You can update your password in your account settings or by using the "Change Password" option in your profile menu.
@@ -176,7 +182,7 @@
                 <h3>What You Can Do with Hunter:</h3>
                 
                 <div class="feature-item">
-                    <h4>📄 Analyze CVs with AI</h4>
+                    <h4><span class="emoji-icon">&#128196;</span>Analyze CVs with AI</h4>
                     <p>
                         Upload candidate CVs and let our AI-powered engine analyze them against your job positions. 
                         Get match percentages, skills analysis, and detailed recommendations instantly.
@@ -184,7 +190,7 @@
                 </div>
 
                 <div class="feature-item">
-                    <h4>💼 Manage Job Positions</h4>
+                    <h4><span class="emoji-icon">&#128188;</span>Manage Job Positions</h4>
                     <p>
                         Keep track of all your open positions. Our system automatically scrapes job boards 
                         and sends you notifications about new or closed positions.
@@ -192,7 +198,7 @@
                 </div>
 
                 <div class="feature-item">
-                    <h4>🤝 Suggest Referrals</h4>
+                    <h4><span class="emoji-icon">&#129309;</span>Suggest Referrals</h4>
                     <p>
                         Found a great match? Easily suggest referrals to hiring managers. Help build strong teams 
                         by recommending the best candidates for each position.
@@ -200,7 +206,7 @@
                 </div>
 
                 <div class="feature-item">
-                    <h4>📊 Track Your Success</h4>
+                    <h4><span class="emoji-icon">&#128202;</span>Track Your Success</h4>
                     <p>
                         Monitor your candidate matches and referral success rates. Make data-driven decisions 
                         and continuously improve your recruitment process.
@@ -219,7 +225,7 @@
                     don't hesitate to reach out to your system administrator.
                 </p>
                 <p>
-                    Happy hunting! We can't wait to see the amazing matches you'll discover with Hunter. 🚀
+                    Happy hunting! We can't wait to see the amazing matches you'll discover with Hunter. &#128640;
                 </p>
             </div>
         </div>
