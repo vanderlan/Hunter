@@ -34,6 +34,25 @@ public class CvAnalysisRepository(DataContext dataContext)
             .CountAsync();
     }
 
+    public async Task<List<CvAnalysis>> GetAllAsync(int page = 1, int pageSize = 10)
+    {
+        var skip = (page - 1) * pageSize;
+        
+        return await DataContext.CvAnalyses
+            .Include(x => x.Candidate)
+            .Include(x => x.User)
+            .OrderByDescending(x => x.AnalyzedAt)
+            .Skip(skip)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<int> GetAllCountAsync()
+    {
+        return await DataContext.CvAnalyses.CountAsync();
+    }
+
     public async Task<CvAnalysis?> GetWithMatchesAsync(string publicId)
     {
         return await DataContext.CvAnalyses

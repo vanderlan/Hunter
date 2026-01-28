@@ -17,12 +17,24 @@ public class GetCvAnalysisHistoryRequestHandler(
     {
         var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id);
 
-        var analyses = await unitOfWork.CvAnalysisRepository.GetByUserIdAsync(
-            user.UserId, 
-            request.Page, 
-            request.Quantity);
+        List<Domain.Core.Entities.CvAnalysis> analyses;
+        int totalCount;
 
-        var totalCount = await unitOfWork.CvAnalysisRepository.GetCountByUserIdAsync(user.UserId);
+        if (currentUser.IsAdmin)
+        {
+            analyses = await unitOfWork.CvAnalysisRepository.GetAllAsync(
+                request.Page, 
+                request.Quantity);
+            totalCount = await unitOfWork.CvAnalysisRepository.GetAllCountAsync();
+        }
+        else
+        {
+            analyses = await unitOfWork.CvAnalysisRepository.GetByUserIdAsync(
+                user.UserId, 
+                request.Page, 
+                request.Quantity);
+            totalCount = await unitOfWork.CvAnalysisRepository.GetCountByUserIdAsync(user.UserId);
+        }
 
         var response = analyses.Select(a => new CvAnalysisHistoryResponse
         {
