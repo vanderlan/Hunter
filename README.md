@@ -507,7 +507,7 @@ The hiring process integrates seamlessly with the CV analyzer:
 
 ### Prerequisites
 - .NET 10 SDK
-- Node.js 18+
+- Node.js 20+
 - PostgreSQL 12+
 - Docker Desktop (for containerized setup)
 - OpenAI API key
