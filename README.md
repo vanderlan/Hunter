@@ -1,10 +1,7 @@
 # **Hunter**
 
-[![Build and Test](https://github.com/vanderlan/Hunter-Api/actions/workflows/build.yml/badge.svg)](https://github.com/vanderlan/Hunter-Api/actions/workflows/build.yml)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=vanderlan_Hunter-Api&metric=coverage)](https://sonarcloud.io/summary/overall?id=vanderlan_Hunter-Api) 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=vanderlan_Hunter-Api&metric=alert_status)](https://sonarcloud.io/summary/overall?id=vanderlan_Hunter-Api)
-[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=vanderlan_Hunter-Api&metric=sqale_index)](https://sonarcloud.io/summary/overall?id=vanderlan_Hunter-Api)
-[![GitHub release](https://img.shields.io/github/release/vanderlan/Hunter-Api.svg)](https://github.com/vanderlan/Hunter-Api/releases) 
+[![Build and Test](https://github.com/vanderlan/Hunter/actions/workflows/build.yml/badge.svg)](https://github.com/vanderlan/Hunter/actions/workflows/build.yml)
+[![Deploy](https://github.com/vanderlan/Hunter/actions/workflows/deploy.yml/badge.svg)](https://github.com/vanderlan/Hunter/actions/workflows/deploy.yml)
 
 ## About this Project
 
