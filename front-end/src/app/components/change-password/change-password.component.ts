@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -13,10 +13,8 @@ import { UserService } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
 
 @Component({
-  selector: 'app-change-password',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-change-password',
+    imports: [
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -25,9 +23,9 @@ import { NotificationService } from '../../services/notification.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule
-  ],
-  templateUrl: './change-password.component.html',
-  styleUrl: './change-password.component.scss'
+],
+    templateUrl: './change-password.component.html',
+    styleUrl: './change-password.component.scss'
 })
 export class ChangePasswordComponent implements OnInit {
   passwordForm!: FormGroup;

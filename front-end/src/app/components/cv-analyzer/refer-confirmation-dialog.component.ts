@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,15 +11,13 @@ export interface ReferConfirmationData {
 }
 
 @Component({
-  selector: 'app-refer-confirmation-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-refer-confirmation-dialog',
+    imports: [
     MatDialogModule,
     MatButtonModule,
     MatIconModule
-  ],
-  template: `
+],
+    template: `
     <div class="refer-dialog">
       <div class="dialog-header">
         <mat-icon class="warning-icon">help_outline</mat-icon>
@@ -59,7 +57,7 @@ export interface ReferConfirmationData {
       </mat-dialog-actions>
     </div>
   `,
-  styles: [`
+    styles: [`
     .refer-dialog {
       min-width: 400px;
       max-width: 500px;

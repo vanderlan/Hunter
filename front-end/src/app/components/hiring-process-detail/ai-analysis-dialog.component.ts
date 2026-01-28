@@ -10,19 +10,18 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { CvAnalysisDetail } from '../../services/cv-analysis.service';
 
 @Component({
-  selector: 'app-ai-analysis-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatExpansionModule,
-    MatProgressBarModule
-  ],
-  template: `
+    selector: 'app-ai-analysis-dialog',
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatIconModule,
+        MatCardModule,
+        MatChipsModule,
+        MatExpansionModule,
+        MatProgressBarModule
+    ],
+    template: `
     <div class="dialog-header">
       <h2 mat-dialog-title>
         <mat-icon>analytics</mat-icon>
@@ -32,7 +31,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
         <mat-icon>close</mat-icon>
       </button>
     </div>
-
+    
     <mat-dialog-content>
       <div class="analysis-header">
         <div class="header-info">
@@ -48,80 +47,83 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
           </p>
         </div>
       </div>
-
+    
       <div class="matches-section">
         <h3 class="section-title">Job Matches</h3>
-        
+    
         <div class="matches-grid">
-          <mat-card *ngFor="let match of data.matches" class="match-card">
-            <mat-card-header>
-              <mat-card-title>{{ match.jobTitle }}</mat-card-title>
-              <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
-            </mat-card-header>
-
-            <mat-card-content>
-              <div class="match-percentage">
-                <h3>{{ match.matchPercentage }}% Match</h3>
-                <mat-progress-bar 
-                  mode="determinate" 
-                  [value]="match.matchPercentage"
-                  [color]="getMatchColor(match.matchPercentage)">
-                </mat-progress-bar>
-              </div>
-
-              <p class="match-reason">{{ match.matchReason }}</p>
-
-              <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                  <mat-panel-title>Skills Analysis</mat-panel-title>
-                </mat-expansion-panel-header>
-
-                <div class="skills-section">
-                  <h4>Matching Skills</h4>
-                  <mat-chip-set>
-                    <mat-chip *ngFor="let skill of match.matchingSkills" class="skill-match">
-                      {{ skill }}
-                    </mat-chip>
-                  </mat-chip-set>
+          @for (match of data.matches; track match) {
+            <mat-card class="match-card">
+              <mat-card-header>
+                <mat-card-title>{{ match.jobTitle }}</mat-card-title>
+                <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <div class="match-percentage">
+                  <h3>{{ match.matchPercentage }}% Match</h3>
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="match.matchPercentage"
+                    [color]="getMatchColor(match.matchPercentage)">
+                  </mat-progress-bar>
                 </div>
-
-                <div class="skills-section">
-                  <h4>Skills to Develop</h4>
-                  <mat-chip-set>
-                    <mat-chip *ngFor="let skill of match.missingSkills" class="skill-missing">
-                      {{ skill }}
-                    </mat-chip>
-                  </mat-chip-set>
-                </div>
-              </mat-expansion-panel>
-
-              <mat-expansion-panel *ngIf="match.whatIsMissingForPerfectMatch">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>What is missing for a perfect match?</mat-panel-title>
-                </mat-expansion-panel-header>
-                <p>{{ match.whatIsMissingForPerfectMatch }}</p>
-              </mat-expansion-panel>
-
-              <mat-expansion-panel *ngIf="match.referralReason">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>Referral Reason</mat-panel-title>
-                </mat-expansion-panel-header>
-                <p>{{ match.referralReason }}</p>
-              </mat-expansion-panel>
-            </mat-card-content>
-          </mat-card>
+                <p class="match-reason">{{ match.matchReason }}</p>
+                <mat-expansion-panel>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>Skills Analysis</mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <div class="skills-section">
+                    <h4>Matching Skills</h4>
+                    <mat-chip-set>
+                      @for (skill of match.matchingSkills; track skill) {
+                        <mat-chip class="skill-match">
+                          {{ skill }}
+                        </mat-chip>
+                      }
+                    </mat-chip-set>
+                  </div>
+                  <div class="skills-section">
+                    <h4>Skills to Develop</h4>
+                    <mat-chip-set>
+                      @for (skill of match.missingSkills; track skill) {
+                        <mat-chip class="skill-missing">
+                          {{ skill }}
+                        </mat-chip>
+                      }
+                    </mat-chip-set>
+                  </div>
+                </mat-expansion-panel>
+                @if (match.whatIsMissingForPerfectMatch) {
+                  <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>What is missing for a perfect match?</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{ match.whatIsMissingForPerfectMatch }}</p>
+                  </mat-expansion-panel>
+                }
+                @if (match.referralReason) {
+                  <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>Referral Reason</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <p>{{ match.referralReason }}</p>
+                  </mat-expansion-panel>
+                }
+              </mat-card-content>
+            </mat-card>
+          }
         </div>
       </div>
     </mat-dialog-content>
-
+    
     <mat-dialog-actions align="end">
       <button mat-raised-button color="primary" mat-dialog-close>
         <mat-icon>check</mat-icon>
         Close
       </button>
     </mat-dialog-actions>
-  `,
-  styles: [`
+    `,
+    styles: [`
     .dialog-header {
       display: flex;
       align-items: center;

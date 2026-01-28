@@ -42,7 +42,7 @@
 
 + **Modern Tech Stack**
 + .NET 10 Web API backend with CQRS pattern
-+ Angular 17 standalone components frontend
++ Angular 21 standalone components frontend
 + PostgreSQL 16.3 database
 + New Relic APM for monitoring
 + Docker Compose for full-stack orchestration
@@ -133,10 +133,10 @@ docker-compose up -d
 13. Real database on CI Tests
 14. Docker and Docker-Compose
 
-### Frontend (Angular 17)
+### Frontend (Angular 21)
 
 **Technology:**
-+ Angular 17 with Standalone Components
++ Angular 21 with Standalone Components
 + Angular Material Design
 + Reactive Forms
 + RxJS for reactive programming
@@ -187,7 +187,7 @@ The application runs 3 containerized services:
 
 | Service | Port | Technology | Purpose |
 |---------|------|------------|---------|
-| **frontend** | 5200 | Angular 17 + Nginx | Web UI |
+| **frontend** | 5200 | Angular 21 + Nginx | Web UI |
 | **api** | 5010 | .NET 10 + New Relic | REST API with APM |
 | **postgresql** | 5432 | PostgreSQL 16.3 | Database |
 
@@ -657,7 +657,7 @@ Hunter/
 │       ├── Integration/                            # Integration tests
 │       └── Shared/Faker/                           # Test data generators
 │
-├── front-end/                                       # Angular 17 Frontend
+├── front-end/                                       # Angular 21 Frontend
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── components/                         # UI Components
@@ -863,7 +863,7 @@ For issues and questions:
 - [x] Email notifications for job changes
 - [x] User management with role-based access
 - [x] JWT authentication with refresh tokens
-- [x] Angular 17 frontend with Material Design
+- [x] Angular 21 frontend with Material Design
 - [x] Docker containerization
 - [x] CI/CD with GitHub Actions
 - [x] Elasticsearch + Kibana logging

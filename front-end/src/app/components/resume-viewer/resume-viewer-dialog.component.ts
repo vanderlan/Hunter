@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,17 +13,15 @@ export interface ResumeViewerData {
 }
 
 @Component({
-  selector: 'app-resume-viewer',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-resume-viewer',
+    imports: [
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule
-  ],
-  templateUrl: './resume-viewer-dialog.component.html',
-  styleUrl: './resume-viewer-dialog.component.scss'
+],
+    templateUrl: './resume-viewer-dialog.component.html',
+    styleUrl: './resume-viewer-dialog.component.scss'
 })
 export class ResumeViewerDialogComponent {
   resumeUrl: SafeResourceUrl | null = null;

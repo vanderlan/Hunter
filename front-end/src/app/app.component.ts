@@ -10,21 +10,20 @@ import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatDividerModule
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        RouterLink,
+        RouterLinkActive,
+        MatSidenavModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatDividerModule
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   isAuthenticated$ = this.authService.isAuthenticated$;

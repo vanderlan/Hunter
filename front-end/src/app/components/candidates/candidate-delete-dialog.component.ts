@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,60 +12,62 @@ export interface CandidateDeleteDialogData {
 }
 
 @Component({
-  selector: 'app-candidate-delete-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-candidate-delete-dialog',
+    imports: [
     MatDialogModule,
     MatButtonModule,
     MatIconModule
-  ],
-  template: `
+],
+    template: `
     <div class="delete-dialog">
       <h2 mat-dialog-title>
         <mat-icon class="warning-icon">warning</mat-icon>
         Confirm Deletion
       </h2>
-      
+    
       <mat-dialog-content>
         <p class="confirmation-message">
-          Are you sure you want to delete candidate 
+          Are you sure you want to delete candidate
           <strong>{{ data.candidate.name || data.candidate.email || 'Unknown' }}</strong>?
         </p>
-        
-        <div class="warning-box" *ngIf="data.hasHiringProcess">
-          <mat-icon>info</mat-icon>
-          <div>
-            <strong>Warning:</strong> This candidate has existing hiring processes.
-            All related data will be permanently deleted including:
-            <ul>
-              <li>CV Analysis records</li>
-              <li>Job matches</li>
-              <li>Hiring process history</li>
-              <li>Status changes and notes</li>
-              <li>Uploaded files</li>
-            </ul>
+    
+        @if (data.hasHiringProcess) {
+          <div class="warning-box">
+            <mat-icon>info</mat-icon>
+            <div>
+              <strong>Warning:</strong> This candidate has existing hiring processes.
+              All related data will be permanently deleted including:
+              <ul>
+                <li>CV Analysis records</li>
+                <li>Job matches</li>
+                <li>Hiring process history</li>
+                <li>Status changes and notes</li>
+                <li>Uploaded files</li>
+              </ul>
+            </div>
           </div>
-        </div>
-
-        <div class="info-box" *ngIf="!data.hasHiringProcess">
-          <mat-icon>info</mat-icon>
-          <div>
-            The following data will be permanently deleted:
-            <ul>
-              <li>Candidate information</li>
-              <li>CV Analysis records</li>
-              <li>Job matches</li>
-              <li>Uploaded files</li>
-            </ul>
+        }
+    
+        @if (!data.hasHiringProcess) {
+          <div class="info-box">
+            <mat-icon>info</mat-icon>
+            <div>
+              The following data will be permanently deleted:
+              <ul>
+                <li>Candidate information</li>
+                <li>CV Analysis records</li>
+                <li>Job matches</li>
+                <li>Uploaded files</li>
+              </ul>
+            </div>
           </div>
-        </div>
-
+        }
+    
         <p class="final-warning">
           <strong>This action cannot be undone.</strong>
         </p>
       </mat-dialog-content>
-      
+    
       <mat-dialog-actions align="end">
         <button mat-button (click)="onCancel()">Cancel</button>
         <button mat-raised-button color="warn" (click)="onConfirm()">
@@ -74,8 +76,8 @@ export interface CandidateDeleteDialogData {
         </button>
       </mat-dialog-actions>
     </div>
-  `,
-  styles: [`
+    `,
+    styles: [`
     .delete-dialog {
       font-family: Roboto, sans-serif;
       min-width: 450px;
