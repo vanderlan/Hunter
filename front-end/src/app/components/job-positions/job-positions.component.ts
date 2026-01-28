@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,10 +20,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-job-positions',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-job-positions',
+    imports: [
     FormsModule,
     ReactiveFormsModule,
     MatCardModule,
@@ -38,9 +36,9 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule
-  ],
-  templateUrl: './job-positions.component.html',
-  styleUrl: './job-positions.component.scss'
+],
+    templateUrl: './job-positions.component.html',
+    styleUrl: './job-positions.component.scss'
 })
 export class JobPositionsComponent implements OnInit {
   displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'isActive', 'actions'];

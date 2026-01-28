@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -11,10 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-login',
+    imports: [
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -22,9 +20,9 @@ import { AuthService } from '../../services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule
-  ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.scss'
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;

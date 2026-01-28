@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,10 +16,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-open-positions',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-open-positions',
+    imports: [
     FormsModule,
     MatCardModule,
     MatIconModule,
@@ -28,9 +26,9 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
     MatFormFieldModule,
     MatInputModule,
     MatSnackBarModule
-  ],
-  templateUrl: './open-positions.component.html',
-  styleUrl: './open-positions.component.scss'
+],
+    templateUrl: './open-positions.component.html',
+    styleUrl: './open-positions.component.scss'
 })
 export class OpenPositionsComponent implements OnInit, OnDestroy {
   positions: JobPosition[] = [];

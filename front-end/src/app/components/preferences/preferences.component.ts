@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,10 +11,8 @@ import { UserService } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
 
 @Component({
-  selector: 'app-preferences',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-preferences',
+    imports: [
     ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
@@ -22,9 +20,9 @@ import { NotificationService } from '../../services/notification.service';
     MatCheckboxModule,
     MatSnackBarModule,
     MatProgressSpinnerModule
-  ],
-  templateUrl: './preferences.component.html',
-  styleUrl: './preferences.component.scss'
+],
+    templateUrl: './preferences.component.html',
+    styleUrl: './preferences.component.scss'
 })
 export class PreferencesComponent implements OnInit {
   preferencesForm: FormGroup;

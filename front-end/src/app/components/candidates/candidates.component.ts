@@ -21,26 +21,25 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-candidates',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule,
-    MatMenuModule
-  ],
-  templateUrl: './candidates.component.html',
-  styleUrl: './candidates.component.scss'
+    selector: 'app-candidates',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSnackBarModule,
+        MatProgressSpinnerModule,
+        MatTooltipModule,
+        MatMenuModule
+    ],
+    templateUrl: './candidates.component.html',
+    styleUrl: './candidates.component.scss'
 })
 export class CandidatesComponent implements OnInit {
   displayedColumns: string[] = ['name', 'email', 'phoneNumber', 'analyzedAt', 'analyzedByUserName', 'actions'];

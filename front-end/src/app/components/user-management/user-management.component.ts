@@ -20,27 +20,26 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-user-management',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatCardModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule,
-    MatPaginatorModule,
-    MatTooltipModule,
-    MatCheckboxModule
-  ],
-  templateUrl: './user-management.component.html',
-  styleUrl: './user-management.component.scss'
+    selector: 'app-user-management',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        FormsModule,
+        MatCardModule,
+        MatTableModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        MatProgressSpinnerModule,
+        MatPaginatorModule,
+        MatTooltipModule,
+        MatCheckboxModule
+    ],
+    templateUrl: './user-management.component.html',
+    styleUrl: './user-management.component.scss'
 })
 export class UserManagementComponent implements OnInit {
 displayedColumns: string[] = ['name', 'email', 'profile', 'createdAt', 'lastLoginAt', 'actions'];
