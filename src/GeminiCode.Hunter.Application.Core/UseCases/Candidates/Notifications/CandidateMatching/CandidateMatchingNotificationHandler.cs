@@ -98,7 +98,7 @@ public class CandidateMatchingNotificationHandler(
 
                         // Extract text from the stored PDF
                         string cvText;
-                        using (var stream = new System.IO.MemoryStream(candidateFile.File.FileData))
+                        using (var stream = new MemoryStream(candidateFile.File.FileData))
                         {
                             cvText = await pdfService.ExtractTextFromPdfAsync(stream);
                         }
@@ -111,7 +111,7 @@ public class CandidateMatchingNotificationHandler(
 
                         var match = analysisResult.Matches.FirstOrDefault();
                         
-                        if (match != null && match.MatchPercentage > 85)
+                        if (match != null && match.MatchPercentage >= 80)
                         {
                             candidateMatches.Add(new CandidateMatchInfo
                             {
