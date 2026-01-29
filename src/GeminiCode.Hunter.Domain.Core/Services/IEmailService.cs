@@ -48,4 +48,12 @@ public interface IEmailService
         string jobTitle,
         string noteText,
         string addedByUserName);
+    
+    Task SendHiringProcessCancelledNotificationAsync(
+        List<string> toEmails,
+        string candidateName,
+        string jobTitle,
+        string jobCode,
+        string cancelledByUserName,
+        string cancelReason);
 }

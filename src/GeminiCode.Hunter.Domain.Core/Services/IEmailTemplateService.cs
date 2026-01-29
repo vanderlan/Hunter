@@ -10,4 +10,5 @@ public interface IEmailTemplateService
     string RenderCandidateReferralTemplate(Dictionary<string, object> data);
     string RenderStatusChangeTemplate(Dictionary<string, object> data);
     string RenderNoteAddedTemplate(Dictionary<string, object> data);
+    string RenderHiringProcessCancelledTemplate(Dictionary<string, object> data);
 }

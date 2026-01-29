@@ -22,9 +22,19 @@
                 {{ process.candidate.name }} - {{ process.jobPosition.title }}
               </mat-card-subtitle>
             </div>
-            <mat-chip [color]="getStatusColor(process.status)" selected class="status-chip">
-              {{ getStatusLabel(process.status) }}
-            </mat-chip>
+            <div class="header-actions">
+              <mat-chip [color]="getStatusColor(process.status)" selected class="status-chip">
+                {{ getStatusLabel(process.status) }}
+              </mat-chip>
+              <button 
+                mat-button 
+                color="warn"
+                (click)="cancelReferral()"
+                class="cancel-button">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+            </div>
           </div>
         </mat-card-header>
       </mat-card>

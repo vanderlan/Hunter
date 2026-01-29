@@ -425,6 +425,67 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task SendHiringProcessCancelledNotificationAsync(
+        List<string> toEmails,
+        string candidateName,
+        string jobTitle,
+        string jobCode,
+        string cancelledByUserName,
+        string cancelReason)
+    {
+        try
+        {
+            if (!toEmails.Any())
+            {
+                _logger.LogInformation("No admin users to notify about hiring process cancellation");
+                return;
+            }
+
+            _logger.LogInformation("Sending hiring process cancellation notification to {Count} admins", toEmails.Count);
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["CandidateName"] = candidateName,
+                ["JobTitle"] = jobTitle,
+                ["JobCode"] = jobCode,
+                ["CancelledByUserName"] = cancelledByUserName,
+                ["CancelReason"] = cancelReason,
+                ["ApplicationUrl"] = _applicationUrl,
+                ["CurrentYear"] = DateTime.UtcNow.Year
+            };
+
+            var htmlBody = _templateService.RenderHiringProcessCancelledTemplate(templateData);
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
+            foreach (var email in toEmails)
+            {
+                message.To.Add(new MailboxAddress("", email));
+            }
+            message.Subject = $"Hiring Process Cancelled - {candidateName} for {jobTitle}";
+            
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = htmlBody
+            };
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
+
+            _logger.LogInformation("Hiring process cancellation notification sent successfully to {Emails}", 
+                string.Join(", ", toEmails));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send hiring process cancellation notification. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
+        }
+    }
+
     private static string GetMatchLevel(double percentage)
     {
         return percentage >= AIMatching.HighMatchPercentage 
