@@ -36,8 +36,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseRequestTimeouts();
 
-app.UseRateLimiter();
-
 app.ConfigureApp();
 
 app.RunMigrations();

@@ -39,6 +39,8 @@ public static class Bootstrapper
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseRateLimiter();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapDefaultControllerRoute();
