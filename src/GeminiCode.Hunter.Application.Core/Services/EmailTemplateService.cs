@@ -77,6 +77,15 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         return result;
     }
 
+    public string RenderHiringProcessCancelledTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering hiring process cancelled template");
+        var template = LoadTemplate("HiringProcessCancelledTemplate.html");
+        var result = RenderTemplate(template, data);
+        logger.LogInformation("Template rendered, length: {Length}", result.Length);
+        return result;
+    }
+
     private string LoadTemplate(string templateName)
     {
         try

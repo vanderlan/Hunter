@@ -2,6 +2,7 @@ using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.AddNote;
+using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Cancel;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.GenerateAIInsights;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Start;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.UpdateStatus;
@@ -101,5 +102,17 @@ public class HiringProcessController(IMediator mediator) : ApiController(mediato
     {
         var response = await Mediator.Send(new GenerateAIInsightsRequest { PublicId = id });
         return Ok(response);
+    }
+
+    [HttpDelete("{id}")]
+    [SwaggerResponse((int)HttpStatusCode.NoContent, "Hiring process cancelled successfully")]
+    [SwaggerResponse((int)HttpStatusCode.NotFound)]
+    [SwaggerResponse((int)HttpStatusCode.BadRequest)]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Cancel(string id, [FromBody] CancelHiringProcessRequest request)
+    {
+        request.PublicId = id;
+        await Mediator.Send(request);
+        return NoContent();
     }
 }

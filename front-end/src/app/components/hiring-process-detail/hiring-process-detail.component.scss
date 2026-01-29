@@ -37,8 +37,21 @@
       }
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
     .status-chip {
       flex-shrink: 0;
+    }
+
+    .cancel-button {
+      mat-icon {
+        margin-right: 4px;
+      }
     }
   }
 }

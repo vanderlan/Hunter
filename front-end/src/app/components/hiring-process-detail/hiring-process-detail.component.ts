@@ -282,4 +282,47 @@ export class HiringProcessDetailComponent implements OnInit {
       }
     });
   }
+
+  cancelReferral(): void {
+    if (!this.process) {
+      return;
+    }
+
+    import('./cancel-confirmation-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.CancelConfirmationDialogComponent, {
+        data: {
+          candidateName: this.process!.candidate.name || 'Unknown',
+          jobTitle: this.process!.jobPosition.title
+        },
+        width: '550px',
+        maxWidth: '90vw',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result?.confirmed && result?.reason) {
+          this.performCancellation(result.reason);
+        }
+      });
+    });
+  }
+
+  private performCancellation(reason: string): void {
+    if (!this.process) {
+      return;
+    }
+
+    this.loading = true;
+    this.hiringProcessService.cancelHiringProcess(this.process.publicId, reason).subscribe({
+      next: () => {
+        this.notificationService.success('Referral cancelled successfully');
+        this.router.navigate(['/hiring-process']);
+      },
+      error: (error) => {
+        this.loading = false;
+        this.notificationService.error('Error cancelling referral');
+        console.error('Error cancelling referral:', error);
+      }
+    });
+  }
 }

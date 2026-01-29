@@ -93,4 +93,11 @@ export class HiringProcessService {
       headers: this.getHeaders()
     });
   }
+
+  cancelHiringProcess(id: string, cancelReason: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders(),
+      body: { cancelReason }
+    });
+  }
 }
