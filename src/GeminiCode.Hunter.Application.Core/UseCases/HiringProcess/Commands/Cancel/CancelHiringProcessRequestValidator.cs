@@ -6,10 +6,6 @@ public class CancelHiringProcessRequestValidator : AbstractValidator<CancelHirin
 {
     public CancelHiringProcessRequestValidator()
     {
-        RuleFor(x => x.PublicId)
-            .NotEmpty()
-            .WithMessage("Hiring Process ID is required");
-
         RuleFor(x => x.CancelReason)
             .NotEmpty()
             .WithMessage("Cancel reason is required")
