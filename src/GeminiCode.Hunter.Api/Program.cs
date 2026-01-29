@@ -31,11 +31,9 @@ builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
 
-// app.UseSerilogRequestLogging();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
-// Add request timeout middleware
 app.UseRequestTimeouts();
 
 app.ConfigureApp();

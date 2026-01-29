@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 using static GeminiCode.Hunter.Domain.Core.Authentication.AuthorizationConfiguration;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GeminiCode.Hunter.Api.Controllers.V1;
 
@@ -72,10 +73,12 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("Analyze")]
     [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
+    [EnableRateLimiting("cvanalysis")]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(AnalyzeCvResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> AnalyzeCv(IFormFile cvFile)
     {
         var request = new AnalyzeCvRequest { CvFile = cvFile };

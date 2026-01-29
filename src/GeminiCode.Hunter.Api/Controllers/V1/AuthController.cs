@@ -10,6 +10,7 @@ using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Api.Models;
 using GeminiCode.Hunter.Application.Core.UseCases.Auth.Commands.LoginWithCredentials;
 using GeminiCode.Hunter.Application.Core.UseCases.Auth.Commands.LoginWithRefreshToken;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace GeminiCode.Hunter.Api.Controllers.V1;
 
@@ -19,9 +20,11 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 public class AuthController(IMediator mediator, IConfiguration configuration) : ApiController(mediator)
 {
     [HttpPost("Login")]
+    [EnableRateLimiting("login")]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success reponse with a Token, Refresh Token and expiration date", typeof(LoginWithCredentialsResponse))]
     [SwaggerResponse((int)HttpStatusCode.BadRequest, "A error response with the error description", typeof(ExceptionResponse))]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [SwaggerResponse((int)HttpStatusCode.TooManyRequests, "Rate limit exceeded")]
     public async Task<IActionResult> Login([FromBody] LoginWithCredentialsRequest loginWithCredentialsRequest)
     {
         return AuthorizeUser(await Mediator.Send(loginWithCredentialsRequest));

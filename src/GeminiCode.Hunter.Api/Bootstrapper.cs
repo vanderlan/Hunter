@@ -39,6 +39,8 @@ public static class Bootstrapper
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseRateLimiter();
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapDefaultControllerRoute();
@@ -49,11 +51,9 @@ public static class Bootstrapper
     {
         services.AddCors();
 
-        // Register ApplicationSettings
         var applicationSettings = configuration.GetSection("ApplicationSettings").Get<ApplicationSettings>() ?? new ApplicationSettings();
         services.AddSingleton(applicationSettings);
-        
-        // Initialize DateTimeExtensions with ApplicationSettings
+
         DateTimeExtensions.Initialize(applicationSettings);
 
         services.ConfigureAuthentication(configuration);
@@ -65,9 +65,9 @@ public static class Bootstrapper
         services.ConfigureApiVersioning();
 
         services.AddMvc(options =>
-                        {
-                            options.Filters.Add<CustomValidationAttribute>();
-                        })
+        {
+            options.Filters.Add<CustomValidationAttribute>();
+        })
             .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddDataAnnotationsLocalization();
 
@@ -93,7 +93,8 @@ public static class Bootstrapper
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IApplicationAssembly).Assembly));
 
-        // Register background service for automatic job synchronization
         services.AddHostedService<JobSyncBackgroundService>();
+
+        services.ConfigureRateLimit(configuration);
     }
 }
