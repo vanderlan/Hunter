@@ -10,21 +10,20 @@ import { AuthService } from './services/auth.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatSidenavModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatDividerModule
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        RouterLink,
+        RouterLinkActive,
+        MatSidenavModule,
+        MatButtonModule,
+        MatIconModule,
+        MatMenuModule,
+        MatDividerModule
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   isAuthenticated$ = this.authService.isAuthenticated$;
@@ -80,6 +79,7 @@ export class AppComponent {
   getPageTitle(): string {
     const route = this.currentRoute;
     if (route === '/' || route === '') return 'Analyze CV';
+    if (route.includes('/open-positions')) return 'Open Positions';
     if (route.includes('/hiring-process')) return this.getReferralsLabel();
     if (route.includes('/candidates')) return 'Candidates';
     if (route.includes('/admin')) return 'Admin Panel';

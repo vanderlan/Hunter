@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Services;
 
@@ -8,7 +8,7 @@ public class CvInfoExtractionService(
     ILogger<CvInfoExtractionService> logger,
     IAIService openAIService) : ICvInfoExtractionService
 {
-    public (string? name, string? email, string? phone) ExtractBasicInfo(string cvText)
+    public async Task<(string? name, string? email, string? phone)> ExtractBasicInfoWithAIAsync(string cvText)
     {
         if (string.IsNullOrWhiteSpace(cvText))
         {
@@ -16,130 +16,87 @@ public class CvInfoExtractionService(
             return (null, null, null);
         }
 
-        var name = ExtractName(cvText);
-        var email = ExtractEmail(cvText);
-        var phone = ExtractPhone(cvText);
-
-        logger.LogInformation("Extracted CV info - Name: {Name}, Email: {Email}, Phone: {Phone}", 
-            name ?? "Not found", 
-            email ?? "Not found", 
-            phone ?? "Not found");
-
-        return (name, email, phone);
-    }
-
-    public async Task<string?> ExtractNameWithAIAsync(string cvText)
-    {
-        if (string.IsNullOrWhiteSpace(cvText))
-        {
-            logger.LogWarning("CV text is empty, cannot extract name");
-            return null;
-        }
-
         try
         {
-            logger.LogInformation("Extracting candidate name using OpenAI");
+            var cvSample = cvText.Length > 2000 ? cvText.Substring(0, 2000) : cvText;
 
-            // Take first 1000 characters of CV for name extraction (usually at the top)
-            var cvSample = cvText.Length > 1000 ? cvText.Substring(0, 1000) : cvText;
+            var prompt = $@"Extract the following information from this CV text and return it as a JSON object with these exact fields: ""name"", ""email"", ""phone"".
+If any information is not found, use null for that field.
 
-            var prompt = $@"Extract ONLY the candidate's full name from this CV text. 
-Return just the name, nothing else. If you cannot find the name, return 'Unknown'.
+Rules:
+- Extract the full name of the candidate
+- Extract the email address
+- Extract the phone number (keep the original format)
+- Return ONLY valid JSON, no additional text
 
 CV Text:
 {cvSample}
 
-Candidate Name:";
+JSON Response:";
 
-            var name = await openAIService.GetCompletionAsync(prompt, maxTokens: 50);
+            var response = await openAIService.GetCompletionAsync(prompt, maxTokens: 150);
             
-            if (string.IsNullOrWhiteSpace(name) || name.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(response))
             {
-                logger.LogWarning("OpenAI could not extract name from CV");
-                return null;
+                logger.LogWarning("AI returned empty response for CV extraction");
+                return (null, null, null);
             }
 
-            name = name.Trim().Replace("\"", "").Replace("'", "");
+            response = response.Trim();
             
-            logger.LogInformation("Extracted name using OpenAI: {Name}", name);
-            
-            return name;
+            if (response.StartsWith("```"))
+            {
+                var lines = response.Split('\n');
+                response = string.Join('\n', lines.Skip(1).Take(lines.Length - 2));
+            }
+
+            var extractedInfo = JsonSerializer.Deserialize<CvExtractedInfo>(response, new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true 
+            });
+
+            if (extractedInfo == null)
+            {
+                logger.LogWarning("Failed to parse AI response as JSON");
+                return (null, null, null);
+            }
+
+            var name = CleanValue(extractedInfo.Name);
+            var email = CleanValue(extractedInfo.Email);
+            var phone = CleanValue(extractedInfo.Phone);
+
+            return (name, email, phone);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error extracting name with OpenAI");
-            return null;
+            logger.LogError(ex, "Error extracting CV information with AI");
+            return (null, null, null);
         }
     }
 
-    private string? ExtractName(string cvText)
+    private static string? CleanValue(string? value)
     {
-        // Try to extract name from first few lines (usually at the top)
-        var lines = cvText.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        
-        if (lines.Length == 0)
+        if (string.IsNullOrWhiteSpace(value))
             return null;
 
-        // Look for the first non-empty line that's not too long and contains letters
-        foreach (var line in lines.Take(10))
-        {
-            var trimmed = line.Trim();
-            
-            // Skip empty lines, email lines, phone lines, and very long lines
-            if (string.IsNullOrWhiteSpace(trimmed) || 
-                trimmed.Length > 50 || 
-                trimmed.Length < 3 ||
-                trimmed.Contains('@') || 
-                Regex.IsMatch(trimmed, @"\d{3,}"))
-            {
-                continue;
-            }
+        value = value.Trim().Replace("\"", "").Replace("'", "");
 
-            // Check if it looks like a name (mostly letters and spaces)
-            if (Regex.IsMatch(trimmed, @"^[A-Za-zÀ-ÿ\s'-]{3,50}$"))
-            {
-                return trimmed;
-            }
+        // Check for placeholder values that indicate "not found"
+        if (value.Equals("Unknown", StringComparison.OrdinalIgnoreCase) ||
+            value.Equals("N/A", StringComparison.OrdinalIgnoreCase) ||
+            value.Equals("Not found", StringComparison.OrdinalIgnoreCase) ||
+            value.Equals("None", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
         }
 
-        return null;
+        return value;
     }
 
-    private string? ExtractEmail(string cvText)
+    private class CvExtractedInfo
     {
-        // Email regex pattern
-        var emailPattern = @"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b";
-        var match = Regex.Match(cvText, emailPattern);
-
-        return match.Success ? match.Value : null;
-    }
-
-    private string? ExtractPhone(string cvText)
-    {
-        // Phone patterns (various formats)
-        var phonePatterns = new[]
-        {
-            @"\+?\d{1,3}[-.\s]?\(?\d{2,3}\)?[-.\s]?\d{3,4}[-.\s]?\d{4}", // International format
-            @"\(?\d{2,3}\)?[-.\s]?\d{4,5}[-.\s]?\d{4}",                   // Brazilian format
-            @"\d{10,11}",                                                  // Compact format
-        };
-
-        foreach (var pattern in phonePatterns)
-        {
-            var match = Regex.Match(cvText, pattern);
-            if (match.Success)
-            {
-                // Clean up the phone number
-                var phone = match.Value.Trim();
-                
-                // Skip if it looks like a date (e.g., 2024-12-29)
-                if (Regex.IsMatch(phone, @"^\d{4}[-/]\d{2}[-/]\d{2}$"))
-                    continue;
-
-                return phone;
-            }
-        }
-
-        return null;
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
     }
 }

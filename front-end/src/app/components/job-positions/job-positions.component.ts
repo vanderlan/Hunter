@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,17 +10,18 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { JobPositionService } from '../../services/job-position.service';
 import { JobPosition } from '../../models/job.model';
+import { NotificationService } from '../../services/notification.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-job-positions',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-job-positions',
+    imports: [
     FormsModule,
     ReactiveFormsModule,
     MatCardModule,
@@ -35,9 +36,9 @@ import { JobPosition } from '../../models/job.model';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule
-  ],
-  templateUrl: './job-positions.component.html',
-  styleUrl: './job-positions.component.scss'
+],
+    templateUrl: './job-positions.component.html',
+    styleUrl: './job-positions.component.scss'
 })
 export class JobPositionsComponent implements OnInit {
   displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'isActive', 'actions'];
@@ -50,10 +51,11 @@ export class JobPositionsComponent implements OnInit {
   isEditing = false;
   jobPositionForm: FormGroup;
   currentJobPositionId: string | null = null;
+  private searchSubject = new Subject<string>();
 
   constructor(
     private jobPositionService: JobPositionService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private fb: FormBuilder,
     public dialog: MatDialog
   ) {
@@ -64,10 +66,19 @@ export class JobPositionsComponent implements OnInit {
       jobCode: ['', Validators.required],
       summary: [''],
       responsibilities: [''],
-      skills: [''],
+      requirements: [''],
       mustHaveSkills: [''],
       niceToHaveSkills: [''],
       isActive: [true]
+    });
+
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.pageIndex = 0;
+      this.loadJobPositions();
     });
   }
 
@@ -86,7 +97,7 @@ export class JobPositionsComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open('Error loading job positions', 'Close', { duration: 3000 });
+          this.notificationService.error('Error loading job positions');
         }
       });
   }
@@ -97,9 +108,9 @@ export class JobPositionsComponent implements OnInit {
     this.loadJobPositions();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadJobPositions();
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   showCreateForm(): void {
@@ -122,7 +133,7 @@ export class JobPositionsComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open('Error loading job position details', 'Close', { duration: 3000 });
+          this.notificationService.error('Error loading job position details');
           this.cancelEdit();
         }
       });
@@ -136,7 +147,7 @@ export class JobPositionsComponent implements OnInit {
 
   saveJobPosition(): void {
     if (this.jobPositionForm.invalid) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      this.notificationService.warning('Please fill in all required fields');
       return;
     }
 
@@ -149,13 +160,13 @@ export class JobPositionsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.loading = false;
-            this.snackBar.open('Job position updated successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Job position updated successfully');
             this.cancelEdit();
             this.loadJobPositions();
           },
           error: (error) => {
             this.loading = false;
-            this.snackBar.open(error.error?.message || 'Error updating job position', 'Close', { duration: 3000 });
+            this.notificationService.error(error.error?.message || 'Error updating job position');
           }
         });
     } else {
@@ -164,13 +175,13 @@ export class JobPositionsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.loading = false;
-            this.snackBar.open('Job position created successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Job position created successfully');
             this.cancelEdit();
             this.loadJobPositions();
           },
           error: (error) => {
             this.loading = false;
-            this.snackBar.open(error.error?.message || 'Error creating job position', 'Close', { duration: 3000 });
+            this.notificationService.error(error.error?.message || 'Error creating job position');
           }
         });
     }
@@ -183,12 +194,12 @@ export class JobPositionsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.loading = false;
-            this.snackBar.open('Job position deleted successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Job position deleted successfully');
             this.loadJobPositions();
           },
           error: (error) => {
             this.loading = false;
-            this.snackBar.open('Error deleting job position', 'Close', { duration: 3000 });
+            this.notificationService.error('Error deleting job position');
           }
         });
     }

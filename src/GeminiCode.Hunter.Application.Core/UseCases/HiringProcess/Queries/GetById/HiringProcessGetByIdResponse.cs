@@ -10,6 +10,8 @@ public class HiringProcessGetByIdResponse
     public UserInfo? LastUpdatedByUser { get; set; }
     public List<StatusHistoryItem> StatusHistory { get; set; } = [];
     public List<NoteItem> Notes { get; set; } = [];
+    public string? ReferralReason { get; set; }
+    public LastAIAnalysisInfo? LastAIAnalysis { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime LastUpdated { get; set; }
 }
@@ -19,6 +21,8 @@ public class CandidateInfo
     public string PublicId { get; set; } = string.Empty;
     public string? Name { get; set; }
     public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
+    public bool HasResume { get; set; }
 }
 
 public class JobPositionInfo
@@ -50,4 +54,11 @@ public class NoteItem
     public string Note { get; set; } = string.Empty;
     public string UserName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+}
+
+public class LastAIAnalysisInfo
+{
+    public string CvAnalysisPublicId { get; set; } = string.Empty;
+    public DateTime AnalyzedAt { get; set; }
+    public decimal MatchPercentage { get; set; }
 }

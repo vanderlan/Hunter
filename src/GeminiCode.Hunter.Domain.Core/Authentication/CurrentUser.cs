@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using static GeminiCode.Hunter.Domain.Core.Authentication.AuthorizationConfiguration;
 
 namespace GeminiCode.Hunter.Domain.Core.Authentication;
 
@@ -20,6 +21,7 @@ public class CurrentUser : ICurrentUser
     public string Id => IsAuthenticated() ? _claims.Find(x => x.Type == ClaimTypes.Sid).Value: string.Empty;
     public string Email => IsAuthenticated() ? _claims.Find(x => x.Type == ClaimTypes.Email).Value: string.Empty;
     public string Profile => IsAuthenticated() ? _claims.Find(x => x.Type == ClaimTypes.Role).Value : string.Empty;
+    public bool IsAdmin => IsAuthenticated() ? _claims.Find(x => x.Type == ClaimTypes.Role).Value == Roles.Admin : false;
 
     public bool IsAuthenticated()
     {

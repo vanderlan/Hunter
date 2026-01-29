@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,10 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { Candidate } from '../../models/candidate.model';
 
 @Component({
-  selector: 'app-candidate-edit-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-candidate-edit-dialog',
+    imports: [
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
@@ -21,47 +19,53 @@ import { Candidate } from '../../models/candidate.model';
     MatInputModule,
     MatProgressSpinnerModule,
     MatIconModule
-  ],
-  template: `
+],
+    template: `
     <h2 mat-dialog-title>Edit Candidate</h2>
-
+    
     <mat-dialog-content>
       <form [formGroup]="candidateForm" class="candidate-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" placeholder="Enter candidate name">
         </mat-form-field>
-
+    
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput formControlName="email" type="email" placeholder="candidate@example.com">
-          <mat-error *ngIf="candidateForm.get('email')?.hasError('email')">
-            Please enter a valid email address
-          </mat-error>
+          @if (candidateForm.get('email')?.hasError('email')) {
+            <mat-error>
+              Please enter a valid email address
+            </mat-error>
+          }
         </mat-form-field>
-
+    
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Phone Number</mat-label>
           <input matInput formControlName="phoneNumber" placeholder="Enter phone number">
         </mat-form-field>
       </form>
     </mat-dialog-content>
-
+    
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()" [disabled]="saving">
         Cancel
       </button>
-      <button 
-        mat-raised-button 
-        color="primary" 
-        (click)="onSave()" 
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSave()"
         [disabled]="!candidateForm.valid || saving">
-        <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
-        <span *ngIf="!saving">Save</span>
+        @if (saving) {
+          <mat-spinner diameter="20"></mat-spinner>
+        }
+        @if (!saving) {
+          <span>Save</span>
+        }
       </button>
     </mat-dialog-actions>
-  `,
-  styles: [`
+    `,
+    styles: [`
     .candidate-form {
       display: flex;
       flex-direction: column;

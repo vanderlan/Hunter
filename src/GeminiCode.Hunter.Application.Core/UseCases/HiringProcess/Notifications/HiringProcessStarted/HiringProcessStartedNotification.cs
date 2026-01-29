@@ -10,4 +10,5 @@ public class HiringProcessStartedNotification : INotification
     public string JobTitle { get; set; } = string.Empty;
     public string JobCode { get; set; } = string.Empty;
     public string StartedByUserName { get; set; } = string.Empty;
+    public string? ReferralReason { get; set; }
 }

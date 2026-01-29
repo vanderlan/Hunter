@@ -7,6 +7,8 @@ export interface HiringProcess {
   lastUpdatedByUser?: UserInfo;
   statusHistory: StatusHistoryItem[];
   notes: NoteItem[];
+  referralReason?: string;
+  lastAIAnalysis?: LastAIAnalysisInfo;
   createdAt: Date;
   lastUpdated: Date;
 }
@@ -28,6 +30,8 @@ export interface CandidateInfo {
   publicId: string;
   name?: string;
   email?: string;
+  phoneNumber?: string;
+  hasResume?: boolean;
 }
 
 export interface JobPositionInfo {
@@ -57,6 +61,12 @@ export interface NoteItem {
   createdAt: Date;
 }
 
+export interface LastAIAnalysisInfo {
+  cvAnalysisPublicId: string;
+  analyzedAt: Date;
+  matchPercentage: number;
+}
+
 export interface DashboardStats {
   statusCounts: { [key: string]: number };
   totalProcesses: number;
@@ -71,17 +81,20 @@ export interface PagedHiringProcesses {
 }
 
 export enum HiringProcessStatus {
-  Referred = 1,
-  Screening = 2,
-  ConsultantTechnicalInterview = 3,
-  ClientInterview = 4,
-  Hired = 5,
-  Reproved = 6
+  New = 0,
+  ReferredByPartner = 1,
+  ReferredInternally = 2,
+  Screening = 3,
+  ConsultantTechnicalInterview = 4,
+  ClientInterview = 5,
+  Hired = 6,
+  Reproved = 7
 }
 
 export interface StartHiringProcessRequest {
   candidateId: string;
   jobPositionId: string;
+  referralReason?: string;
 }
 
 export interface StartHiringProcessResponse {
@@ -96,4 +109,8 @@ export interface UpdateStatusRequest {
 
 export interface AddNoteRequest {
   note: string;
+}
+
+export interface GenerateAIInsightsResponse {
+  referralReason: string;
 }

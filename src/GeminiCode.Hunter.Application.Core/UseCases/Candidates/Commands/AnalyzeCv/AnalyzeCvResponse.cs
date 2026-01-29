@@ -18,6 +18,7 @@ public class CandidateInfoDto
 
 public class JobMatchDto
 {
+    public string JobPositionId { get; set; } = string.Empty;
     public string JobCode { get; set; } = string.Empty;
     public string JobTitle { get; set; } = string.Empty;
     public string CompanyCode { get; set; } = string.Empty;
@@ -29,4 +30,6 @@ public class JobMatchDto
     public string? Summary { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
+    public string? ReferralReason { get; set; }
+    public string? WhatIsMissingForPerfectMatch { get; set; }
 }

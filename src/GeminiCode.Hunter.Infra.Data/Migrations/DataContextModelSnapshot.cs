@@ -17,7 +17,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.1")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -35,10 +35,6 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("CvText")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -233,6 +229,9 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
+                    b.Property<string>("WhatIsMissingForPerfectMatch")
+                        .HasColumnType("text");
+
                     b.HasKey("CvAnalysisMatchId");
 
                     b.HasIndex("CvAnalysisId");
@@ -331,6 +330,9 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ReferralReason")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -502,7 +504,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Property<string>("Responsibilities")
                         .HasColumnType("text");
 
-                    b.Property<string>("Skills")
+                    b.Property<string>("Requirements")
                         .HasColumnType("text");
 
                     b.Property<string>("Summary")
@@ -578,6 +580,9 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp without time zone");

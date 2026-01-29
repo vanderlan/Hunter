@@ -2,6 +2,7 @@ using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.AddNote;
+using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.GenerateAIInsights;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.Start;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Commands.UpdateStatus;
 using GeminiCode.Hunter.Application.Core.UseCases.HiringProcess.Queries.GetById;
@@ -87,5 +88,18 @@ public class HiringProcessController(IMediator mediator) : ApiController(mediato
         request.HiringProcessId = id;
         await Mediator.Send(request);
         return NoContent();
+    }
+
+    [HttpPost("{id}/GenerateAIInsights")]
+    [AuthorizeFor(Roles.Admin)]
+    [SwaggerResponse((int)HttpStatusCode.OK, "AI insights generated successfully", typeof(GenerateAIInsightsResponse))]
+    [SwaggerResponse((int)HttpStatusCode.NotFound)]
+    [SwaggerResponse((int)HttpStatusCode.BadRequest)]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    [SwaggerResponse((int)HttpStatusCode.Forbidden)]
+    public async Task<IActionResult> GenerateAIInsights(string id)
+    {
+        var response = await Mediator.Send(new GenerateAIInsightsRequest { PublicId = id });
+        return Ok(response);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 
 namespace GeminiCode.Hunter.Domain.Core.Entities;

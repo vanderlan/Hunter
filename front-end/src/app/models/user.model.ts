@@ -11,6 +11,7 @@ export interface User {
   createdAt?: Date;
   lastUpdated?: Date;
   receiveJobChangeNotifications?: boolean;
+  lastLoginAt?: Date;
 }
 
 export interface UserCreateRequest {

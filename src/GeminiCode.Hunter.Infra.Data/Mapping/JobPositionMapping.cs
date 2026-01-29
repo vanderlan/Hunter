@@ -17,7 +17,7 @@ public class JobPositionMapping : IEntityTypeConfiguration<JobPosition>
         builder.Property(x => x.JobCode).HasMaxLength(50).IsRequired();
         builder.Property(x => x.Summary).HasColumnType("text");
         builder.Property(x => x.Responsibilities).HasColumnType("text");
-        builder.Property(x => x.Skills).HasColumnType("text");
+        builder.Property(x => x.Requirements).HasColumnType("text");
         builder.Property(x => x.MustHaveSkills).HasColumnType("text");
         builder.Property(x => x.NiceToHaveSkills).HasColumnType("text");
         builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);

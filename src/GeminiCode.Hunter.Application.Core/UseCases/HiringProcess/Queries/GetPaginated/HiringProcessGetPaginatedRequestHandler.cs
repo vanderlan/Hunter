@@ -1,4 +1,5 @@
 using GeminiCode.Hunter.Domain.Core.Authentication;
+using GeminiCode.Hunter.Domain.Core.Extensions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
@@ -40,8 +41,8 @@ public class HiringProcessGetPaginatedRequestHandler(
             JobCode = hp.JobPosition?.JobCode ?? "",
             CompanyCode = hp.JobPosition?.CompanyCode ?? "",
             CreatedByUserName = hp.CreatedByUser?.Name ?? "",
-            CreatedAt = hp.CreatedAt,
-            LastUpdated = hp.LastUpdated
+            CreatedAt = hp.CreatedAt.ToApplicationTime(), // Convert to configured timezone
+            LastUpdated = hp.LastUpdated.ToApplicationTime() // Convert to configured timezone
         }).ToList();
 
         logger.LogInformation("Retrieved {Count} hiring processes", response.Count);

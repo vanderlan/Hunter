@@ -2,6 +2,8 @@ using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Delete;
+using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.ReAnalyzeCv;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.UploadResume;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.DownloadResume;
@@ -9,6 +11,7 @@ using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetById;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using MediatR;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -69,9 +72,10 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     /// <param name="cvFile">The CV file in PDF format (max 10MB)</param>
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("Analyze")]
+    [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
     [EnableRateLimiting("cvanalysis")]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AnalyzeCvResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
@@ -80,11 +84,26 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
         var request = new AnalyzeCvRequest { CvFile = cvFile };
         var response = await Mediator.Send(request);
 
-        return Ok(new
-        {
-            message = "CV analysis completed successfully",
-            data = response
-        });
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Re-analyzes an existing candidate's CV against all active job positions
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <returns>List of matching job positions with match percentages and analysis</returns>
+    [HttpPost("{id}/ReAnalyze")]
+    [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
+    [ProducesResponseType(typeof(ReAnalyzeCvResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ReAnalyzeCv(string id)
+    {
+        var request = new ReAnalyzeCvRequest { CandidateId = id };
+        var response = await Mediator.Send(request);
+
+        return Ok(response);
     }
 
     /// <summary>
@@ -124,5 +143,23 @@ public class CandidatesController(IMediator mediator) : ApiController(mediator)
     {
         var response = await Mediator.Send(new CandidateDownloadResumeRequest(id));
         return File(response.FileData, response.ContentType, response.FileName);
+    }
+
+    /// <summary>
+    /// Deletes a candidate and all related data (CvAnalysis, Matches, Files, HiringProcess)
+    /// Partner users can only delete candidates without hiring processes
+    /// Admin users can delete any candidate
+    /// </summary>
+    /// <param name="id">The candidate's public ID</param>
+    /// <returns>No content on success</returns>
+    [HttpDelete("{id}")]
+    [SwaggerResponse((int)HttpStatusCode.NoContent, "Candidate deleted successfully")]
+    [SwaggerResponse((int)HttpStatusCode.NotFound, "Candidate not found")]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Only Admin can delete candidates with hiring processes")]
+    [SwaggerResponse((int)HttpStatusCode.Forbidden, "Insufficient permissions")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await Mediator.Send(new CandidateDeleteRequest { PublicId = id });
+        return NoContent();
     }
 }

@@ -9,36 +9,37 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { CandidateService } from '../../services/candidate.service';
+import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 import { Candidate } from '../../models/candidate.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-candidates',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule,
-    MatMenuModule
-  ],
-  templateUrl: './candidates.component.html',
-  styleUrl: './candidates.component.scss'
+    selector: 'app-candidates',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSnackBarModule,
+        MatProgressSpinnerModule,
+        MatTooltipModule,
+        MatMenuModule
+    ],
+    templateUrl: './candidates.component.html',
+    styleUrl: './candidates.component.scss'
 })
 export class CandidatesComponent implements OnInit {
   displayedColumns: string[] = ['name', 'email', 'phoneNumber', 'analyzedAt', 'analyzedByUserName', 'actions'];
@@ -53,10 +54,10 @@ export class CandidatesComponent implements OnInit {
 
   constructor(
     private candidateService: CandidateService,
-    private snackBar: MatSnackBar,
+    private authService: AuthService,
+    private notificationService: NotificationService,
     public dialog: MatDialog
   ) {
-    // Setup auto-search with debounce
     this.searchSubject.pipe(
       debounceTime(400),
       distinctUntilChanged()
@@ -81,7 +82,7 @@ export class CandidatesComponent implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open('Error loading candidates', 'Close', { duration: 3000 });
+          this.notificationService.error('Error loading candidates');
         }
       });
   }
@@ -111,12 +112,12 @@ export class CandidatesComponent implements OnInit {
           this.candidateService.updateCandidate(result.publicId, result).subscribe({
             next: () => {
               this.loading = false;
-              this.snackBar.open('Candidate updated successfully', 'Close', { duration: 3000 });
+              this.notificationService.success('Candidate updated successfully');
               this.loadCandidates();
             },
             error: (error) => {
               this.loading = false;
-              this.snackBar.open(error.error?.message || 'Error updating candidate', 'Close', { duration: 3000 });
+              this.notificationService.error(error.error?.message || 'Error updating candidate');
             }
           });
         }
@@ -146,14 +147,14 @@ export class CandidatesComponent implements OnInit {
       
       // Validate file type
       if (file.type !== 'application/pdf') {
-        this.snackBar.open('Only PDF files are allowed', 'Close', { duration: 3000 });
+        this.notificationService.warning('Only PDF files are allowed');
         input.value = '';
         return;
       }
 
       // Validate file size (10MB)
       if (file.size > 10 * 1024 * 1024) {
-        this.snackBar.open('File size must not exceed 10 MB', 'Close', { duration: 3000 });
+        this.notificationService.warning('File size must not exceed 10 MB');
         input.value = '';
         return;
       }
@@ -169,12 +170,12 @@ export class CandidatesComponent implements OnInit {
     this.candidateService.uploadResume(candidate.publicId, file).subscribe({
       next: (response) => {
         this.uploadingResumeFor = null;
-        this.snackBar.open('Resume uploaded successfully', 'Close', { duration: 3000 });
+        this.notificationService.success('Resume uploaded successfully');
         this.loadCandidates();
       },
       error: (error) => {
         this.uploadingResumeFor = null;
-        this.snackBar.open(error.error?.message || 'Error uploading resume', 'Close', { duration: 3000 });
+        this.notificationService.error(error.error?.message || 'Error uploading resume');
       }
     });
   }
@@ -197,8 +198,60 @@ export class CandidatesComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: (error) => {
-        this.snackBar.open('Error downloading resume', 'Close', { duration: 3000 });
+        this.notificationService.error('Error downloading resume');
       }
+    });
+  }
+
+  canDeleteCandidate(candidate: Candidate): boolean {
+    const isAdmin = this.authService.isAdmin();
+    
+    if (isAdmin) {
+      return true;
+    }
+    
+    return !candidate.hasHiringProcess;
+  }
+
+  deleteCandidate(candidate: Candidate): void {
+    if (!this.canDeleteCandidate(candidate)) {
+      this.notificationService.warning(
+        'Only Admin users can delete candidates with existing hiring processes'
+      );
+      return;
+    }
+
+    import('./candidate-delete-dialog.component').then(m => {
+      const dialogRef = this.dialog.open(m.CandidateDeleteDialogComponent, {
+        data: {
+          candidate: candidate,
+          hasHiringProcess: candidate.hasHiringProcess || false,
+          isAdmin: this.authService.isAdmin()
+        },
+        width: '550px',
+        maxWidth: '95vw',
+        disableClose: true,
+        autoFocus: true,
+        panelClass: 'candidate-delete-dialog'
+      });
+
+      dialogRef.afterClosed().subscribe(confirmed => {
+        if (confirmed) {
+          this.loading = true;
+          this.candidateService.deleteCandidate(candidate.publicId).subscribe({
+            next: () => {
+              this.loading = false;
+              this.notificationService.success('Candidate deleted successfully');
+              this.loadCandidates();
+            },
+            error: (error) => {
+              this.loading = false;
+              const message = error.error?.message || error.message || 'Error deleting candidate';
+              this.notificationService.error(message);
+            }
+          });
+        }
+      });
     });
   }
 }

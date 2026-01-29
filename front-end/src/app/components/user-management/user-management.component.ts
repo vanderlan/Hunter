@@ -8,48 +8,51 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from '../../services/notification.service';
 import { User, UserProfile, UserCreateRequest, UserUpdateRequest } from '../../models/user.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-user-management',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    MatCardModule,
-    MatTableModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule,
-    MatPaginatorModule,
-    MatTooltipModule,
-    MatCheckboxModule
-  ],
-  templateUrl: './user-management.component.html',
-  styleUrl: './user-management.component.scss'
+    selector: 'app-user-management',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        FormsModule,
+        MatCardModule,
+        MatTableModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatSnackBarModule,
+        MatProgressSpinnerModule,
+        MatPaginatorModule,
+        MatTooltipModule,
+        MatCheckboxModule
+    ],
+    templateUrl: './user-management.component.html',
+    styleUrl: './user-management.component.scss'
 })
 export class UserManagementComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'email', 'profile', 'createdAt', 'actions'];
-  dataSource: User[] = [];
-  totalCount = 0;
-  pageSize = 10;
-  pageIndex = 0;
-  searchQuery = '';
-  loading = false;
-  isEditing = false;
-  userForm: FormGroup;
-  currentUserId: string | null = null;
+displayedColumns: string[] = ['name', 'email', 'profile', 'createdAt', 'lastLoginAt', 'actions'];
+dataSource: User[] = [];
+totalCount = 0;
+pageSize = 10;
+pageIndex = 0;
+searchQuery = '';
+loading = false;
+isEditing = false;
+userForm: FormGroup;
+currentUserId: string | null = null;
+private searchSubject = new Subject<string>();
 
   userProfiles = [
     { value: UserProfile.Admin, label: 'Admin' },
@@ -58,7 +61,7 @@ export class UserManagementComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private fb: FormBuilder
   ) {
     this.userForm = this.fb.group({
@@ -67,6 +70,15 @@ export class UserManagementComponent implements OnInit {
       profile: [UserProfile.Partner, Validators.required],
       sendWelcomeEmail: [true],
       receiveJobChangeNotifications: [true]
+    });
+
+    // Setup auto-search with debounce
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.pageIndex = 0;
+      this.loadUsers();
     });
   }
 
@@ -84,7 +96,7 @@ export class UserManagementComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.snackBar.open('Error loading users', 'Close', { duration: 3000 });
+        this.notificationService.error('Error loading users');
       }
     });
   }
@@ -95,9 +107,9 @@ export class UserManagementComponent implements OnInit {
     this.loadUsers();
   }
 
-  onSearch(): void {
-    this.pageIndex = 0;
-    this.loadUsers();
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   showCreateForm(): void {
@@ -155,7 +167,7 @@ export class UserManagementComponent implements OnInit {
 
   saveUser(): void {
     if (this.userForm.invalid) {
-      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+      this.notificationService.warning('Please fill in all required fields');
       return;
     }
 
@@ -167,13 +179,13 @@ export class UserManagementComponent implements OnInit {
       this.userService.updateUser(this.currentUserId, userData).subscribe({
         next: () => {
           this.loading = false;
-          this.snackBar.open('User updated successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('User updated successfully');
           this.cancelEdit();
           this.loadUsers();
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open(error.error?.message || 'Error updating user', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.message || 'Error updating user');
         }
       });
     } else {
@@ -182,13 +194,13 @@ export class UserManagementComponent implements OnInit {
       this.userService.createUser(userData).subscribe({
         next: () => {
           this.loading = false;
-          this.snackBar.open('User created successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('User created successfully');
           this.cancelEdit();
           this.loadUsers();
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open(error.error?.message || 'Error creating user', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.message || 'Error creating user');
         }
       });
     }
@@ -200,12 +212,12 @@ export class UserManagementComponent implements OnInit {
       this.userService.deleteUser(user.publicId!).subscribe({
         next: () => {
           this.loading = false;
-          this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('User deleted successfully');
           this.loadUsers();
         },
         error: (error) => {
           this.loading = false;
-          this.snackBar.open(error.error?.message || 'Error deleting user', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.message || 'Error deleting user');
         }
       });
     }

@@ -18,8 +18,6 @@ public class JobSyncBackgroundService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Job Sync Background Service started");
-
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -27,27 +25,13 @@ public class JobSyncBackgroundService(
                 var now = DateTime.Now;
                 var currentTime = TimeOnly.FromDateTime(now);
 
-                // Check if current time is within business hours
                 if (currentTime >= StartTime && currentTime <= EndTime)
                 {
-                    _logger.LogInformation("Starting scheduled job synchronization at {Time}", now);
-                    
                     await SyncJobsAsync(stoppingToken);
-                    
-                    _logger.LogInformation("Scheduled job synchronization completed at {Time}", DateTime.Now);
-                }
-                else
-                {
-                    _logger.LogDebug("Outside business hours ({StartTime} - {EndTime}). Skipping sync at {Time}",
-                        StartTime, EndTime, currentTime);
                 }
 
-                // Calculate next run time
                 var nextRunTime = CalculateNextRunTime(now);
                 var delay = nextRunTime - now;
-                
-                _logger.LogInformation("Next job sync scheduled for {NextTime} (in {Delay})",
-                    nextRunTime, delay);
 
                 await Task.Delay(delay, stoppingToken);
             }

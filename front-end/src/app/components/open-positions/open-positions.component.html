@@ -1,0 +1,91 @@
+<div class="open-positions-container">
+  <!-- Header Card -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>work_outline</mat-icon>
+        Open Positions
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Browse all available job positions</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Search Section (No Card) -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search by title, company, or job code">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <!-- Positions Listing Card -->
+  <mat-card class="positions-listing-card">
+    <mat-card-header>
+      <mat-card-title class="positions-listing-title">
+        <mat-icon>work_outline</mat-icon>
+        <span>Available Positions</span>
+      </mat-card-title>
+      <mat-card-subtitle class="positions-listing-subtitle">
+        {{ filteredPositions.length }} open position{{ filteredPositions.length !== 1 ? 's' : '' }}
+        @if (searchQuery && filteredPositions.length !== positions.length) {
+          <span> (filtered from {{ positions.length }})</span>
+        }
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="positions-listing-content">
+      <!-- Loading State -->
+      @if (loading) {
+        <div class="positions-loading-state">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p class="positions-loading-text">Loading available positions...</p>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loading && filteredPositions.length === 0 && !searchQuery) {
+        <div class="positions-empty-state">
+          <mat-icon class="positions-empty-icon">info_outline</mat-icon>
+          <p class="positions-empty-text">No positions available at the moment</p>
+        </div>
+      }
+
+      <!-- No Results State -->
+      @if (!loading && filteredPositions.length === 0 && searchQuery) {
+        <div class="positions-empty-state">
+          <mat-icon class="positions-empty-icon">search_off</mat-icon>
+          <p class="positions-empty-text">No positions found matching "{{ searchQuery }}"</p>
+          <p class="positions-empty-hint">Try a different search term</p>
+        </div>
+      }
+
+      <!-- Positions List -->
+      @if (!loading && filteredPositions.length > 0) {
+        <div class="positions-list-wrapper">
+          @for (position of filteredPositions; track position) {
+            <div
+              class="position-list-item"
+              (click)="openPositionDetails(position)">
+              <div class="position-item-header">
+                <h3 class="position-item-title">{{ position.title }}</h3>
+                <mat-icon class="position-item-arrow">chevron_right</mat-icon>
+              </div>
+              @if (position.summary) {
+                <p class="position-item-summary">{{ position.summary }}</p>
+              }
+              @if (!position.summary) {
+                <p class="position-item-summary">{{ position.companyCode }} - {{ position.jobCode }}</p>
+              }
+            </div>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

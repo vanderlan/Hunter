@@ -77,7 +77,17 @@ public class JobPositionRepository(DataContext dataContext) : BaseEntityReposito
     private static IQueryable<JobPosition> ApplyFilters(JobPositionFilter filter, IQueryable<JobPosition> query)
     {
         if (!string.IsNullOrWhiteSpace(filter.Query))
-            query = query.Where(x => x.Title.Contains(filter.Query) || x.CompanyCode.Contains(filter.Query));
+        {
+            var searchTerm = filter.Query.ToLower();
+            query = query.Where(x => 
+                                x.Title.ToLower().Contains(searchTerm) 
+                                || x.CompanyCode.ToLower().Contains(searchTerm)
+                                || x.Requirements.ToLower().Contains(searchTerm)
+                                || x.Responsibilities.ToLower().Contains(searchTerm)
+                                || x.MustHaveSkills.ToLower().Contains(searchTerm)
+                                || x.NiceToHaveSkills.ToLower().Contains(searchTerm)                             
+                                );
+        }
 
         return query;
     }

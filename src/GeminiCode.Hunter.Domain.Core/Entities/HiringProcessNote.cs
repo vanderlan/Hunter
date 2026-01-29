@@ -1,5 +1,3 @@
-using System;
-
 namespace GeminiCode.Hunter.Domain.Core.Entities;
 
 public class HiringProcessNote : BaseEntity

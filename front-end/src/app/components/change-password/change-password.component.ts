@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -8,14 +8,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
-  selector: 'app-change-password',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-change-password',
+    imports: [
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -24,9 +23,9 @@ import { UserService } from '../../services/user.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule
-  ],
-  templateUrl: './change-password.component.html',
-  styleUrl: './change-password.component.scss'
+],
+    templateUrl: './change-password.component.html',
+    styleUrl: './change-password.component.scss'
 })
 export class ChangePasswordComponent implements OnInit {
   passwordForm!: FormGroup;
@@ -38,7 +37,7 @@ export class ChangePasswordComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private router: Router
   ) {}
 
@@ -72,20 +71,14 @@ export class ChangePasswordComponent implements OnInit {
     this.userService.changePassword(request).subscribe({
       next: () => {
         this.loading = false;
-        this.snackBar.open('Password changed successfully!', 'Close', { 
-          duration: 5000,
-          panelClass: ['success-snackbar']
-        });
+        this.notificationService.success('Password changed successfully!');
         this.passwordForm.reset();
         this.router.navigate(['/']);
       },
       error: (error) => {
         this.loading = false;
         const message = error.error?.message || 'Error changing password. Please check your current password.';
-        this.snackBar.open(message, 'Close', { 
-          duration: 5000,
-          panelClass: ['error-snackbar']
-        });
+        this.notificationService.error(message);
       }
     });
   }

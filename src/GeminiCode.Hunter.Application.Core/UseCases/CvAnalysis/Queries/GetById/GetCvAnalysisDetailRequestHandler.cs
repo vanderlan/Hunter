@@ -1,5 +1,5 @@
-using System.Text.Json;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
+using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
@@ -9,6 +9,7 @@ namespace GeminiCode.Hunter.Application.Core.UseCases.CvAnalysis.Queries.GetById
 
 public class GetCvAnalysisDetailRequestHandler(
     IUnitOfWork unitOfWork,
+    ICurrentUser currentUser,
     ILogger<GetCvAnalysisDetailRequestHandler> logger)
     : IRequestHandler<GetCvAnalysisDetailRequest, CvAnalysisDetailResponse>
 {
@@ -20,6 +21,15 @@ public class GetCvAnalysisDetailRequestHandler(
 
         var analysis = await unitOfWork.CvAnalysisRepository.GetWithMatchesAsync(request.AnalysisId)
             ?? throw new NotFoundException($"Analysis with ID {request.AnalysisId} not found");
+
+        if (!currentUser.IsAdmin)
+        {
+            var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id);
+            if (analysis.UserId != user.UserId)
+            {
+                throw new UnauthorizedUserException("You are not authorized to view this CV analysis");
+            }
+        }
 
         var response = new CvAnalysisDetailResponse
         {
@@ -37,6 +47,7 @@ public class GetCvAnalysisDetailRequestHandler(
             MatchesFound = analysis.MatchesFound,
             Matches = analysis.Matches.Select(m => new JobMatchDto
             {
+                JobPositionId = m.JobPosition?.PublicId ?? "",
                 JobCode = m.JobCode,
                 JobTitle = m.JobTitle,
                 CompanyCode = m.CompanyCode,
@@ -47,7 +58,8 @@ public class GetCvAnalysisDetailRequestHandler(
                 MissingSkills = System.Text.Json.JsonSerializer.Deserialize<List<string>>(m.MissingSkills) ?? [],
                 Summary = m.JobSummary,
                 MustHaveSkills = m.MustHaveSkills,
-                NiceToHaveSkills = m.NiceToHaveSkills
+                NiceToHaveSkills = m.NiceToHaveSkills,
+                WhatIsMissingForPerfectMatch = m.WhatIsMissingForPerfectMatch
             }).OrderByDescending(m => m.MatchPercentage).ToList()
         };
 

@@ -69,10 +69,7 @@ public class AIService : IAIService
             }
 
             var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
-
             var responseContent = chatCompletion.Value.Content[0].Text;
-            
-            _logger.LogDebug("{Provider} Job Enrichment Response: {Response}", _provider, responseContent);
 
             var result = JsonSerializer.Deserialize<OpenAIJobEnrichmentResponse>(responseContent, new JsonSerializerOptions
             {
@@ -82,12 +79,10 @@ public class AIService : IAIService
             if (result == null)
                 throw new InvalidOperationException($"Failed to deserialize {_provider} job enrichment response");
 
-            _logger.LogInformation("Successfully enriched job details for: {JobTitle} using {Provider}", jobTitle, _provider);
-
             return new JobEnrichmentResult(
                 Summary: result.Summary ?? string.Empty,
                 Responsibilities: result.Responsibilities ?? string.Empty,
-                Skills: result.Skills ?? string.Empty,
+                Requirements: result.Requirements ?? string.Empty,
                 MustHaveSkills: result.MustHaveSkills ?? string.Empty,
                 NiceToHaveSkills: result.NiceToHaveSkills ?? string.Empty
             );
@@ -105,8 +100,8 @@ public class AIService : IAIService
     {
         try
         {
-            _logger.LogInformation("Starting CV analysis against {JobCount} positions using {Provider} ({Model})", 
-                jobPositions.Count, _provider, _model);
+            _logger.LogInformation("Analyzing CV against {JobCount} positions using {Provider}", 
+                jobPositions.Count, _provider);
 
             var prompt = BuildAnalysisPrompt(cvText, jobPositions);
 
@@ -144,10 +139,7 @@ public class AIService : IAIService
             }
 
             var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
-
             var responseContent = chatCompletion.Value.Content[0].Text;
-            
-            _logger.LogDebug("{Provider} CV Analysis Response: {Response}", _provider, responseContent);
 
             var result = JsonSerializer.Deserialize<OpenAICvAnalysisResponse>(responseContent, new JsonSerializerOptions
             {
@@ -164,12 +156,11 @@ public class AIService : IAIService
                     m.MatchPercentage,
                     m.MatchReason,
                     [.. m.MatchingSkills],
-                    [.. m.MissingSkills]
+                    [.. m.MissingSkills],
+                    m.ReferralReason,
+                    m.WhatIsMissingForPerfectMatch
                 )).ToList()
             );
-
-            _logger.LogInformation("CV analysis completed using {Provider}. Found {MatchCount} matches", 
-                _provider, cvAnalysisResult.Matches.Count);
 
             return cvAnalysisResult;
         }
@@ -184,8 +175,6 @@ public class AIService : IAIService
     {
         try
         {
-            _logger.LogInformation("Getting {Provider} completion with max tokens: {MaxTokens}", _provider, maxTokens);
-
             var messages = new List<ChatMessage>
             {
                 new UserChatMessage(prompt)
@@ -230,17 +219,17 @@ public class AIService : IAIService
         sb.AppendLine();
         sb.AppendLine("1. **Summary**: A concise 2-3 sentence overview of the position");
         sb.AppendLine("2. **Responsibilities**: Key duties and responsibilities (bullet points or paragraphs)");
-        sb.AppendLine("3. **Skills**: ALL technical and soft skills mentioned, comma-separated");
-        sb.AppendLine("   - Example: \"Java, C#, SQL Server, Kubernetes, Docker, Agile, Team Leadership\"");
-        sb.AppendLine("4. **Must-Have Skills**: Essential/required skills only, comma-separated");
+        sb.AppendLine("3. **Requirements**: ALL position requirements including education, experience level, certifications, and general qualifications");
+        sb.AppendLine("   - Example: \"Bachelor's degree in Computer Science, 5+ years of experience, AWS certification, Strong problem-solving skills\"");
+        sb.AppendLine("4. **Must-Have Skills**: Essential/required technical and soft skills only, comma-separated");
         sb.AppendLine("5. **Nice-to-Have Skills**: Preferred/optional skills, comma-separated");
         sb.AppendLine();
         sb.AppendLine("# IMPORTANT RULES");
         sb.AppendLine("- Extract ONLY information present in the HTML content");
         sb.AppendLine("- Do NOT invent or assume information");
         sb.AppendLine("- If a section has no data, return empty string");
-        sb.AppendLine("- For Skills: include ALL skills mentioned (technical, soft, tools, technologies)");
-        sb.AppendLine("- Format skills as comma-separated values");
+        sb.AppendLine("- For Requirements: include education, experience level, years, certifications, and general qualifications");
+        sb.AppendLine("- Format requirements as comma-separated values or structured text");
         sb.AppendLine("- Keep text concise and professional");
         sb.AppendLine();
         sb.AppendLine("# OUTPUT FORMAT");
@@ -249,7 +238,7 @@ public class AIService : IAIService
         sb.AppendLine("{");
         sb.AppendLine("  \"summary\": \"string\",");
         sb.AppendLine("  \"responsibilities\": \"string\",");
-        sb.AppendLine("  \"skills\": \"string\",");
+        sb.AppendLine("  \"requirements\": \"string\",");
         sb.AppendLine("  \"mustHaveSkills\": \"string\",");
         sb.AppendLine("  \"niceToHaveSkills\": \"string\"");
         sb.AppendLine("}");
@@ -291,6 +280,11 @@ public class AIService : IAIService
                 sb.AppendLine($"**Responsibilities:** {job.Responsibilities}");
             }
             
+            if (!string.IsNullOrWhiteSpace(job.Requirements))
+            {
+                sb.AppendLine($"**Requirements:** {job.Requirements}");
+            }
+            
             if (!string.IsNullOrWhiteSpace(job.MustHaveSkills))
             {
                 sb.AppendLine($"**Must-Have Skills:** {job.MustHaveSkills}");
@@ -308,14 +302,38 @@ public class AIService : IAIService
         sb.AppendLine("For each job position:");
         sb.AppendLine("1. Calculate a match percentage (0-100) based on:");
         sb.AppendLine("   - Skills alignment (technical and soft skills)");
-        sb.AppendLine("   - Experience level and years");
+        sb.AppendLine("   - Experience level and years of experience");
         sb.AppendLine("   - Education background");
+        sb.AppendLine("   - Requirements compliance (certifications, qualifications)");
         sb.AppendLine("   - Responsibilities match");
         sb.AppendLine("2. Provide a clear, concise reason for the match percentage");
         sb.AppendLine("3. List specific matching skills found in the CV");
         sb.AppendLine("4. List skills required by the job but missing from the CV");
+        sb.AppendLine("5. Generate 'What is missing for a perfect match?' (2-4 sentences) explaining:");
+        sb.AppendLine("   - Specific skills, experiences, or qualifications the candidate needs to develop");
+        sb.AppendLine("   - Areas where the candidate could improve to reach 100% match");
+        sb.AppendLine("   - Be constructive and actionable");
         sb.AppendLine();
-        sb.AppendLine("Return ONLY positions with match percentage > 60%, ordered by match percentage (highest first).");
+        sb.AppendLine("# CRITICAL EVALUATION CRITERIA");
+        sb.AppendLine("Be extremely critical about the following requirements and SEVERELY penalize candidates who do not meet them:");
+        sb.AppendLine();
+        sb.AppendLine("1. **Years of Experience:**");
+        sb.AppendLine("   - Carefully analyze the candidate's total years of professional experience");
+        sb.AppendLine("   - Compare against the required years specified in the Requirements section");
+        sb.AppendLine("   - If candidate has LESS years than required, apply severe penalty (reduce match by 20-40%)");
+        sb.AppendLine("   - Example: Position requires 5+ years, candidate has 2 years ? Maximum match should be 50-60%");
+        sb.AppendLine("   - Exception: Only if candidate shows exceptional skills that clearly compensate, allow up to 70% match");
+        sb.AppendLine();
+        sb.AppendLine("2. **Primary Technology Stack:**");
+        sb.AppendLine("   - If position requires full-stack development but candidate only has front-end OR back-end experience ? Severely penalize");
+        sb.AppendLine("   - If candidate specializes in one technology but position requires a different core technology (e.g., Java vs C#) ? Severely penalize");
+        sb.AppendLine("   - Example: Position requires C# expertise, candidate is Java specialist ? Maximum match 60-65% even with many years of experience");
+        sb.AppendLine();
+        sb.AppendLine("3. **Education & Certifications:**");
+        sb.AppendLine("   - If Requirements specify degree level (Bachelor's, Master's) and candidate doesn't have it ? Apply penalty (reduce match by 10-15%)");
+        sb.AppendLine("   - If Requirements specify certifications (AWS, Azure, etc.) and candidate lacks them ? Apply penalty (reduce match by 5-10%)");
+        sb.AppendLine();
+        sb.AppendLine($"Return ONLY positions with match percentage > {AIMatching.MinimumMatchPercentage}%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
         sb.AppendLine();
         sb.AppendLine("# OUTPUT FORMAT");
@@ -329,7 +347,8 @@ public class AIService : IAIService
         sb.AppendLine("      \"matchPercentage\": 85.5,");
         sb.AppendLine("      \"matchReason\": \"string\",");
         sb.AppendLine("      \"matchingSkills\": [\"skill1\", \"skill2\"],");
-        sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"]");
+        sb.AppendLine("      \"missingSkills\": [\"skill3\", \"skill4\"],");
+        sb.AppendLine("      \"whatIsMissingForPerfectMatch\": \"string\"");
         sb.AppendLine("    }");
         sb.AppendLine("  ]");
         sb.AppendLine("}");
@@ -346,11 +365,11 @@ public class AIService : IAIService
           "properties": {
             "summary": { "type": "string" },
             "responsibilities": { "type": "string" },
-            "skills": { "type": "string" },
+            "requirements": { "type": "string" },
             "mustHaveSkills": { "type": "string" },
             "niceToHaveSkills": { "type": "string" }
           },
-          "required": ["summary", "responsibilities", "skills", "mustHaveSkills", "niceToHaveSkills"],
+          "required": ["summary", "responsibilities", "requirements", "mustHaveSkills", "niceToHaveSkills"],
           "additionalProperties": false
         }
         """;
@@ -378,9 +397,10 @@ public class AIService : IAIService
                   "missingSkills": {
                     "type": "array",
                     "items": { "type": "string" }
-                  }
+                  },
+                  "whatIsMissingForPerfectMatch": { "type": "string" }
                 },
-                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills"],
+                "required": ["jobCode", "jobTitle", "matchPercentage", "matchReason", "matchingSkills", "missingSkills", "whatIsMissingForPerfectMatch"],
                 "additionalProperties": false
               }
             }
@@ -394,7 +414,7 @@ public class AIService : IAIService
     private record OpenAIJobEnrichmentResponse(
         string? Summary,
         string? Responsibilities,
-        string? Skills,
+        string? Requirements,
         string? MustHaveSkills,
         string? NiceToHaveSkills
     );
@@ -407,7 +427,9 @@ public class AIService : IAIService
         decimal MatchPercentage,
         string MatchReason,
         List<string> MatchingSkills,
-        List<string> MissingSkills
+        List<string> MissingSkills,
+        string? ReferralReason,
+        string WhatIsMissingForPerfectMatch
     );
 
     private void SetupProvider(IConfiguration configuration, ILogger<AIService> logger)

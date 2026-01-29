@@ -21,34 +21,68 @@ public class JobChangesDetectedNotificationHandler(
             notification.UpdatedPositionsCount,
             notification.SyncTimestamp);
 
-        logger.LogDebug(
-            "Job changes details: {Notification}",
-            JsonConvert.SerializeObject(notification, Formatting.Indented));
+        // Send separate notifications for new and closed positions
+        await SendNewPositionsNotificationsAsync(notification);
+        await SendClosedPositionsNotificationsAsync(notification);
+    }
 
-        // Send email notification if there are changes
-        if (notification.NewPositionsCount > 0 || notification.ClosedPositionsCount > 0)
+    private async Task SendNewPositionsNotificationsAsync(JobChangesDetectedNotification notification)
+    {
+        if (notification.NewPositionsCount == 0)
         {
-            var usersWithNotifications = await unitOfWork.UserRepository.GetUsersWithJobNotificationsEnabledAsync();
-            var emailAddresses = usersWithNotifications.Select(u => u.Email).ToList();
+            logger.LogInformation("No new positions to notify");
+            return;
+        }
 
-            if (emailAddresses.Any())
-            {
-                logger.LogInformation("Sending job change notifications to {Count} users", emailAddresses.Count);
+        // For new positions, notify all users with notifications enabled
+        var usersWithNotifications = await unitOfWork.UserRepository.GetUsersWithJobNotificationsEnabledAsync();
+        var emailAddresses = usersWithNotifications.Select(u => u.Email).ToList();
 
-                await emailService.SendJobChangesNotificationAsync(
-                    emailAddresses,
-                    [.. notification.NewJobTitles],
-                    [.. notification.ClosedJobTitles],
-                    DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
-            }
-            else
-            {
-                logger.LogInformation("No users have job change notifications enabled");
-            }
+        if (emailAddresses.Any())
+        {
+            logger.LogInformation("Sending new position notifications to {Count} users", emailAddresses.Count);
+
+            await emailService.SendJobChangesNotificationAsync(
+                emailAddresses,
+                [.. notification.NewJobTitles],
+                [],
+                notification.NewJobPositions,
+                [],
+                DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
         }
         else
         {
-            logger.LogInformation("No new or closed positions, skipping email notification");
+            logger.LogInformation("No users have job change notifications enabled for new positions");
+        }
+    }
+
+    private async Task SendClosedPositionsNotificationsAsync(JobChangesDetectedNotification notification)
+    {
+        if (notification.ClosedPositionsCount == 0)
+        {
+            logger.LogInformation("No closed positions to notify");
+            return;
+        }
+
+        // For closed positions, notify only admin users with notifications enabled
+        var adminUsersWithNotifications = await unitOfWork.UserRepository.GetAdminUsersWithJobNotificationsEnabledAsync();
+        var emailAddresses = adminUsersWithNotifications.Select(u => u.Email).ToList();
+
+        if (emailAddresses.Any())
+        {
+            logger.LogInformation("Sending closed position notifications to {Count} admin users", emailAddresses.Count);
+
+            await emailService.SendJobChangesNotificationAsync(
+                emailAddresses,
+                [],
+                [.. notification.ClosedJobTitles],
+                [],
+                notification.ClosedJobPositions,
+                DateTime.SpecifyKind(notification.SyncTimestamp, DateTimeKind.Utc));
+        }
+        else
+        {
+            logger.LogInformation("No admin users have job change notifications enabled for closed positions");
         }
     }
 }

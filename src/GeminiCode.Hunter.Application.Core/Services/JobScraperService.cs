@@ -61,19 +61,13 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
     {
         try
         {
-            logger.LogInformation("Scraping raw HTML content from {Url}", url);
-
             var web = new HtmlWeb();
             var doc = await web.LoadFromWebAsync(url);
 
-            // Extract the main content body (usually the job description container)
             var bodyNode = doc.DocumentNode.SelectSingleNode("//body") 
                 ?? doc.DocumentNode;
 
             var rawHtml = bodyNode.InnerHtml;
-
-            logger.LogInformation("Successfully scraped {CharCount} characters from {Url}", 
-                rawHtml.Length, url);
 
             return new ScrapedJobDetails(RawHtmlContent: rawHtml);
         }
