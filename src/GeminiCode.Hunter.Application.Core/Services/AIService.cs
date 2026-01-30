@@ -47,11 +47,8 @@ public class AIService : IAIService
                 GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.ActiveAIService, 
                 _configuration["AI:Provider"] ?? AIProviders.OpenAI);
             
-            // Ensure provider is set up
-            if (!string.IsNullOrEmpty(_provider))
-            {
-                SetupProvider(_configuration, _logger);
-            }
+            // Re-setup provider with new configuration
+            SetupProvider(_configuration, _logger);
 
             _logger.LogInformation("Enriching job details for: {JobTitle} using {Provider}", jobTitle, _provider);
 
@@ -127,11 +124,8 @@ public class AIService : IAIService
                 GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.ActiveAIService, 
                 _configuration["AI:Provider"] ?? AIProviders.OpenAI);
             
-            // Ensure provider is set up
-            if (!string.IsNullOrEmpty(_provider))
-            {
-                SetupProvider(_configuration, _logger);
-            }
+            // Re-setup provider with new configuration
+            SetupProvider(_configuration, _logger);
 
             _logger.LogInformation("Analyzing CV against {JobCount} positions using {Provider}", 
                 jobPositions.Count, _provider);

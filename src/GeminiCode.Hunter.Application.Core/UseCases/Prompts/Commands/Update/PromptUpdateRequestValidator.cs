@@ -17,7 +17,7 @@ public class PromptUpdateRequestValidator : AbstractValidator<PromptUpdateReques
 
         RuleFor(x => x.Text)
             .NotEmpty()
-            .When(x => x.Text != null)
+            .When(x => !string.IsNullOrEmpty(x.Text))
             .WithMessage("Text cannot be empty when provided");
     }
 }

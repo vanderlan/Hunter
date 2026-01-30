@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { firstValueFrom } from 'rxjs';
 import { ParameterService, Parameter } from '../../services/parameter.service';
 import { PromptService, Prompt } from '../../services/prompt.service';
 
@@ -58,8 +59,8 @@ export class AiSettingsComponent implements OnInit {
     this.loading = true;
     
     Promise.all([
-      this.parameterService.getAll().toPromise(),
-      this.promptService.getAll().toPromise()
+      firstValueFrom(this.parameterService.getAll()),
+      firstValueFrom(this.promptService.getAll())
     ]).then(([parameters, prompts]) => {
       this.parameters = parameters || [];
       this.prompts = prompts || [];
