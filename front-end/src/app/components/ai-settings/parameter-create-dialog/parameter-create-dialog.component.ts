@@ -22,63 +22,78 @@ import { ParameterCreateRequest } from '../../../services/parameter.service';
   ],
   template: `
     <h2 mat-dialog-title>
-      <mat-icon>add</mat-icon>
+      <mat-icon>tune</mat-icon>
       Create New Parameter
     </h2>
 
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Key</mat-label>
-        <input matInput [(ngModel)]="key" placeholder="EXAMPLE_PARAMETER" (input)="onKeyInput()">
+        <mat-label>Parameter Key</mat-label>
+        <input matInput [(ngModel)]="key" placeholder="EXAMPLE_PARAMETER" (input)="onKeyInput()" autocomplete="off">
         <mat-hint>Use UPPERCASE with underscores (e.g., MY_PARAMETER)</mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Value</mat-label>
-        <input matInput [(ngModel)]="value" placeholder="Parameter value" maxlength="500">
+        <mat-label>Parameter Value</mat-label>
+        <input matInput [(ngModel)]="value" placeholder="Parameter value" maxlength="500" autocomplete="off">
         <mat-hint>Maximum 500 characters</mat-hint>
       </mat-form-field>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button (click)="onCancel()">
+        <mat-icon>close</mat-icon>
+        Cancel
+      </button>
       <button mat-raised-button color="primary" (click)="onCreate()" [disabled]="!isValid()">
-        <mat-icon>add</mat-icon>
+        <mat-icon>add_circle</mat-icon>
         Create
       </button>
     </mat-dialog-actions>
   `,
   styles: [`
+    h2[mat-dialog-title] {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 24px 0;
+      font-size: 24px;
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
     .full-width {
       width: 100%;
       margin-bottom: 20px;
     }
 
     mat-dialog-content {
-      min-width: 450px;
-      padding: 24px 0;
-    }
-
-    h2 {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 24px 0;
-      padding: 0 24px;
-      font-size: 20px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
+      min-width: 500px;
+      padding: 20px 0;
+      overflow: visible;
     }
 
     mat-dialog-actions {
-      padding: 16px 24px;
+      padding: 16px;
       margin: 0;
       border-top: 1px solid #e0e0e0;
-      background-color: #fafafa;
-    }
+      gap: 8px;
 
-    button[mat-raised-button] {
-      min-width: 100px;
+      button {
+        min-width: 100px;
+
+        mat-icon {
+          margin-right: 4px;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
     }
   `]
 })

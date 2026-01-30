@@ -24,86 +24,133 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
   ],
   template: `
     <h2 mat-dialog-title>
-      <mat-icon>add</mat-icon>
+      <mat-icon>description</mat-icon>
       Create New Prompt
     </h2>
 
     <mat-dialog-content>
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Key</mat-label>
-        <input matInput [(ngModel)]="key" placeholder="PROMPT_KEY" (input)="onKeyInput()">
-        <mat-hint>Use UPPERCASE with underscores (e.g., MY_PROMPT)</mat-hint>
-      </mat-form-field>
+      <div class="form-container">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Key</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="key" 
+            placeholder="PROMPT_KEY" 
+            (input)="onKeyInput()"
+            autocomplete="off">
+          <mat-icon matPrefix>vpn_key</mat-icon>
+          <mat-hint align="start">Use UPPERCASE with underscores (e.g., MY_PROMPT)</mat-hint>
+          <mat-hint align="end">{{ key.length }}/100</mat-hint>
+          @if (key && !isKeyValid()) {
+            <mat-error>Key must contain only uppercase letters and underscores</mat-error>
+          }
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Name</mat-label>
-        <input matInput [(ngModel)]="name" placeholder="Prompt display name" maxlength="200">
-        <mat-hint>Maximum 200 characters</mat-hint>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Name</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="name" 
+            placeholder="Prompt display name" 
+            maxlength="200"
+            autocomplete="off">
+          <mat-icon matPrefix>label</mat-icon>
+          <mat-hint align="start">Display name for this prompt</mat-hint>
+          <mat-hint align="end">{{ name.length }}/200</mat-hint>
+        </mat-form-field>
 
-      <div class="prompt-editor-wrapper">
-        <label class="editor-label">Prompt Text</label>
-        <quill-editor 
-          [(ngModel)]="text"
-          [modules]="quillModules"
-          [styles]="{ height: '300px' }"
-          placeholder="Enter your prompt text here..."
-          class="quill-editor">
-        </quill-editor>
-        <div class="editor-hint">
-          Use placeholders like &#123;jobTitle&#125;, &#123;rawHtmlContent&#125;, &#123;cvText&#125;, &#123;jobPositions&#125;, &#123;minimumMatchPercentage&#125;
+        <div class="prompt-editor-wrapper">
+          <label class="editor-label">Prompt Text</label>
+          <quill-editor 
+            [(ngModel)]="text"
+            [modules]="quillModules"
+            [styles]="{ height: '300px' }"
+            placeholder="Enter your prompt text here..."
+            class="quill-editor">
+          </quill-editor>
+          <div class="editor-hint">
+            Use placeholders like &#123;jobTitle&#125;, &#123;rawHtmlContent&#125;, &#123;cvText&#125;, &#123;jobPositions&#125;, &#123;minimumMatchPercentage&#125;
+          </div>
         </div>
       </div>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancel</button>
-      <button mat-raised-button color="primary" (click)="onCreate()" [disabled]="!isValid()">
-        <mat-icon>add</mat-icon>
+      <button mat-button (click)="onCancel()">
+        <mat-icon>close</mat-icon>
+        Cancel
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onCreate()" 
+        [disabled]="!isValid()">
+        <mat-icon>add_circle</mat-icon>
         Create
       </button>
     </mat-dialog-actions>
   `,
   styles: [`
+    h2[mat-dialog-title] {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 24px 0;
+      font-size: 24px;
+      font-weight: 500;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+    }
+
     .full-width {
       width: 100%;
       margin-bottom: 20px;
     }
 
     mat-dialog-content {
-      min-width: 700px;
+      min-width: 650px;
       max-height: 80vh;
       overflow-y: auto;
-      padding: 24px;
+      padding: 20px 0;
     }
 
-    h2 {
+    .form-container {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 24px 0;
-      padding: 0 24px;
-      font-size: 20px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    mat-icon[matPrefix] {
+      margin-right: 12px;
+      color: rgba(0, 0, 0, 0.54);
     }
 
     mat-dialog-actions {
-      padding: 16px 24px;
+      padding: 16px;
       margin: 0;
       border-top: 1px solid #e0e0e0;
-      background-color: #fafafa;
-    }
+      gap: 8px;
 
-    button[mat-raised-button] {
-      min-width: 100px;
+      button {
+        min-width: 100px;
+
+        mat-icon {
+          margin-right: 4px;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
     }
 
     .prompt-editor-wrapper {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-bottom: 20px;
 
       .editor-label {
         font-size: 14px;
@@ -142,25 +189,29 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
         color: rgba(0, 0, 0, 0.6);
       }
     }
+
+    mat-error {
+      font-size: 12px;
+    }
   `]
 })
 export class PromptCreateDialogComponent {
-key = '';
-name = '';
-text = '';
+  key = '';
+  name = '';
+  text = '';
 
-// Quill editor configuration
-quillModules = {
-  toolbar: [
-    ['bold', 'italic', 'underline', 'strike'],
-    ['blockquote', 'code-block'],
-    [{ 'header': 1 }, { 'header': 2 }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'indent': '-1'}, { 'indent': '+1' }],
-    ['link'],
-    ['clean']
-  ]
-};
+  // Quill editor configuration
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      ['link'],
+      ['clean']
+    ]
+  };
 
   constructor(
     private dialogRef: MatDialogRef<PromptCreateDialogComponent>
@@ -171,11 +222,15 @@ quillModules = {
     this.key = this.key.toUpperCase().replace(/[^A-Z_]/g, '');
   }
 
+  isKeyValid(): boolean {
+    return /^[A-Z_]+$/.test(this.key);
+  }
+
   isValid(): boolean {
     return this.key.trim().length > 0 && 
            this.name.trim().length > 0 &&
            this.text.trim().length >= 10 &&
-           /^[A-Z_]+$/.test(this.key);
+           this.isKeyValid();
   }
 
   onCreate(): void {

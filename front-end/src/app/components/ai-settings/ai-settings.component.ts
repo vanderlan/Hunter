@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -32,6 +34,8 @@ import { QuillModule } from 'ngx-quill';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatRadioModule,
+    MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTabsModule,
@@ -63,9 +67,19 @@ export class AiSettingsComponent implements OnInit {
 
   // AI Provider options
   aiProviders = [
-    { value: 'OpenAI', label: 'OpenAI GPT-4o' },
-    { value: 'DeepSeek', label: 'DeepSeek' }
+    { 
+      value: 'OpenAI', 
+      label: 'OpenAI GPT-4o',
+      description: 'Most accurate AI model with advanced reasoning capabilities'
+    },
+    { 
+      value: 'DeepSeek', 
+      label: 'DeepSeek',
+      description: 'Cost-effective alternative with comparable performance'
+    }
   ];
+
+  activeAIProvider = 'OpenAI';
 
   constructor(
     private parameterService: ParameterService,
@@ -78,6 +92,24 @@ export class AiSettingsComponent implements OnInit {
     this.loadData();
   }
 
+  get regularParameters(): Parameter[] {
+    return this.parameters.filter(p => p.key !== 'ACTIVE_AI_SERVICE');
+  }
+
+  onProviderChange(): void {
+    const aiServiceParam = this.parameters.find(p => p.key === 'ACTIVE_AI_SERVICE');
+    if (aiServiceParam) {
+      aiServiceParam.value = this.activeAIProvider;
+      this.saveParameter(aiServiceParam);
+    } else {
+      // Create the parameter if it doesn't exist
+      this.createParameter({
+        key: 'ACTIVE_AI_SERVICE',
+        value: this.activeAIProvider
+      });
+    }
+  }
+
   loadData(): void {
     this.loading = true;
     
@@ -87,6 +119,13 @@ export class AiSettingsComponent implements OnInit {
     ]).then(([parameters, prompts]) => {
       this.parameters = parameters || [];
       this.prompts = prompts || [];
+      
+      // Set active AI provider
+      const aiServiceParam = this.parameters.find(p => p.key === 'ACTIVE_AI_SERVICE');
+      if (aiServiceParam) {
+        this.activeAIProvider = aiServiceParam.value;
+      }
+      
       this.loading = false;
     }).catch(error => {
       console.error('Error loading AI settings:', error);
@@ -129,7 +168,7 @@ export class AiSettingsComponent implements OnInit {
 
   openCreatePromptDialog(): void {
     const dialogRef = this.dialog.open(PromptCreateDialogComponent, {
-      width: '800px',
+      width: '750px',
       maxHeight: '90vh'
     });
 
