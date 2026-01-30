@@ -1,0 +1,154 @@
+.ai-settings-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  .header-card {
+    margin-bottom: 24px;
+
+    mat-card-header {
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 24px;
+
+        mat-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    gap: 16px;
+
+    mat-spinner {
+      margin: 0 auto;
+    }
+  }
+
+  .settings-tabs {
+    margin-top: 24px;
+
+    .tab-content {
+      padding: 24px 0;
+    }
+  }
+
+  .settings-card {
+    mat-card-header {
+      margin-bottom: 16px;
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 20px;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+    }
+  }
+
+  .parameters-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .parameter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+
+      mat-form-field {
+        flex: 1;
+      }
+
+      button {
+        margin-top: 8px;
+        min-width: 100px;
+      }
+    }
+  }
+
+  .prompt-card {
+    margin-bottom: 24px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    mat-card-header {
+      margin-bottom: 16px;
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+
+        mat-icon {
+          font-size: 22px;
+          width: 22px;
+          height: 22px;
+        }
+      }
+    }
+
+    mat-card-content {
+      .prompt-text-field {
+        margin-top: 16px;
+      }
+
+      .prompt-textarea {
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 16px;
+        gap: 12px;
+
+        button {
+          min-width: 120px;
+        }
+      }
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .ai-settings-container {
+    padding: 16px;
+
+    .parameter-item {
+      flex-direction: column;
+
+      button {
+        align-self: stretch;
+        margin-top: 0;
+      }
+    }
+  }
+}

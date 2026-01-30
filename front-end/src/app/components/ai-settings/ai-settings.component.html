@@ -1,0 +1,127 @@
+<div class="ai-settings-container">
+  <!-- Header Card -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>settings</mat-icon>
+        AI Settings Management
+      </mat-card-title>
+      <mat-card-subtitle>
+        Configure AI service providers, prompts, and matching parameters
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading AI settings...</p>
+    </div>
+  } @else {
+    <mat-tab-group class="settings-tabs">
+      <!-- Parameters Tab -->
+      <mat-tab label="Parameters">
+        <div class="tab-content">
+          <mat-card class="settings-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>tune</mat-icon>
+                System Parameters
+              </mat-card-title>
+              <mat-card-subtitle>
+                Configure system-wide parameters for AI operations
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="parameters-grid">
+                @for (param of parameters; track param.publicId) {
+                  <div class="parameter-item">
+                    @if (param.key === 'ACTIVE_AI_SERVICE') {
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Active AI Service</mat-label>
+                        <mat-select [(ngModel)]="param.value">
+                          @for (provider of aiProviders; track provider.value) {
+                            <mat-option [value]="provider.value">
+                              {{ provider.label }}
+                            </mat-option>
+                          }
+                        </mat-select>
+                        <mat-hint>Select the AI service provider to use</mat-hint>
+                      </mat-form-field>
+                    } @else {
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>{{ param.key }}</mat-label>
+                        <input matInput type="number" [(ngModel)]="param.value">
+                        @if (param.key.includes('PERCENTAGE')) {
+                          <span matTextSuffix>%</span>
+                          <mat-hint>Minimum match percentage (0-100)</mat-hint>
+                        }
+                      </mat-form-field>
+                    }
+                    
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      [disabled]="saving"
+                      (click)="saveParameter(param)">
+                      <mat-icon>save</mat-icon>
+                      Save
+                    </button>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Prompts Tab -->
+      <mat-tab label="Prompts">
+        <div class="tab-content">
+          @for (prompt of prompts; track prompt.publicId) {
+            <mat-card class="prompt-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>description</mat-icon>
+                  {{ prompt.name }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                  Key: {{ prompt.key }}
+                </mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Prompt Name</mat-label>
+                  <input matInput [(ngModel)]="prompt.name">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width prompt-text-field">
+                  <mat-label>Prompt Text</mat-label>
+                  <textarea 
+                    matInput 
+                    [(ngModel)]="prompt.text"
+                    rows="15"
+                    class="prompt-textarea"></textarea>
+                  <mat-hint>Use placeholders like &#123;jobTitle&#125;, &#123;rawHtmlContent&#125;, &#123;cvText&#125;, &#123;jobPositions&#125;, &#123;minimumMatchPercentage&#125;</mat-hint>
+                </mat-form-field>
+
+                <div class="actions">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    [disabled]="saving"
+                    (click)="savePrompt(prompt)">
+                    <mat-icon>save</mat-icon>
+                    Save Prompt
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>
