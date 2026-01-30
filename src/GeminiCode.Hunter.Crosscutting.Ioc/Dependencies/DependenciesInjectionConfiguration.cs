@@ -29,6 +29,8 @@ public static class DependenciesInjectionConfiguration
         services.AddScoped<IAIService, AIService>();
         services.AddScoped<IPdfService, PdfService>();
         services.AddScoped<ICvInfoExtractionService, CvInfoExtractionService>();
+        services.AddScoped<IParameterService, ParameterService>();
+        services.AddScoped<IPromptService, PromptService>();
     }
 
     public static void AddNotificationServices(this IServiceCollection services)

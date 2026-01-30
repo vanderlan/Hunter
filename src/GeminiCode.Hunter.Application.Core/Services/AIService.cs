@@ -15,25 +15,47 @@ public class AIService : IAIService
 {
     private ChatClient _chatClient;
     private readonly ILogger<AIService> _logger;
-    private readonly string _provider;
+    private readonly IConfiguration _configuration;
+    private readonly IParameterService _parameterService;
+    private readonly IPromptService _promptService;
+    private string _provider;
     private string _model;
 
-    public AIService(IConfiguration configuration, ILogger<AIService> logger)
+    public AIService(
+        IConfiguration configuration, 
+        ILogger<AIService> logger,
+        IParameterService parameterService,
+        IPromptService promptService)
     {
+        _configuration = configuration;
+        _logger = logger;
+        _parameterService = parameterService;
+        _promptService = promptService;
+        
+        // Provider will be set from parameter service in async methods
         _provider = configuration["AI:Provider"] ?? AIProviders.OpenAI;
 
         SetupProvider(configuration, logger);
-
-        _logger = logger;
     }
 
     public async Task<JobEnrichmentResult> EnrichJobDetailsAsync(string jobTitle, string rawHtmlContent)
     {
         try
         {
+            // Get active AI provider from parameter
+            _provider = await _parameterService.GetValueAsync(
+                GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.ActiveAIService, 
+                _configuration["AI:Provider"] ?? AIProviders.OpenAI);
+            
+            // Ensure provider is set up
+            if (!string.IsNullOrEmpty(_provider))
+            {
+                SetupProvider(_configuration, _logger);
+            }
+
             _logger.LogInformation("Enriching job details for: {JobTitle} using {Provider}", jobTitle, _provider);
 
-            var prompt = BuildJobEnrichmentPrompt(jobTitle, rawHtmlContent);
+            var prompt = await BuildJobEnrichmentPromptAsync(jobTitle, rawHtmlContent);
 
             var messages = new List<ChatMessage>
             {
@@ -100,10 +122,21 @@ public class AIService : IAIService
     {
         try
         {
+            // Get active AI provider from parameter
+            _provider = await _parameterService.GetValueAsync(
+                GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.ActiveAIService, 
+                _configuration["AI:Provider"] ?? AIProviders.OpenAI);
+            
+            // Ensure provider is set up
+            if (!string.IsNullOrEmpty(_provider))
+            {
+                SetupProvider(_configuration, _logger);
+            }
+
             _logger.LogInformation("Analyzing CV against {JobCount} positions using {Provider}", 
                 jobPositions.Count, _provider);
 
-            var prompt = BuildAnalysisPrompt(cvText, jobPositions);
+            var prompt = await BuildAnalysisPromptAsync(cvText, jobPositions);
 
             var messages = new List<ChatMessage>
             {
@@ -199,7 +232,27 @@ public class AIService : IAIService
         }
     }
 
-    private static string BuildJobEnrichmentPrompt(string jobTitle, string rawHtmlContent)
+    private async Task<string> BuildJobEnrichmentPromptAsync(string jobTitle, string rawHtmlContent)
+    {
+        // Get prompt template from database
+        var promptTemplate = await _promptService.GetPromptTextAsync(
+            GeminiCode.Hunter.Domain.Core.Constants.PromptConstants.JobEnrichment);
+        
+        // If no template found in database, use fallback
+        if (string.IsNullOrEmpty(promptTemplate))
+        {
+            return BuildJobEnrichmentPromptFallback(jobTitle, rawHtmlContent);
+        }
+
+        // Replace placeholders in template
+        var prompt = promptTemplate
+            .Replace("{jobTitle}", jobTitle)
+            .Replace("{rawHtmlContent}", rawHtmlContent);
+
+        return prompt;
+    }
+
+    private static string BuildJobEnrichmentPromptFallback(string jobTitle, string rawHtmlContent)
     {
         var sb = new StringBuilder();
         
@@ -247,7 +300,82 @@ public class AIService : IAIService
         return sb.ToString();
     }
 
-    private static string BuildAnalysisPrompt(string cvText, List<JobPositionSummary> jobPositions)
+    private async Task<string> BuildAnalysisPromptAsync(string cvText, List<JobPositionSummary> jobPositions)
+    {
+        // Get prompt template from database
+        var promptTemplate = await _promptService.GetPromptTextAsync(
+            GeminiCode.Hunter.Domain.Core.Constants.PromptConstants.CvAnalysis);
+        
+        // If no template found in database, use fallback
+        if (string.IsNullOrEmpty(promptTemplate))
+        {
+            // Get minimum match percentage from parameter
+            var minimumMatchPercentage = await _parameterService.GetValueAsIntAsync(
+                GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.MinimumMatchPercentageCvAnalysis,
+                AIMatching.MinimumMatchPercentage);
+
+            return BuildAnalysisPromptFallback(cvText, jobPositions, minimumMatchPercentage);
+        }
+
+        // Build job positions section
+        var jobPositionsText = BuildJobPositionsSection(jobPositions);
+        
+        // Get minimum match percentage from parameter
+        var minMatchPercentage = await _parameterService.GetValueAsIntAsync(
+            GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.MinimumMatchPercentageCvAnalysis,
+            AIMatching.MinimumMatchPercentage);
+
+        // Replace placeholders in template
+        var prompt = promptTemplate
+            .Replace("{cvText}", cvText)
+            .Replace("{jobPositions}", jobPositionsText)
+            .Replace("{minimumMatchPercentage}", minMatchPercentage.ToString());
+
+        return prompt;
+    }
+
+    private static string BuildJobPositionsSection(List<JobPositionSummary> jobPositions)
+    {
+        var sb = new StringBuilder();
+        
+        foreach (var job in jobPositions)
+        {
+            sb.AppendLine($"## Job Code: {job.JobCode}");
+            sb.AppendLine($"**Title:** {job.Title}");
+            sb.AppendLine($"**Company:** {job.CompanyCode}");
+            
+            if (!string.IsNullOrWhiteSpace(job.Summary))
+            {
+                sb.AppendLine($"**Summary:** {job.Summary}");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(job.Responsibilities))
+            {
+                sb.AppendLine($"**Responsibilities:** {job.Responsibilities}");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(job.Requirements))
+            {
+                sb.AppendLine($"**Requirements:** {job.Requirements}");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(job.MustHaveSkills))
+            {
+                sb.AppendLine($"**Must-Have Skills:** {job.MustHaveSkills}");
+            }
+            
+            if (!string.IsNullOrWhiteSpace(job.NiceToHaveSkills))
+            {
+                sb.AppendLine($"**Nice-to-Have Skills:** {job.NiceToHaveSkills}");
+            }
+            
+            sb.AppendLine();
+        }
+        
+        return sb.ToString();
+    }
+
+    private static string BuildAnalysisPromptFallback(string cvText, List<JobPositionSummary> jobPositions, int minimumMatchPercentage)
     {
         var sb = new StringBuilder();
         
@@ -333,7 +461,7 @@ public class AIService : IAIService
         sb.AppendLine("   - If Requirements specify degree level (Bachelor's, Master's) and candidate doesn't have it ? Apply penalty (reduce match by 10-15%)");
         sb.AppendLine("   - If Requirements specify certifications (AWS, Azure, etc.) and candidate lacks them ? Apply penalty (reduce match by 5-10%)");
         sb.AppendLine();
-        sb.AppendLine($"Return ONLY positions with match percentage > {AIMatching.MinimumMatchPercentage}%, ordered by match percentage (highest first).");
+        sb.AppendLine($"Return ONLY positions with match percentage > {minimumMatchPercentage}%, ordered by match percentage (highest first).");
         sb.AppendLine("Validate CV File if you are not able to find important information such as: Name, e-mail, phone number or the file is inconsistent with a usual CV format, reject then and returns no matches.");
         sb.AppendLine();
         sb.AppendLine("# OUTPUT FORMAT");
