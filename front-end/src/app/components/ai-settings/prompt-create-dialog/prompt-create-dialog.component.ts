@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { QuillModule } from 'ngx-quill';
 import { PromptCreateRequest } from '../../../services/prompt.service';
 
 @Component({
@@ -18,7 +19,8 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    QuillModule
   ],
   template: `
     <h2 mat-dialog-title>
@@ -39,15 +41,19 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
         <mat-hint>Maximum 200 characters</mat-hint>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Text</mat-label>
-        <textarea 
-          matInput 
-          [(ngModel)]="text" 
-          placeholder="Prompt text with placeholders..."
-          rows="10"></textarea>
-        <mat-hint>Use placeholders like &#123;variable&#125; where needed</mat-hint>
-      </mat-form-field>
+      <div class="prompt-editor-wrapper">
+        <label class="editor-label">Prompt Text</label>
+        <quill-editor 
+          [(ngModel)]="text"
+          [modules]="quillModules"
+          [styles]="{ height: '300px' }"
+          placeholder="Enter your prompt text here..."
+          class="quill-editor">
+        </quill-editor>
+        <div class="editor-hint">
+          Use placeholders like &#123;jobTitle&#125;, &#123;rawHtmlContent&#125;, &#123;cvText&#125;, &#123;jobPositions&#125;, &#123;minimumMatchPercentage&#125;
+        </div>
+      </div>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
@@ -65,10 +71,10 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
     }
 
     mat-dialog-content {
-      min-width: 550px;
-      max-height: 70vh;
+      min-width: 700px;
+      max-height: 80vh;
       overflow-y: auto;
-      padding: 24px 0;
+      padding: 24px;
     }
 
     h2 {
@@ -93,17 +99,68 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
       min-width: 100px;
     }
 
-    textarea {
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
+    .prompt-editor-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+
+      .editor-label {
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      .quill-editor {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+        background: white;
+
+        ::ng-deep .ql-container {
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+          line-height: 1.6;
+          min-height: 300px;
+        }
+
+        ::ng-deep .ql-editor {
+          min-height: 300px;
+          max-height: 400px;
+          overflow-y: auto;
+        }
+
+        ::ng-deep .ql-toolbar {
+          border-top-left-radius: 4px;
+          border-top-right-radius: 4px;
+          background: #f5f5f5;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+        }
+      }
+
+      .editor-hint {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.6);
+      }
     }
   `]
 })
 export class PromptCreateDialogComponent {
-  key = '';
-  name = '';
-  text = '';
+key = '';
+name = '';
+text = '';
+
+// Quill editor configuration
+quillModules = {
+  toolbar: [
+    ['bold', 'italic', 'underline', 'strike'],
+    ['blockquote', 'code-block'],
+    [{ 'header': 1 }, { 'header': 2 }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }],
+    ['link'],
+    ['clean']
+  ]
+};
 
   constructor(
     private dialogRef: MatDialogRef<PromptCreateDialogComponent>

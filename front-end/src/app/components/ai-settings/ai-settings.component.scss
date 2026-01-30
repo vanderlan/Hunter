@@ -173,10 +173,56 @@
         white-space: pre-wrap;
       }
 
+      .prompt-editor {
+        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .editor-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: rgba(0, 0, 0, 0.87);
+          margin-bottom: 4px;
+        }
+
+        .quill-editor {
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          border-radius: 4px;
+          background: white;
+
+          ::ng-deep .ql-container {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            min-height: 300px;
+          }
+
+          ::ng-deep .ql-editor {
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+          }
+
+          ::ng-deep .ql-toolbar {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            background: #f5f5f5;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+          }
+        }
+
+        .editor-hint {
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.6);
+          margin-top: 4px;
+        }
+      }
+
       .actions {
         display: flex;
         justify-content: flex-end;
-        margin-top: 16px;
+        margin-top: 24px;
         gap: 12px;
 
         button {

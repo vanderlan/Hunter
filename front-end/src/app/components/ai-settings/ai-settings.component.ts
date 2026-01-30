@@ -129,7 +129,7 @@ export class AiSettingsComponent implements OnInit {
 
   openCreatePromptDialog(): void {
     const dialogRef = this.dialog.open(PromptCreateDialogComponent, {
-      width: '600px',
+      width: '800px',
       maxHeight: '90vh'
     });
 
