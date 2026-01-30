@@ -1,0 +1,211 @@
+<div class="ai-settings-container">
+  <!-- Header Card -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>settings</mat-icon>
+        AI Settings Management
+      </mat-card-title>
+      <mat-card-subtitle>
+        Configure AI service providers, prompts, and matching parameters
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading AI settings...</p>
+    </div>
+  } @else {
+    <mat-tab-group class="settings-tabs">
+      <!-- Parameters Tab -->
+      <mat-tab label="Parameters">
+        <div class="tab-content">
+          <!-- AI Provider Section -->
+          <mat-card class="provider-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>psychology</mat-icon>
+                AI Service Provider
+              </mat-card-title>
+              <mat-card-subtitle>
+                Select the AI service provider for analysis operations
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <mat-radio-group 
+                class="provider-radio-group" 
+                [(ngModel)]="activeAIProvider"
+                (change)="onProviderChange()">
+                @for (provider of aiProviders; track provider.value) {
+                  <mat-radio-button [value]="provider.value" class="provider-radio-button">
+                    <div class="provider-option">
+                      <div class="provider-info">
+                        <span class="provider-name">{{ provider.label }}</span>
+                        <span class="provider-description">{{ provider.description }}</span>
+                      </div>
+                    </div>
+                  </mat-radio-button>
+                }
+              </mat-radio-group>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- System Parameters Section -->
+          <mat-card class="settings-card">
+            <mat-card-header>
+              <mat-card-title>
+                <mat-icon>tune</mat-icon>
+                System Parameters
+              </mat-card-title>
+              <mat-card-subtitle>
+                Configure system-wide parameters
+              </mat-card-subtitle>
+              <div class="header-actions">
+                <button 
+                  mat-raised-button 
+                  color="primary"
+                  (click)="openCreateParameterDialog()">
+                  <mat-icon>add</mat-icon>
+                  New Parameter
+                </button>
+              </div>
+            </mat-card-header>
+
+            <mat-card-content>
+              @if (regularParameters.length === 0) {
+                <div class="empty-state">
+                  <mat-icon>info</mat-icon>
+                  <p>No parameters configured yet. Click "New Parameter" to create one.</p>
+                </div>
+              } @else {
+                <div class="parameters-table">
+                  <div class="table-header">
+                    <div class="column-key">Key</div>
+                    <div class="column-value">Value</div>
+                    <div class="column-actions">Actions</div>
+                  </div>
+                  @for (param of regularParameters; track param.publicId) {
+                    <div class="table-row">
+                      <div class="column-key">
+                        <span class="param-key">{{ param.key }}</span>
+                      </div>
+                      <div class="column-value">
+                        <input 
+                          type="text" 
+                          class="param-value-input"
+                          [(ngModel)]="param.value"
+                          placeholder="Enter value">
+                      </div>
+                      <div class="column-actions">
+                        <button 
+                          mat-icon-button 
+                          color="primary" 
+                          [disabled]="saving"
+                          (click)="saveParameter(param)"
+                          matTooltip="Save">
+                          <mat-icon>save</mat-icon>
+                        </button>
+                        <button 
+                          mat-icon-button 
+                          color="warn" 
+                          [disabled]="saving"
+                          (click)="confirmDeleteParameter(param)"
+                          matTooltip="Delete">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- Prompts Tab -->
+      <mat-tab label="Prompts">
+        <div class="tab-content">
+          <div class="tab-header-actions">
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="openCreatePromptDialog()">
+              <mat-icon>add</mat-icon>
+              New Prompt
+            </button>
+          </div>
+
+          @if (prompts.length === 0) {
+            <mat-card class="empty-state-card">
+              <mat-card-content>
+                <div class="empty-state">
+                  <mat-icon>info</mat-icon>
+                  <p>No prompts configured yet. Click "New Prompt" to create one.</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+
+          @for (prompt of prompts; track prompt.publicId) {
+            <mat-card class="prompt-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>description</mat-icon>
+                  {{ prompt.name }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                  Key: {{ prompt.key }}
+                </mat-card-subtitle>
+              </mat-card-header>
+
+              <mat-card-content>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Prompt Name</mat-label>
+                  <input matInput [(ngModel)]="prompt.name">
+                </mat-form-field>
+
+                <div class="prompt-editor">
+                  <label class="editor-label">Prompt Text</label>
+                  <quill-editor 
+                    [(ngModel)]="prompt.text"
+                    [modules]="quillModules"
+                    [styles]="{ height: '300px' }"
+                    placeholder="Enter your prompt text here..."
+                    class="quill-editor">
+                  </quill-editor>
+                  <div class="editor-hint">
+                    Use placeholders like {{ '{' }}jobTitle{{ '}' }}, {{ '{' }}rawHtmlContent{{ '}' }}, {{ '{' }}cvText{{ '}' }}, {{ '{' }}jobPositions{{ '}' }}, {{ '{' }}minimumMatchPercentage{{ '}' }}
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    [disabled]="saving"
+                    (click)="savePrompt(prompt)">
+                    <mat-icon>save</mat-icon>
+                    Save Prompt
+                  </button>
+                  <button 
+                    mat-raised-button 
+                    color="warn" 
+                    [disabled]="saving"
+                    (click)="confirmDeletePrompt(prompt)">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>
+

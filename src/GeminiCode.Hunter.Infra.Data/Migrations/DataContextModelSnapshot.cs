@@ -501,10 +501,10 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<string>("Responsibilities")
+                    b.Property<string>("Requirements")
                         .HasColumnType("text");
 
-                    b.Property<string>("Requirements")
+                    b.Property<string>("Responsibilities")
                         .HasColumnType("text");
 
                     b.Property<string>("Summary")
@@ -530,6 +530,90 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("JobPosition", (string)null);
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.Parameter", b =>
+                {
+                    b.Property<long>("ParameterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ParameterId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("ParameterId");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.ToTable("Parameter", (string)null);
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.Prompt", b =>
+                {
+                    b.Property<long>("PromptId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PromptId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("PromptId");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.ToTable("Prompt", (string)null);
                 });
 
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.RefreshToken", b =>

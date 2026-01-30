@@ -33,6 +33,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard, AdminGuard]
   },
   {
+    path: 'ai-settings',
+    loadComponent: () => import('./components/ai-settings/ai-settings.component').then(m => m.AiSettingsComponent),
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
     path: 'candidates',
     loadComponent: () => import('./components/candidates/candidates.component').then(m => m.CandidatesComponent),
     canActivate: [AuthGuard]
