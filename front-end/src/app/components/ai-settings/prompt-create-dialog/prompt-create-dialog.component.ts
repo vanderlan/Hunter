@@ -117,8 +117,8 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
         background: white;
 
         ::ng-deep .ql-container {
-          font-family: 'Courier New', monospace;
-          font-size: 13px;
+          font-family: 'SF Mono', Monaco, Menlo, Consolas, 'Roboto Mono', 'Liberation Mono', monospace;
+          font-size: 14px;
           line-height: 1.6;
           min-height: 300px;
         }
