@@ -24,6 +24,8 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<HiringProcessNote> HiringProcessNotes { get; set; }
     public DbSet<CvAnalysis> CvAnalyses { get; set; }
     public DbSet<CvAnalysisMatch> CvAnalysisMatches { get; set; }
+    public DbSet<Parameter> Parameters { get; set; }
+    public DbSet<Prompt> Prompts { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -46,6 +48,8 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new HiringProcessNoteMapping());
         modelBuilder.ApplyConfiguration(new CvAnalysisMapping());
         modelBuilder.ApplyConfiguration(new CvAnalysisMatchMapping());
+        modelBuilder.ApplyConfiguration(new ParameterMapping());
+        modelBuilder.ApplyConfiguration(new PromptMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

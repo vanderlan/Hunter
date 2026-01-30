@@ -46,6 +46,12 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private ICvAnalysisRepository _cvAnalysisRepository;
     public ICvAnalysisRepository CvAnalysisRepository => _cvAnalysisRepository ??= new CvAnalysisRepository(DbContext);
 
+    private IParameterRepository _parameterRepository;
+    public IParameterRepository ParameterRepository => _parameterRepository ??= new ParameterRepository(DbContext);
+
+    private IPromptRepository _promptRepository;
+    public IPromptRepository PromptRepository => _promptRepository ??= new PromptRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try
