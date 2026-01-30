@@ -10,9 +10,15 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
-import { ParameterService, Parameter } from '../../services/parameter.service';
-import { PromptService, Prompt } from '../../services/prompt.service';
+import { ParameterService, Parameter, ParameterCreateRequest } from '../../services/parameter.service';
+import { PromptService, Prompt, PromptCreateRequest } from '../../services/prompt.service';
+import { ParameterCreateDialogComponent } from './parameter-create-dialog/parameter-create-dialog.component';
+import { PromptCreateDialogComponent } from './prompt-create-dialog/prompt-create-dialog.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-ai-settings',
@@ -28,7 +34,10 @@ import { PromptService, Prompt } from '../../services/prompt.service';
     MatSelectModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatTabsModule
+    MatTabsModule,
+    MatDialogModule,
+    MatTooltipModule,
+    QuillModule
   ],
   templateUrl: './ai-settings.component.html',
   styleUrls: ['./ai-settings.component.scss']
@@ -39,6 +48,19 @@ export class AiSettingsComponent implements OnInit {
   loading = false;
   saving = false;
 
+  // Quill editor configuration
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'indent': '-1'}, { 'indent': '+1' }],
+      ['link'],
+      ['clean']
+    ]
+  };
+
   // AI Provider options
   aiProviders = [
     { value: 'OpenAI', label: 'OpenAI GPT-4o' },
@@ -48,7 +70,8 @@ export class AiSettingsComponent implements OnInit {
   constructor(
     private parameterService: ParameterService,
     private promptService: PromptService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -92,6 +115,67 @@ export class AiSettingsComponent implements OnInit {
     return this.prompts.find(p => p.key === key);
   }
 
+  openCreateParameterDialog(): void {
+    const dialogRef = this.dialog.open(ParameterCreateDialogComponent, {
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe((request: ParameterCreateRequest | null) => {
+      if (request) {
+        this.createParameter(request);
+      }
+    });
+  }
+
+  openCreatePromptDialog(): void {
+    const dialogRef = this.dialog.open(PromptCreateDialogComponent, {
+      width: '600px',
+      maxHeight: '90vh'
+    });
+
+    dialogRef.afterClosed().subscribe((request: PromptCreateRequest | null) => {
+      if (request) {
+        this.createPrompt(request);
+      }
+    });
+  }
+
+  createParameter(request: ParameterCreateRequest): void {
+    this.saving = true;
+    this.parameterService.create(request)
+      .subscribe({
+        next: (newParameter) => {
+          this.parameters.push(newParameter);
+          this.snackBar.open('Parameter created successfully', 'Close', { duration: 2000 });
+          this.saving = false;
+        },
+        error: (error) => {
+          console.error('Error creating parameter:', error);
+          const errorMsg = error.error?.title || error.error?.message || 'Error creating parameter';
+          this.snackBar.open(errorMsg, 'Close', { duration: 3000 });
+          this.saving = false;
+        }
+      });
+  }
+
+  createPrompt(request: PromptCreateRequest): void {
+    this.saving = true;
+    this.promptService.create(request)
+      .subscribe({
+        next: (newPrompt) => {
+          this.prompts.push(newPrompt);
+          this.snackBar.open('Prompt created successfully', 'Close', { duration: 2000 });
+          this.saving = false;
+        },
+        error: (error) => {
+          console.error('Error creating prompt:', error);
+          const errorMsg = error.error?.title || error.error?.message || 'Error creating prompt';
+          this.snackBar.open(errorMsg, 'Close', { duration: 3000 });
+          this.saving = false;
+        }
+      });
+  }
+
   saveParameter(param: Parameter): void {
     this.saving = true;
     this.parameterService.update(param.publicId, { value: param.value })
@@ -123,4 +207,75 @@ export class AiSettingsComponent implements OnInit {
         }
       });
   }
+
+  confirmDeleteParameter(param: Parameter): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Parameter',
+        message: `Are you sure you want to delete the parameter "${param.key}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.deleteParameter(param);
+      }
+    });
+  }
+
+  deleteParameter(param: Parameter): void {
+    this.saving = true;
+    this.parameterService.delete(param.publicId)
+      .subscribe({
+        next: () => {
+          this.parameters = this.parameters.filter(p => p.publicId !== param.publicId);
+          this.snackBar.open('Parameter deleted successfully', 'Close', { duration: 2000 });
+          this.saving = false;
+        },
+        error: (error) => {
+          console.error('Error deleting parameter:', error);
+          this.snackBar.open('Error deleting parameter', 'Close', { duration: 3000 });
+          this.saving = false;
+        }
+      });
+  }
+
+  confirmDeletePrompt(prompt: Prompt): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Prompt',
+        message: `Are you sure you want to delete the prompt "${prompt.name}"?`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.deletePrompt(prompt);
+      }
+    });
+  }
+
+  deletePrompt(prompt: Prompt): void {
+    this.saving = true;
+    this.promptService.delete(prompt.publicId)
+      .subscribe({
+        next: () => {
+          this.prompts = this.prompts.filter(p => p.publicId !== prompt.publicId);
+          this.snackBar.open('Prompt deleted successfully', 'Close', { duration: 2000 });
+          this.saving = false;
+        },
+        error: (error) => {
+          console.error('Error deleting prompt:', error);
+          this.snackBar.open('Error deleting prompt', 'Close', { duration: 3000 });
+          this.saving = false;
+        }
+      });
+  }
 }
+

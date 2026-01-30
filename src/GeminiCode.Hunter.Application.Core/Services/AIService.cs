@@ -1,3 +1,4 @@
+using GeminiCode.Hunter.Domain.Core.Constants;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Services;
 using Microsoft.Extensions.Configuration;
@@ -43,9 +44,7 @@ public class AIService : IAIService
         try
         {
             // Get active AI provider from parameter
-            _provider = await _parameterService.GetValueAsync(
-                GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.ActiveAIService, 
-                _configuration["AI:Provider"] ?? AIProviders.OpenAI);
+            _provider = await _parameterService.GetValueAsync(ParameterConstants.ActiveAIService, _configuration["AI:Provider"] ?? AIProviders.OpenAI);
             
             // Re-setup provider with new configuration
             SetupProvider(_configuration, _logger);
@@ -120,9 +119,7 @@ public class AIService : IAIService
         try
         {
             // Get active AI provider from parameter
-            _provider = await _parameterService.GetValueAsync(
-                GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.ActiveAIService, 
-                _configuration["AI:Provider"] ?? AIProviders.OpenAI);
+            _provider = await _parameterService.GetValueAsync(ParameterConstants.ActiveAIService, _configuration["AI:Provider"] ?? AIProviders.OpenAI);
             
             // Re-setup provider with new configuration
             SetupProvider(_configuration, _logger);
@@ -228,17 +225,11 @@ public class AIService : IAIService
 
     private async Task<string> BuildJobEnrichmentPromptAsync(string jobTitle, string rawHtmlContent)
     {
-        // Get prompt template from database
-        var promptTemplate = await _promptService.GetPromptTextAsync(
-            GeminiCode.Hunter.Domain.Core.Constants.PromptConstants.JobEnrichment);
+        var promptTemplate = await _promptService.GetPromptTextAsync(PromptConstants.JobEnrichment);
         
-        // If no template found in database, use fallback
         if (string.IsNullOrEmpty(promptTemplate))
-        {
             return BuildJobEnrichmentPromptFallback(jobTitle, rawHtmlContent);
-        }
 
-        // Replace placeholders in template
         var prompt = promptTemplate
             .Replace("{jobTitle}", jobTitle)
             .Replace("{rawHtmlContent}", rawHtmlContent);
@@ -297,15 +288,14 @@ public class AIService : IAIService
     private async Task<string> BuildAnalysisPromptAsync(string cvText, List<JobPositionSummary> jobPositions)
     {
         // Get prompt template from database
-        var promptTemplate = await _promptService.GetPromptTextAsync(
-            GeminiCode.Hunter.Domain.Core.Constants.PromptConstants.CvAnalysis);
+        var promptTemplate = await _promptService.GetPromptTextAsync(PromptConstants.CvAnalysis);
         
         // If no template found in database, use fallback
         if (string.IsNullOrEmpty(promptTemplate))
         {
             // Get minimum match percentage from parameter
             var minimumMatchPercentage = await _parameterService.GetValueAsIntAsync(
-                GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.MinimumMatchPercentageCvAnalysis,
+                ParameterConstants.MinimumMatchPercentageCvAnalysis,
                 AIMatching.MinimumMatchPercentage);
 
             return BuildAnalysisPromptFallback(cvText, jobPositions, minimumMatchPercentage);
@@ -316,7 +306,7 @@ public class AIService : IAIService
         
         // Get minimum match percentage from parameter
         var minMatchPercentage = await _parameterService.GetValueAsIntAsync(
-            GeminiCode.Hunter.Domain.Core.Constants.ParameterConstants.MinimumMatchPercentageCvAnalysis,
+            ParameterConstants.MinimumMatchPercentageCvAnalysis,
             AIMatching.MinimumMatchPercentage);
 
         // Replace placeholders in template

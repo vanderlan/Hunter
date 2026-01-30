@@ -85,6 +85,7 @@ export class AppComponent {
     if (route.includes('/admin')) return 'Admin Panel';
     if (route.includes('/job-positions')) return 'Job Positions';
     if (route.includes('/users')) return 'Users';
+    if (route.includes('/ai-settings')) return 'IA Settings';
     if (route.includes('/change-password')) return 'Change Password';
     if (route.includes('/preferences')) return 'Preferences';
     return 'Hunter';

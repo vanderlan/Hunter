@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
+using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Create;
+using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Delete;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Queries.GetAll;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Queries.GetByKey;
@@ -47,6 +49,22 @@ public class PromptsController(IMediator mediator) : ApiController(mediator)
             return NotFound();
 
         return Ok(prompt);
+    }
+
+    /// <summary>
+    /// Creates a new prompt
+    /// </summary>
+    /// <param name="request">The prompt data</param>
+    /// <returns>The created prompt</returns>
+    [HttpPost]
+    [SwaggerResponse((int)HttpStatusCode.Created, "Prompt created successfully", typeof(PromptCreateResponse))]
+    [SwaggerResponse((int)HttpStatusCode.Conflict, "Prompt with same key already exists")]
+    [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid request")]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Create([FromBody] PromptCreateRequest request)
+    {
+        var response = await Mediator.Send(request);
+        return CreatedAtAction(nameof(GetByKey), new { key = response.Key }, response);
     }
 
     /// <summary>

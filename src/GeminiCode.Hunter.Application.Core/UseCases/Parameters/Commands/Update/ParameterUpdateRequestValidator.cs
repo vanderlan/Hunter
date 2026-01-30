@@ -6,10 +6,6 @@ public class ParameterUpdateRequestValidator : AbstractValidator<ParameterUpdate
 {
     public ParameterUpdateRequestValidator()
     {
-        RuleFor(x => x.PublicId)
-            .NotEmpty()
-            .WithMessage("PublicId is required");
-
         RuleFor(x => x.Value)
             .NotEmpty()
             .WithMessage("Value is required")

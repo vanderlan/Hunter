@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
+using GeminiCode.Hunter.Application.Core.UseCases.Parameters.Commands.Create;
+using GeminiCode.Hunter.Application.Core.UseCases.Parameters.Commands.Delete;
 using GeminiCode.Hunter.Application.Core.UseCases.Parameters.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Parameters.Queries.GetAll;
 using GeminiCode.Hunter.Application.Core.UseCases.Parameters.Queries.GetByKey;
@@ -50,6 +52,22 @@ public class ParametersController(IMediator mediator) : ApiController(mediator)
     }
 
     /// <summary>
+    /// Creates a new parameter
+    /// </summary>
+    /// <param name="request">The parameter data</param>
+    /// <returns>The created parameter</returns>
+    [HttpPost]
+    [SwaggerResponse((int)HttpStatusCode.Created, "Parameter created successfully", typeof(ParameterCreateResponse))]
+    [SwaggerResponse((int)HttpStatusCode.Conflict, "Parameter with same key already exists")]
+    [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid request")]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Create([FromBody] ParameterCreateRequest request)
+    {
+        var response = await Mediator.Send(request);
+        return CreatedAtAction(nameof(GetByKey), new { key = response.Key }, response);
+    }
+
+    /// <summary>
     /// Updates a parameter's value
     /// </summary>
     /// <param name="id">The parameter's public ID</param>
@@ -64,6 +82,21 @@ public class ParametersController(IMediator mediator) : ApiController(mediator)
     {
         request.PublicId = id;
         await Mediator.Send(request);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Deletes a parameter
+    /// </summary>
+    /// <param name="id">The parameter's public ID</param>
+    /// <returns>No content on success</returns>
+    [HttpDelete("{id}")]
+    [SwaggerResponse((int)HttpStatusCode.NoContent, "Parameter deleted successfully")]
+    [SwaggerResponse((int)HttpStatusCode.NotFound, "Parameter not found")]
+    [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+    public async Task<IActionResult> Delete(string id)
+    {
+        await Mediator.Send(new ParameterDeleteRequest { PublicId = id });
         return NoContent();
     }
 }

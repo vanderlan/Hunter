@@ -31,6 +31,15 @@
               <mat-card-subtitle>
                 Configure system-wide parameters for AI operations
               </mat-card-subtitle>
+              <div class="header-actions">
+                <button 
+                  mat-raised-button 
+                  color="primary"
+                  (click)="openCreateParameterDialog()">
+                  <mat-icon>add</mat-icon>
+                  New Parameter
+                </button>
+              </div>
             </mat-card-header>
 
             <mat-card-content>
@@ -60,14 +69,31 @@
                       </mat-form-field>
                     }
                     
-                    <button 
-                      mat-raised-button 
-                      color="primary" 
-                      [disabled]="saving"
-                      (click)="saveParameter(param)">
-                      <mat-icon>save</mat-icon>
-                      Save
-                    </button>
+                    <div class="parameter-actions">
+                      <button 
+                        mat-raised-button 
+                        color="primary" 
+                        [disabled]="saving"
+                        (click)="saveParameter(param)">
+                        <mat-icon>save</mat-icon>
+                        Save
+                      </button>
+                      <button 
+                        mat-stroked-button 
+                        color="warn" 
+                        [disabled]="saving"
+                        (click)="confirmDeleteParameter(param)">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                }
+                
+                @if (parameters.length === 0) {
+                  <div class="empty-state">
+                    <mat-icon>info</mat-icon>
+                    <p>No parameters configured yet. Click "New Parameter" to create one.</p>
                   </div>
                 }
               </div>
@@ -79,6 +105,27 @@
       <!-- Prompts Tab -->
       <mat-tab label="Prompts">
         <div class="tab-content">
+          <div class="tab-header-actions">
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="openCreatePromptDialog()">
+              <mat-icon>add</mat-icon>
+              New Prompt
+            </button>
+          </div>
+
+          @if (prompts.length === 0) {
+            <mat-card class="empty-state-card">
+              <mat-card-content>
+                <div class="empty-state">
+                  <mat-icon>info</mat-icon>
+                  <p>No prompts configured yet. Click "New Prompt" to create one.</p>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+
           @for (prompt of prompts; track prompt.publicId) {
             <mat-card class="prompt-card">
               <mat-card-header>
@@ -97,15 +144,19 @@
                   <input matInput [(ngModel)]="prompt.name">
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" class="full-width prompt-text-field">
-                  <mat-label>Prompt Text</mat-label>
-                  <textarea 
-                    matInput 
+                <div class="prompt-editor">
+                  <label class="editor-label">Prompt Text</label>
+                  <quill-editor 
                     [(ngModel)]="prompt.text"
-                    rows="15"
-                    class="prompt-textarea"></textarea>
-                  <mat-hint>Use placeholders like &#123;jobTitle&#125;, &#123;rawHtmlContent&#125;, &#123;cvText&#125;, &#123;jobPositions&#125;, &#123;minimumMatchPercentage&#125;</mat-hint>
-                </mat-form-field>
+                    [modules]="quillModules"
+                    [styles]="{ height: '300px' }"
+                    placeholder="Enter your prompt text here..."
+                    class="quill-editor">
+                  </quill-editor>
+                  <div class="editor-hint">
+                    Use placeholders like {{ '{' }}jobTitle{{ '}' }}, {{ '{' }}rawHtmlContent{{ '}' }}, {{ '{' }}cvText{{ '}' }}, {{ '{' }}jobPositions{{ '}' }}, {{ '{' }}minimumMatchPercentage{{ '}' }}
+                  </div>
+                </div>
 
                 <div class="actions">
                   <button 
@@ -116,6 +167,14 @@
                     <mat-icon>save</mat-icon>
                     Save Prompt
                   </button>
+                  <button 
+                    mat-raised-button 
+                    color="warn" 
+                    [disabled]="saving"
+                    (click)="confirmDeletePrompt(prompt)">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                  </button>
                 </div>
               </mat-card-content>
             </mat-card>
@@ -125,3 +184,4 @@
     </mat-tab-group>
   }
 </div>
+

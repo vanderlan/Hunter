@@ -6,10 +6,6 @@ public class PromptUpdateRequestValidator : AbstractValidator<PromptUpdateReques
 {
     public PromptUpdateRequestValidator()
     {
-        RuleFor(x => x.PublicId)
-            .NotEmpty()
-            .WithMessage("PublicId is required");
-
         RuleFor(x => x.Name)
             .MaximumLength(200)
             .When(x => !string.IsNullOrEmpty(x.Name))

@@ -13,6 +13,11 @@ export interface ParameterUpdateRequest {
   value: string;
 }
 
+export interface ParameterCreateRequest {
+  key: string;
+  value: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,9 +44,23 @@ export class ParameterService {
     });
   }
 
+  create(request: ParameterCreateRequest): Observable<Parameter> {
+    return this.http.post<Parameter>(this.apiUrl, request, {
+      headers: this.getHeaders()
+    });
+  }
+
   update(id: string, request: ParameterUpdateRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, request, {
       headers: this.getHeaders()
     });
   }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
 }
+
+

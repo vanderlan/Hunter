@@ -15,6 +15,12 @@ export interface PromptUpdateRequest {
   text?: string;
 }
 
+export interface PromptCreateRequest {
+  key: string;
+  name: string;
+  text: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,9 +47,23 @@ export class PromptService {
     });
   }
 
+  create(request: PromptCreateRequest): Observable<Prompt> {
+    return this.http.post<Prompt>(this.apiUrl, request, {
+      headers: this.getHeaders()
+    });
+  }
+
   update(id: string, request: PromptUpdateRequest): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/${id}`, request, {
       headers: this.getHeaders()
     });
   }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders()
+    });
+  }
 }
+
+
