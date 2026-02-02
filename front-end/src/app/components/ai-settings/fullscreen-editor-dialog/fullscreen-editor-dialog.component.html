@@ -1,0 +1,44 @@
+<div class="fullscreen-editor-container">
+  <div class="editor-header">
+    <div class="header-left">
+      <mat-icon>description</mat-icon>
+      <h2>{{ promptName }}</h2>
+    </div>
+    <div class="header-actions">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onSave()"
+        [disabled]="saving"
+        matTooltip="Save to database and close">
+        @if (saving) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          <mat-icon>check</mat-icon>
+        }
+        Save
+      </button>
+      <button 
+        mat-button 
+        (click)="onCancel()"
+        [disabled]="saving"
+        matTooltip="Close without saving">
+        <mat-icon>close</mat-icon>
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <div class="editor-content">
+    <quill-editor 
+      [(ngModel)]="promptText"
+      [modules]="quillModules"
+      [styles]="{ height: 'calc(100% - 60px)' }"
+      placeholder="Enter your prompt text here..."
+      class="fullscreen-quill-editor">
+    </quill-editor>
+    <div class="editor-hint">
+      Use placeholders like {{ '{' }}jobTitle{{ '}' }}, {{ '{' }}rawHtmlContent{{ '}' }}, {{ '{' }}cvText{{ '}' }}, {{ '{' }}jobPositions{{ '}' }}, {{ '{' }}minimumMatchPercentage{{ '}' }}
+    </div>
+  </div>
+</div>

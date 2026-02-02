@@ -5,18 +5,20 @@ using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Features;
+using GeminiCode.Hunter.Domain.Core.Constants;
 using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Notifications.CandidateMatching;
 
 public class CandidateMatchingNotificationHandler(
-    IUnitOfWork unitOfWork,
-    IAIService openAIService,
-    IPdfService pdfService,
-    IEmailService emailService,
-    IFeatureManager featureManager,
-    ILogger<CandidateMatchingNotificationHandler> logger)
-    : INotificationHandler<JobChangesDetectedNotification>
+IUnitOfWork unitOfWork,
+IAIService openAIService,
+IPdfService pdfService,
+IEmailService emailService,
+IParameterService parameterService,
+IFeatureManager featureManager,
+ILogger<CandidateMatchingNotificationHandler> logger)
+: INotificationHandler<JobChangesDetectedNotification>
 {
     public async Task Handle(JobChangesDetectedNotification notification, CancellationToken cancellationToken)
     {
@@ -37,6 +39,13 @@ public class CandidateMatchingNotificationHandler(
         }
 
         logger.LogInformation("Starting candidate matching for {Count} new positions", notification.NewPositionsCount);
+
+        // Get minimum match percentage from database (default to 80 if not configured)
+        var minimumMatchPercentage = await parameterService.GetValueAsIntAsync(
+            ParameterConstants.MinimumMatchPercentageAutoMatching, 
+            80);
+        
+        logger.LogInformation("Using minimum match percentage: {Percentage}%", minimumMatchPercentage);
 
         try
         {
@@ -87,8 +96,7 @@ public class CandidateMatchingNotificationHandler(
                     try
                     {
                         // Get the candidate's CV file
-                        var candidateFile = await unitOfWork.CandidateFileRepository
-                            .GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
+                        var candidateFile = await unitOfWork.CandidateFileRepository.GetByCandidateAndFileTypeAsync(candidate.CandidateId, "Resume");
                         
                         if (candidateFile == null || candidateFile.File == null || candidateFile.File.FileData == null)
                         {
@@ -111,7 +119,7 @@ public class CandidateMatchingNotificationHandler(
 
                         var match = analysisResult.Matches.FirstOrDefault();
                         
-                        if (match != null && match.MatchPercentage >= 80)
+                        if (match != null && match.MatchPercentage >= minimumMatchPercentage)
                         {
                             candidateMatches.Add(new CandidateMatchInfo
                             {

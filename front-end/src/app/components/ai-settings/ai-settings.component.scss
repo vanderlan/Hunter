@@ -330,11 +330,17 @@
         flex-direction: column;
         gap: 8px;
 
+        .editor-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 4px;
+        }
+
         .editor-label {
           font-size: 14px;
           font-weight: 500;
           color: rgba(0, 0, 0, 0.87);
-          margin-bottom: 4px;
         }
 
         .quill-editor {

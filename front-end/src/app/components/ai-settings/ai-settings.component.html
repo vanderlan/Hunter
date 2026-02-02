@@ -169,7 +169,16 @@
                 </mat-form-field>
 
                 <div class="prompt-editor">
-                  <label class="editor-label">Prompt Text</label>
+                  <div class="editor-header">
+                    <label class="editor-label">Prompt Text</label>
+                    <button 
+                      mat-icon-button 
+                      color="primary"
+                      (click)="openFullscreenEditor(prompt)"
+                      matTooltip="Open in fullscreen mode">
+                      <mat-icon>fullscreen</mat-icon>
+                    </button>
+                  </div>
                   <quill-editor 
                     [(ngModel)]="prompt.text"
                     [modules]="quillModules"

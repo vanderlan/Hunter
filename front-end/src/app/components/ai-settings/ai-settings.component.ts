@@ -282,6 +282,32 @@ export class AiSettingsComponent implements OnInit {
       });
   }
 
+  openFullscreenEditor(prompt: Prompt): void {
+    // Lazy load the fullscreen editor dialog
+    import('./fullscreen-editor-dialog/fullscreen-editor-dialog.component').then(module => {
+      const dialogRef = this.dialog.open(module.FullscreenEditorDialogComponent, {
+        width: '95vw',
+        height: '95vh',
+        maxWidth: '95vw',
+        maxHeight: '95vh',
+        panelClass: 'fullscreen-dialog',
+        data: {
+          prompt: prompt,
+          quillModules: this.quillModules
+        }
+      });
+
+      dialogRef.afterClosed().subscribe((updatedText: string | null) => {
+        if (updatedText !== null && updatedText !== undefined) {
+          prompt.text = updatedText;
+        }
+      });
+    }).catch(error => {
+      console.error('Error loading fullscreen editor:', error);
+      this.snackBar.open('Error loading fullscreen editor', 'Close', { duration: 3000 });
+    });
+  }
+
   confirmDeletePrompt(prompt: Prompt): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
