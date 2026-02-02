@@ -41,7 +41,7 @@ export class CvAnalysisService {
 
   constructor(private http: HttpClient) {}
 
-  getHistory(page: number = 1, pageSize: number = 3, searchQuery: string = ''): Observable<PagedAnalysisHistory> {
+  getHistory(page: number = 1, pageSize: number = 5, searchQuery: string = ''): Observable<PagedAnalysisHistory> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('quantity', pageSize.toString());
