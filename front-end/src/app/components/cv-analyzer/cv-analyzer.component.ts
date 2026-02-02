@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,17 +12,22 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { NgxFileDropModule, NgxFileDropEntry, FileSystemFileEntry } from 'ngx-file-drop';
 import { JobService } from '../../services/job.service';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { CvAnalysisService, CvAnalysisHistoryItem } from '../../services/cv-analysis.service';
 import { NotificationService } from '../../services/notification.service';
 import { JobMatch, CandidateInfo } from '../../models/job.model';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
     selector: 'app-cv-analyzer',
     imports: [
         CommonModule,
+        FormsModule,
         MatCardModule,
         MatButtonModule,
         MatIconModule,
@@ -33,33 +39,46 @@ import { JobMatch, CandidateInfo } from '../../models/job.model';
         MatDialogModule,
         MatDividerModule,
         MatListModule,
+        MatFormFieldModule,
+        MatInputModule,
         NgxFileDropModule
     ],
     templateUrl: './cv-analyzer.component.html',
     styleUrl: './cv-analyzer.component.scss'
 })
 export class CvAnalyzerComponent implements OnInit {
-  selectedFile: File | null = null;
-  analyzing = false;
-  matches: JobMatch[] = [];
-  totalPositions = 0;
-  dragOver = false;
-  candidateInfo: CandidateInfo | null = null;
+selectedFile: File | null = null;
+analyzing = false;
+matches: JobMatch[] = [];
+totalPositions = 0;
+dragOver = false;
+candidateInfo: CandidateInfo | null = null;
 
-  // Analysis history section
-  analysisHistory: CvAnalysisHistoryItem[] = [];
-  loadingHistory = false;
-  historyPage = 1;
-  historyPageSize = 10;
-  historyTotalCount = 0;
+// Analysis history section
+analysisHistory: CvAnalysisHistoryItem[] = [];
+loadingHistory = false;
+historyPage = 1;
+historyPageSize = 5;
+historyTotalCount = 0;
+searchQuery = '';
+private searchSubject = new Subject<string>();
 
-  constructor(
-    private jobService: JobService,
-    private hiringProcessService: HiringProcessService,
-    private cvAnalysisService: CvAnalysisService,
-    private notificationService: NotificationService,
-    public dialog: MatDialog
-  ) {}
+constructor(
+  private jobService: JobService,
+  private hiringProcessService: HiringProcessService,
+  private cvAnalysisService: CvAnalysisService,
+  private notificationService: NotificationService,
+  public dialog: MatDialog
+) {
+  // Setup auto-search with debounce
+  this.searchSubject.pipe(
+    debounceTime(400),
+    distinctUntilChanged()
+  ).subscribe(searchTerm => {
+    this.historyPage = 1;
+    this.loadAnalysisHistory();
+  });
+}
 
   ngOnInit(): void {
     this.loadAnalysisHistory();
@@ -67,7 +86,7 @@ export class CvAnalyzerComponent implements OnInit {
 
   loadAnalysisHistory(): void {
     this.loadingHistory = true;
-    this.cvAnalysisService.getHistory(this.historyPage, this.historyPageSize).subscribe({
+    this.cvAnalysisService.getHistory(this.historyPage, this.historyPageSize, this.searchQuery).subscribe({
       next: (response) => {
         this.analysisHistory = response.items;
         this.historyTotalCount = response.count;
@@ -78,6 +97,11 @@ export class CvAnalyzerComponent implements OnInit {
         console.error('Error loading analysis history:', error);
       }
     });
+  }
+
+  onSearchChange(searchTerm: string): void {
+    this.searchQuery = searchTerm;
+    this.searchSubject.next(searchTerm);
   }
 
   viewHistoricalAnalysis(historyItem: CvAnalysisHistoryItem): void {

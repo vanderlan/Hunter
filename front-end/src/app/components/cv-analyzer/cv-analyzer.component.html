@@ -116,6 +116,16 @@
       </mat-card-header>
 
       <mat-card-content>
+        <!-- Search Box -->
+        <mat-form-field appearance="outline" class="history-search-field">
+          <mat-label>Search by candidate name</mat-label>
+          <input matInput
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Search candidate...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
         <!-- Loading State -->
         @if (loadingHistory) {
           <div class="history-loading">
@@ -149,8 +159,14 @@
         @if (!loadingHistory && analysisHistory.length === 0) {
           <div class="history-empty">
             <mat-icon>info_outline</mat-icon>
-            <p>No analysis history yet</p>
-            <p class="empty-hint">Upload a CV to get started</p>
+            @if (searchQuery) {
+              <p>No results found for "{{ searchQuery }}"</p>
+              <p class="empty-hint">Try a different search term</p>
+            }
+            @if (!searchQuery) {
+              <p>No analysis history yet</p>
+              <p class="empty-hint">Upload a CV to get started</p>
+            }
           </div>
         }
       </mat-card-content>

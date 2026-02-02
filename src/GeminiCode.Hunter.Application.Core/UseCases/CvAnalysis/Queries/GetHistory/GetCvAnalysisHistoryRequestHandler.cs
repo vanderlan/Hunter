@@ -17,26 +17,18 @@ public class GetCvAnalysisHistoryRequestHandler(
     {
         var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id);
 
-        List<Domain.Core.Entities.CvAnalysis> analyses;
-        int totalCount;
+        PagedList<Domain.Core.Entities.CvAnalysis> analyses;
 
         if (currentUser.IsAdmin)
         {
-            analyses = await unitOfWork.CvAnalysisRepository.GetAllAsync(
-                request.Page, 
-                request.Quantity);
-            totalCount = await unitOfWork.CvAnalysisRepository.GetAllCountAsync();
+            analyses = await unitOfWork.CvAnalysisRepository.GetAllWithFilterAsync(request);
         }
         else
         {
-            analyses = await unitOfWork.CvAnalysisRepository.GetByUserIdAsync(
-                user.UserId, 
-                request.Page, 
-                request.Quantity);
-            totalCount = await unitOfWork.CvAnalysisRepository.GetCountByUserIdAsync(user.UserId);
+            analyses = await unitOfWork.CvAnalysisRepository.GetByUserIdWithFilterAsync(user.UserId, request);
         }
 
-        var response = analyses.Select(a => new CvAnalysisHistoryResponse
+        var response = analyses.Items.Select(a => new CvAnalysisHistoryResponse
         {
             AnalysisId = a.PublicId,
             CandidateName = a.Candidate?.Name ?? "Unknown",
@@ -47,6 +39,6 @@ public class GetCvAnalysisHistoryRequestHandler(
             MatchesFound = a.MatchesFound
         }).ToList();
 
-        return new PagedList<CvAnalysisHistoryResponse>(response, totalCount);
+        return new PagedList<CvAnalysisHistoryResponse>(response, analyses.Count);
     }
 }

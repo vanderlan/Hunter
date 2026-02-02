@@ -568,7 +568,7 @@ mat-card-actions {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 0 !important;
+    padding: 16px !important;
     min-height: 0;
 
     &::-webkit-scrollbar {
@@ -589,6 +589,11 @@ mat-card-actions {
       }
     }
   }
+}
+
+.history-search-field {
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 .history-loading {

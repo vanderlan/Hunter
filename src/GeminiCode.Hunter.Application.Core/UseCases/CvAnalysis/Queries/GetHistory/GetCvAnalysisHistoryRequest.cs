@@ -4,6 +4,6 @@ using MediatR;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.CvAnalysis.Queries.GetHistory;
 
-public class GetCvAnalysisHistoryRequest : BaseFilter, IRequest<PagedList<CvAnalysisHistoryResponse>>
+public class GetCvAnalysisHistoryRequest : CvAnalysisFilter, IRequest<PagedList<CvAnalysisHistoryResponse>>
 {
 }

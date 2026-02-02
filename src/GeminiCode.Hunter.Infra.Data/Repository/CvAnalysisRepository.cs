@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Filters;
 using GeminiCode.Hunter.Domain.Core.Repositories;
+using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
 using GeminiCode.Hunter.Infra.Data.Context;
 using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +53,56 @@ public class CvAnalysisRepository(DataContext dataContext)
     public async Task<int> GetAllCountAsync()
     {
         return await DataContext.CvAnalyses.CountAsync();
+    }
+
+    public async Task<PagedList<CvAnalysis>> GetByUserIdWithFilterAsync(long userId, CvAnalysisFilter filter)
+    {
+        IQueryable<CvAnalysis> query = DataContext.CvAnalyses
+            .Include(x => x.Candidate)
+            .Include(x => x.User)
+            .Where(x => x.UserId == userId);
+
+        query = ApplyFilters(filter, query);
+
+        var pagination = (filter.Page * filter.Quantity) - filter.Quantity;
+
+        var entityList = await query.OrderByDescending(x => x.AnalyzedAt)
+            .AsNoTracking()
+            .Skip(pagination)
+            .Take(filter.Quantity)
+            .ToListAsync();
+
+        return new PagedList<CvAnalysis>(entityList, await query.CountAsync());
+    }
+
+    public async Task<PagedList<CvAnalysis>> GetAllWithFilterAsync(CvAnalysisFilter filter)
+    {
+        IQueryable<CvAnalysis> query = DataContext.CvAnalyses
+            .Include(x => x.Candidate)
+            .Include(x => x.User);
+
+        query = ApplyFilters(filter, query);
+
+        var pagination = (filter.Page * filter.Quantity) - filter.Quantity;
+
+        var entityList = await query.OrderByDescending(x => x.AnalyzedAt)
+            .AsNoTracking()
+            .Skip(pagination)
+            .Take(filter.Quantity)
+            .ToListAsync();
+
+        return new PagedList<CvAnalysis>(entityList, await query.CountAsync());
+    }
+
+    private static IQueryable<CvAnalysis> ApplyFilters(CvAnalysisFilter filter, IQueryable<CvAnalysis> query)
+    {
+        if (!string.IsNullOrWhiteSpace(filter.Query))
+        {
+            var searchTerm = filter.Query.ToLower();
+            query = query.Where(x => x.Candidate != null && x.Candidate.Name.ToLower().Contains(searchTerm));
+        }
+
+        return query;
     }
 
     public async Task<CvAnalysis?> GetWithMatchesAsync(string publicId)
