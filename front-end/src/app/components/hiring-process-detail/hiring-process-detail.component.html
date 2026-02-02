@@ -142,7 +142,7 @@
                           (click)="viewAIAnalysis(process.lastAIAnalysis.cvAnalysisPublicId)"
                           class="analysis-button">
                           <mat-icon>analytics</mat-icon>
-                          AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'short' }}
+                          AI Analysis: {{ process.lastAIAnalysis.analyzedAt | date:'dd/MM/yy - HH:mm\'h\'' }}
                           ({{ process.lastAIAnalysis.matchPercentage }}%)
                           <mat-icon class="external-icon">open_in_new</mat-icon>
                         </button>
@@ -228,7 +228,7 @@
                       </div>
                       <div class="timeline-meta">
                         <span class="user">{{ history.changedByUserName }}</span>
-                        <span class="date">{{ history.createdAt | date:'medium' }}</span>
+                        <span class="date">{{ history.createdAt | date:'dd/MM/yy - HH:mm\'h\'' }}</span>
                       </div>
                       @if (history.notes) {
                         <div class="timeline-notes">
@@ -277,7 +277,7 @@
                   <div class="note-item">
                     <div class="note-header">
                       <span class="note-user">{{ note.userName }}</span>
-                      <span class="note-date">{{ note.createdAt | date:'medium' }}</span>
+                      <span class="note-date">{{ note.createdAt | date:'dd/MM/yy - HH:mm\'h\'' }}</span>
                     </div>
                     <p class="note-text">{{ note.note }}</p>
                   </div>

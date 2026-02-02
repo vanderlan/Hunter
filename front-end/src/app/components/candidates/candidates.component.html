@@ -58,8 +58,8 @@
           <!-- Analyzed At Column -->
           <ng-container matColumnDef="analyzedAt">
             <th mat-header-cell *matHeaderCellDef>Analyzed At</th>
-            <td mat-cell *matCellDef="let element">
-              {{ element.analyzedAt | date:'short' }}
+          <td mat-cell *matCellDef="let element">
+              {{ element.analyzedAt | date:'dd/MM/yy - HH:mm\'h\'' }}
             </td>
           </ng-container>
           <!-- Analyzed By Column -->

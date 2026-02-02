@@ -544,8 +544,7 @@ mat-card-actions {
 
   mat-card-header {
     flex-shrink: 0;
-    padding: 16px;
-
+    
     mat-card-title {
       display: flex;
       align-items: center;
@@ -593,7 +592,6 @@ mat-card-actions {
 
 .history-search-field {
   width: 100%;
-  margin-bottom: 16px;
 }
 
 .history-loading {
