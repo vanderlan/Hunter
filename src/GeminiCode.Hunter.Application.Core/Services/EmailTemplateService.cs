@@ -171,8 +171,6 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         // Process each loop
         foreach (var (startIndex, endIndex, collectionName, itemTemplate) in loopsToProcess)
         {
-            var loopBlock = result.Substring(startIndex, endIndex - startIndex);
-            
             logger.LogInformation("{Level} loop: {CollectionName}", isTopLevel ? "Processing" : "Processing nested", collectionName);
 
             var rendered = new StringBuilder();

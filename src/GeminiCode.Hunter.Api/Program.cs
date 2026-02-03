@@ -23,10 +23,6 @@ builder.Services.AddRequestTimeouts(options =>
     };
 });
 
-//TODO: Temp disabled due server resource limits
-//builder.Configuration.ConfigureLogging();
-//builder.Host.UseSerilog();
-
 builder.Services.ConfigureServices(builder.Configuration);
 
 var app = builder.Build();
