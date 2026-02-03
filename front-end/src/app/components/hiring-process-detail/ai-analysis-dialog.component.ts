@@ -83,7 +83,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
                     </mat-chip-set>
                   </div>
                   <div class="skills-section">
-                    <h4>Skills to Develop</h4>
+                    <h4>Missing Skills</h4>
                     <mat-chip-set>
                       @for (skill of match.missingSkills; track skill) {
                         <mat-chip class="skill-missing">
