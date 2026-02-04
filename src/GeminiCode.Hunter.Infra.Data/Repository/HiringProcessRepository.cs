@@ -63,7 +63,7 @@ public class HiringProcessRepository(DataContext dataContext) : BaseEntityReposi
 
         var entityList = await query
             .OrderByDescending(x => x.LastUpdated)
-            .OrderByDescending(x => x.Status)
+            .OrderBy(x => x.Status)
             .AsNoTracking()
             .Skip(pagination)
             .Take(filter.Quantity)
