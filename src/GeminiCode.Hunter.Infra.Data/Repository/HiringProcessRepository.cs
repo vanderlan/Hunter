@@ -61,7 +61,9 @@ public class HiringProcessRepository(DataContext dataContext) : BaseEntityReposi
 
         var pagination = (filter.Page * filter.Quantity) - filter.Quantity;
 
-        var entityList = await query.OrderByDescending(x => x.CreatedAt)
+        var entityList = await query
+            .OrderByDescending(x => x.LastUpdated)
+            .OrderByDescending(x => x.Status)
             .AsNoTracking()
             .Skip(pagination)
             .Take(filter.Quantity)

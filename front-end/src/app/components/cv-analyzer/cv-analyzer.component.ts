@@ -302,7 +302,30 @@ constructor(
             },
             error: (error) => {
               console.error('Referral error:', error);
-              const message = error.error?.message || 'Error submitting referral. It may already exist.';
+              console.error('Error object:', JSON.stringify(error));
+              console.error('error.error:', error.error);
+              
+              // Extract error message from backend response format
+              let message = 'Error submitting referral. It may already exist.';
+              
+              if (error.error) {
+                if (Array.isArray(error.error.Errors) && error.error.Errors.length > 0) {
+                  message = error.error.Errors[0];
+                } else if (Array.isArray(error.error.errors) && error.error.errors.length > 0) {
+                  message = error.error.errors[0];
+                } else if (error.error.title) {
+                  message = error.error.title;
+                } else if (error.error.detail) {
+                  message = error.error.detail;
+                } else if (error.error.message) {
+                  message = error.error.message;
+                } else if (typeof error.error === 'string') {
+                  message = error.error;
+                }
+              } else if (error.message) {
+                message = error.message;
+              }
+              
               this.notificationService.error(message);
             }
           });

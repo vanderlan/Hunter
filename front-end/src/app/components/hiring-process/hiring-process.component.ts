@@ -100,7 +100,7 @@ export class HiringProcessComponent implements OnInit {
       this.searchQuery || undefined
     ).subscribe({
       next: (data) => {
-        this.processes = this.sortProcessesByStatus(data.items);
+        this.processes = data.items;
         this.totalCount = data.count;
         this.loading = false;
       },
@@ -132,20 +132,6 @@ export class HiringProcessComponent implements OnInit {
       default:
         return 8;
     }
-  }
-
-  sortProcessesByStatus(processes: HiringProcessListItem[]): HiringProcessListItem[] {
-    return processes.sort((a, b) => {
-      const priorityA = this.getStatusPriority(a.status);
-      const priorityB = this.getStatusPriority(b.status);
-      
-      if (priorityA !== priorityB) {
-        return priorityA - priorityB;
-      }
-      
-      // If same priority, sort by date (most recent first)
-      return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
-    });
   }
 
   onPageChange(event: PageEvent): void {

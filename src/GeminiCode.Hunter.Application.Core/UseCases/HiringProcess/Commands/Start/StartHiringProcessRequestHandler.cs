@@ -35,10 +35,10 @@ public class StartHiringProcessRequestHandler(
 
         // Get job position
         var jobPosition = await unitOfWork.JobPositionRepository.GetByIdAsync(request.JobPositionId);
-        if (jobPosition == null)
+        if (jobPosition == null || !jobPosition.IsActive)
         {
-            logger.LogWarning("Job position not found: {JobPositionId}", request.JobPositionId);
-            throw new NotFoundException($"Job position with ID {request.JobPositionId} not found");
+            logger.LogWarning("Job position not found or inactive: {JobPositionId}", request.JobPositionId);
+            throw new BusinessException($"Job position not found or inactive");
         }
 
         // Check if hiring process already exists
