@@ -18,6 +18,7 @@ import { JobPosition } from '../../models/job.model';
 import { NotificationService } from '../../services/notification.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PriorityBadgeComponent } from '../shared/priority-badge.component';
 
 @Component({
     selector: 'app-job-positions',
@@ -35,13 +36,14 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     MatCheckboxModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    PriorityBadgeComponent
 ],
     templateUrl: './job-positions.component.html',
     styleUrl: './job-positions.component.scss'
 })
 export class JobPositionsComponent implements OnInit {
-  displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'isActive', 'actions'];
+  displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'priority', 'isActive', 'actions'];
   dataSource: JobPosition[] = [];
   totalCount = 0;
   pageSize = 10;

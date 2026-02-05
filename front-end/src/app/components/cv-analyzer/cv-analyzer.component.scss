@@ -285,6 +285,10 @@
       font-size: 18px;
       font-weight: 500;
       margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     mat-card-subtitle {

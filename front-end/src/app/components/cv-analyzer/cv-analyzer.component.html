@@ -181,7 +181,10 @@
         @for (match of matches; track match) {
           <mat-card class="match-card">
             <mat-card-header>
-              <mat-card-title>{{ match.jobTitle }}</mat-card-title>
+              <mat-card-title>
+                {{ match.jobTitle }}
+                <app-priority-badge [priority]="match.priority"></app-priority-badge>
+              </mat-card-title>
               <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
