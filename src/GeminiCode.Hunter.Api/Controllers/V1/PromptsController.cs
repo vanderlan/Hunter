@@ -2,7 +2,6 @@ using Asp.Versioning;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Create;
-using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Delete;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Update;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Queries.GetAll;
 using GeminiCode.Hunter.Application.Core.UseCases.Prompts.Queries.GetByKey;

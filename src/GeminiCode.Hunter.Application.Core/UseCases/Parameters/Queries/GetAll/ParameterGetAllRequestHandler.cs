@@ -1,10 +1,6 @@
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Parameters.Queries.GetAll;
 

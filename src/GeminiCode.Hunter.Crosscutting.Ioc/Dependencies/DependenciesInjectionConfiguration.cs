@@ -38,4 +38,12 @@ public static class DependenciesInjectionConfiguration
         services.AddScoped<IEmailService, EmailService>();
         services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
     }
+
+    public static void AddLookerStudioServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IEncryptionService, EncryptionService>();
+        services.AddScoped<ICurlParserService, CurlParserService>();
+        services.AddScoped<ICsvParserService, CsvParserService>();
+        services.AddHttpClient<ILookerStudioService, LookerStudioService>();
+    }
 }

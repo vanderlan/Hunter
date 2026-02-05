@@ -556,4 +556,43 @@ public class EmailService : IEmailService
 
         return positions;
     }
+
+    public async Task SendEmailAsync(string subject, string htmlBody)
+    {
+        try
+        {
+            _logger.LogInformation("Sending generic email with subject: {subject}", subject);
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
+            
+            foreach (var email in _toEmails)
+            {
+                message.To.Add(new MailboxAddress("", email));
+            }
+            
+            message.Subject = subject;
+            
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = htmlBody
+            };
+            message.Body = bodyBuilder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(_smtpLogin, _password);
+            await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
+
+            _logger.LogInformation("Generic email sent successfully to {Emails}", 
+                string.Join(", ", _toEmails));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send generic email. Error: {ErrorMessage}. InnerException: {InnerException}", 
+                ex.Message, ex.InnerException?.Message ?? "None");
+        }
+    }
 }
+

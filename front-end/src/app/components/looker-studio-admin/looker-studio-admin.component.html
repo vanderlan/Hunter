@@ -1,0 +1,189 @@
+<div class="looker-studio-admin-container">
+  <mat-card class="admin-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>analytics</mat-icon>
+        Looker Studio Priority Management
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Credential Status Section -->
+      <div class="status-section">
+        <h3>Current Status</h3>
+        
+        <div class="status-card" [ngClass]="getStatusClass()" *ngIf="!isLoadingStatus && credentialStatus">
+          <mat-icon>{{ getStatusIcon() }}</mat-icon>
+          <div class="status-content">
+            <h4>{{ credentialStatus.message }}</h4>
+            
+            <div class="status-details" *ngIf="credentialStatus.hasActiveCredential">
+              <p *ngIf="!credentialStatus.isExpired">
+                <strong>Expires in:</strong> {{ credentialStatus.daysUntilExpiration }} day(s)
+              </p>
+              <p *ngIf="credentialStatus.expiresAt">
+                <strong>Expiration date:</strong> {{ credentialStatus.expiresAt | date:'short' }}
+              </p>
+              <p *ngIf="credentialStatus.lastSyncedAt">
+                <strong>Last sync:</strong> {{ credentialStatus.lastSyncedAt | date:'short' }}
+              </p>
+              <p *ngIf="credentialStatus.createdAt">
+                <strong>Created:</strong> {{ credentialStatus.createdAt | date:'short' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="loading-container" *ngIf="isLoadingStatus">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Store Credentials Section -->
+      <div class="credentials-section">
+        <h3>Update Credentials</h3>
+        
+        <mat-expansion-panel [(expanded)]="showHowTo">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>help_outline</mat-icon>
+              How to get the curl command
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          
+          <div class="how-to-content">
+            <ol>
+              <li>Open <a href="https://lookerstudio.google.com" target="_blank">Looker Studio</a> and login with your company email</li>
+              <li>Navigate to the "Taller Open Positions and Priorities" report</li>
+              <li>Open browser DevTools (F12) and go to the Network tab</li>
+              <li><strong>Refresh the page</strong> (F5 or Ctrl+R) to capture the data request</li>
+              <li>Find the request to <code>batchedDataV2</code> in the Network tab (should show POST, 200 OK)</li>
+              <li>Right-click on the request → Copy → <strong>Copy as cURL (bash)</strong> ✅</li>
+              <li>Paste the entire curl command in the text area below</li>
+            </ol>
+            <div class="tip-box">
+              <mat-icon>info</mat-icon>
+              <div>
+                <strong>Important:</strong> You MUST use <strong>"Copy as cURL (bash)"</strong> format. 
+                Copy the <code>batchedDataV2</code> request (POST, 200 OK) that happens when you refresh the page.
+                This is the request that loads the report data, NOT the export button.
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Paste curl command here</mat-label>
+          <textarea 
+            matInput 
+            [(ngModel)]="curlCommand"
+            placeholder='curl "https://lookerstudio.google.com/u/0/exportDatasource?appVersion=..." ...'
+            rows="8"
+            [disabled]="isStoringCredentials">
+          </textarea>
+          <mat-hint>Paste the full curl command from your browser DevTools</mat-hint>
+        </mat-form-field>
+
+        <div class="expires-section">
+          <mat-form-field appearance="outline">
+            <mat-label>Expires in (days)</mat-label>
+            <input 
+              matInput 
+              type="number" 
+              [(ngModel)]="expiresInDays"
+              [disabled]="isStoringCredentials"
+              min="1"
+              max="30">
+          </mat-form-field>
+        </div>
+
+        <div class="button-row">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="storeCredentials()"
+            [disabled]="isStoringCredentials || !curlCommand.trim()">
+            <mat-icon>save</mat-icon>
+            <span *ngIf="!isStoringCredentials">Store Credentials</span>
+            <span *ngIf="isStoringCredentials">Storing...</span>
+          </button>
+
+          <mat-spinner diameter="24" *ngIf="isStoringCredentials"></mat-spinner>
+        </div>
+
+        <div class="result-section" *ngIf="lastStoreResult">
+          <mat-chip-listbox>
+            <mat-chip [color]="lastStoreResult.isValid ? 'primary' : 'warn'">
+              <mat-icon>{{ lastStoreResult.isValid ? 'check_circle' : 'warning' }}</mat-icon>
+              {{ lastStoreResult.message }}
+            </mat-chip>
+          </mat-chip-listbox>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Sync Priorities Section -->
+      <div class="sync-section">
+        <h3>Manual Sync</h3>
+        <p class="description">
+          Sync job priorities from Looker Studio. The system also syncs automatically every day at 9 AM.
+        </p>
+
+        <div class="button-row">
+          <button 
+            mat-raised-button 
+            color="accent"
+            (click)="syncPriorities()"
+            [disabled]="isSyncingPriorities || !credentialStatus?.hasActiveCredential || credentialStatus?.isExpired">
+            <mat-icon>sync</mat-icon>
+            <span *ngIf="!isSyncingPriorities">Sync Priorities Now</span>
+            <span *ngIf="isSyncingPriorities">Syncing...</span>
+          </button>
+
+          <mat-spinner diameter="24" *ngIf="isSyncingPriorities"></mat-spinner>
+        </div>
+
+        <div class="result-section" *ngIf="lastSyncResult">
+          <div class="sync-stats">
+            <div class="stat">
+              <strong>Total in CSV:</strong> {{ lastSyncResult.totalPrioritiesInCsv }}
+            </div>
+            <div class="stat">
+              <strong>Matched:</strong> {{ lastSyncResult.matchedJobs }}
+            </div>
+            <div class="stat">
+              <strong>Updated:</strong> {{ lastSyncResult.updatedJobs }}
+            </div>
+            <div class="stat" *ngIf="lastSyncResult.unmatchedJobs > 0">
+              <strong>Unmatched:</strong> {{ lastSyncResult.unmatchedJobs }}
+            </div>
+          </div>
+
+          <div class="updated-jobs" *ngIf="lastSyncResult.updatedJobCodes.length > 0">
+            <p><strong>Updated job codes:</strong></p>
+            <mat-chip-listbox>
+              <mat-chip *ngFor="let code of lastSyncResult.updatedJobCodes.slice(0, 10)">
+                {{ code }}
+              </mat-chip>
+            </mat-chip-listbox>
+            <p *ngIf="lastSyncResult.updatedJobCodes.length > 10">
+              ...and {{ lastSyncResult.updatedJobCodes.length - 10 }} more
+            </p>
+          </div>
+
+          <div class="unmatched-jobs" *ngIf="lastSyncResult.unmatchedJobCodes.length > 0">
+            <p><strong>Unmatched job codes (not found in database):</strong></p>
+            <mat-chip-listbox>
+              <mat-chip *ngFor="let code of lastSyncResult.unmatchedJobCodes" color="warn">
+                {{ code }}
+              </mat-chip>
+            </mat-chip-listbox>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

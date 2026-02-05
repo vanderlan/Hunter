@@ -38,6 +38,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard, AdminGuard]
   },
   {
+    path: 'looker-studio',
+    loadComponent: () => import('./components/looker-studio-admin/looker-studio-admin.component').then(m => m.LookerStudioAdminComponent),
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
     path: 'candidates',
     loadComponent: () => import('./components/candidates/candidates.component').then(m => m.CandidatesComponent),
     canActivate: [AuthGuard]

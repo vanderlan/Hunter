@@ -17,6 +17,7 @@ public interface IUnitOfWork: IDisposable
     ICvAnalysisRepository CvAnalysisRepository { get; }
     IParameterRepository ParameterRepository { get; }
     IPromptRepository PromptRepository { get; }
+    ILookerStudioCredentialRepository LookerStudioCredentialRepository { get; }
     Task CommitAsync();
     void DiscardChanges();
 }

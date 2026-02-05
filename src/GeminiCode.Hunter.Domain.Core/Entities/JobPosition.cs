@@ -17,4 +17,7 @@ public class JobPosition : BaseEntity
     public bool IsActive { get; set; }
     public DateTime? ClosedAt { get; set; }
     public DateTime LastCheckedAt { get; set; }
+    public string? Priority { get; set; }
+    public string? CountryRestrictions { get; set; }
+    public DateTime? PriorityLastSyncedAt { get; set; }
 }

@@ -2,8 +2,6 @@ using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Prompts.Commands.Delete;
 

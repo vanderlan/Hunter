@@ -56,4 +56,6 @@ public interface IEmailService
         string jobCode,
         string cancelledByUserName,
         string cancelReason);
+    
+    Task SendEmailAsync(string subject, string htmlBody);
 }
