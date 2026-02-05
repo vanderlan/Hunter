@@ -142,11 +142,21 @@
         align-items: center;
         margin-bottom: 8px;
 
+        .position-item-title-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex: 1;
+          min-width: 0;
+        }
+
         .position-item-title {
           margin: 0;
           font-size: 18px;
           font-weight: 500;
           color: #333;
+          flex-shrink: 1;
+          min-width: 0;
         }
 
         .position-item-arrow {

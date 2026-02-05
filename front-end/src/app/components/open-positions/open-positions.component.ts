@@ -14,6 +14,7 @@ import { NotificationService } from '../../services/notification.service';
 import { JobPosition } from '../../models/job.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
+import { PriorityBadgeComponent } from '../shared/priority-badge.component';
 
 @Component({
     selector: 'app-open-positions',
@@ -25,7 +26,8 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    PriorityBadgeComponent
 ],
     templateUrl: './open-positions.component.html',
     styleUrl: './open-positions.component.scss'

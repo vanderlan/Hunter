@@ -73,7 +73,10 @@
               class="position-list-item"
               (click)="openPositionDetails(position)">
               <div class="position-item-header">
-                <h3 class="position-item-title">{{ position.title }}</h3>
+                <div class="position-item-title-wrapper">
+                  <h3 class="position-item-title">{{ position.title }}</h3>
+                  <app-priority-badge [priority]="position.priority"></app-priority-badge>
+                </div>
                 <mat-icon class="position-item-arrow">chevron_right</mat-icon>
               </div>
               @if (position.summary) {
