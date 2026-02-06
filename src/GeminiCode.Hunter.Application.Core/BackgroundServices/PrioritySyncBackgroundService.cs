@@ -18,6 +18,10 @@ public class PrioritySyncBackgroundService(
     private static readonly TimeSpan SyncInterval = TimeSpan.FromHours(2);
     private static readonly TimeOnly StartTime = new(11, 0);  // 8:00 AM BRT = 11:00 AM UTC
     private static readonly TimeOnly EndTime = new(22, 0);    // 7:00 PM BRT = 10:00 PM UTC
+    
+    // Email cooldown tracking - prevents email spam for recurring issues
+    private static readonly TimeSpan EmailCooldownPeriod = TimeSpan.FromHours(24);
+    private static readonly Dictionary<string, DateTime> _lastEmailSentTimes = new();
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -144,6 +148,14 @@ public class PrioritySyncBackgroundService(
     {
         try
         {
+            // Check if we should send email (cooldown check to prevent spam)
+            if (!ShouldSendEmail(subject))
+            {
+                _logger.LogInformation("Email alert skipped due to cooldown period: {subject}. Last sent: {lastSent}", 
+                    subject, _lastEmailSentTimes[subject]);
+                return;
+            }
+
             await emailService.SendEmailAsync(
                 $"[Hunter] Looker Studio - {subject}",
                 $@"<html>
@@ -153,15 +165,32 @@ public class PrioritySyncBackgroundService(
                         <p>{message}</p>
                         <hr/>
                         <p><small>This is an automated message from Hunter recruitment system.</small></p>
+                        <p><small>Note: You will only receive one email per issue per 24 hours to avoid spam.</small></p>
                     </body>
                    </html>");
 
+            // Record email sent time
+            _lastEmailSentTimes[subject] = DateTime.UtcNow;
+            
             _logger.LogInformation("Alert email sent: {subject}", subject);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send alert email");
         }
+    }
+
+    private static bool ShouldSendEmail(string subject)
+    {
+        // If no email was sent for this subject before, allow it
+        if (!_lastEmailSentTimes.TryGetValue(subject, out var lastSentTime))
+        {
+            return true;
+        }
+
+        // Check if cooldown period has passed
+        var timeSinceLastEmail = DateTime.UtcNow - lastSentTime;
+        return timeSinceLastEmail >= EmailCooldownPeriod;
     }
 
     private static DateTime CalculateNextRunTime(DateTime currentTime)
