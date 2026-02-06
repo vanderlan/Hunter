@@ -34,14 +34,6 @@ public class JobPositionRepository(DataContext dataContext) : BaseEntityReposito
             .ToListAsync();
     }
 
-    public async Task<List<JobPosition>> GetByCompanyCodeAsync(string companyCode)
-    {
-        return await DataContext.JobPositions
-            .Where(x => x.CompanyCode == companyCode && x.IsActive)
-            .OrderByDescending(x => x.CreatedAt)
-            .ToListAsync();
-    }
-
     public async Task MarkAsInactiveAsync(long jobPositionId)
     {
         var position = await DataContext.JobPositions.FindAsync(jobPositionId);

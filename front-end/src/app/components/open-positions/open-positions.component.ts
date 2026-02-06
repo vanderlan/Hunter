@@ -79,8 +79,8 @@ export class OpenPositionsComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.jobService.getActiveJobs().subscribe({
       next: (positions) => {
-        this.positions = positions;
-        this.filteredPositions = positions;
+        this.positions = this.sortByPriority(positions);
+        this.filteredPositions = this.positions;
         this.loading = false;
 
         // Check for jobId after positions are loaded
@@ -113,12 +113,27 @@ export class OpenPositionsComponent implements OnInit, OnDestroy {
     }
 
     const searchLower = this.searchQuery.toLowerCase();
-    this.filteredPositions = this.positions.filter(position => 
+    const filtered = this.positions.filter(position => 
       position.title.toLowerCase().includes(searchLower) ||
       position.companyCode.toLowerCase().includes(searchLower) ||
       position.jobCode.toLowerCase().includes(searchLower) ||
       (position.summary && position.summary.toLowerCase().includes(searchLower))
     );
+    this.filteredPositions = this.sortByPriority(filtered);
+  }
+
+  private sortByPriority(positions: JobPosition[]): JobPosition[] {
+    const priorityOrder: { [key: string]: number } = {
+      'High': 1,
+      'Medium': 2,
+      'Low': 3
+    };
+
+    return positions.sort((a, b) => {
+      const priorityA = priorityOrder[a.priority || 'Low'] || 999;
+      const priorityB = priorityOrder[b.priority || 'Low'] || 999;
+      return priorityA - priorityB;
+    });
   }
 
   openPositionDetails(position: JobPosition): void {

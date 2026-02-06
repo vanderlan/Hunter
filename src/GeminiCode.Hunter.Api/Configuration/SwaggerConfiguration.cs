@@ -12,7 +12,7 @@ public static class SwaggerConfiguration
             {
                 Version = "v1",
                 Title = "Hunter API",
-                Description = "Hunter API - A simple project template for creating a .NET API (v10.0)"
+                Description = "Hunter API - A comprehensive AI-powered recruitment management system that streamlines the entire hiring process from CV analysis to candidate tracking"
             });
 
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

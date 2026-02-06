@@ -97,10 +97,9 @@ public class JobPositionsController(IMediator mediator) : ApiController(mediator
     [SwaggerResponse((int)HttpStatusCode.OK,"Active jobs retrieved successfully", typeof(GetActiveJobsResponse))]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
     [AuthorizeFor(Roles.Admin, Roles.Partner)]
-    public async Task<IActionResult> GetActiveJobs([FromQuery] string companyCode = null)
+    public async Task<IActionResult> GetActiveJobs()
     {
-        var request = new GetActiveJobsRequest { CompanyCode = companyCode };
-        var response = await Mediator.Send(request);
+        var response = await Mediator.Send(new GetActiveJobsRequest());
         return Ok(response);
     }
 }
