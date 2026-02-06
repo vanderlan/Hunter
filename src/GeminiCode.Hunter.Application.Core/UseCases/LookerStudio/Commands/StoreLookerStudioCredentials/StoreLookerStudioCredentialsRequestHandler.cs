@@ -26,7 +26,7 @@ public class StoreLookerStudioCredentialsRequestHandler(
         try
         {
             // 1. Parse curl command
-            var (cookies, xsrfToken, datasourceId, reportId) = curlParserService.ParseCurlCommand(request.CurlCommand);
+            var (cookies, xsrfToken, datasourceId, reportId, sessionId) = curlParserService.ParseCurlCommand(request.CurlCommand);
 
             logger.LogInformation("Successfully parsed curl command. DatasourceId: {datasourceId}, ReportId: {reportId}", 
                 datasourceId, reportId);
@@ -47,6 +47,7 @@ public class StoreLookerStudioCredentialsRequestHandler(
                 XsrfToken = xsrfToken,
                 DatasourceId = datasourceId,
                 ReportId = reportId,
+                SessionId = sessionId,
                 ExpiresAt = expiresAt,
                 IsActive = true,
                 UpdatedByUserId = currentUser.Id

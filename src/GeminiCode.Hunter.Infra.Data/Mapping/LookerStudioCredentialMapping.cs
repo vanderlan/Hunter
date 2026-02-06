@@ -15,6 +15,7 @@ public class LookerStudioCredentialMapping : IEntityTypeConfiguration<LookerStud
         builder.Property(x => x.XsrfToken).HasMaxLength(200).IsRequired();
         builder.Property(x => x.DatasourceId).HasMaxLength(100).IsRequired();
         builder.Property(x => x.ReportId).HasMaxLength(100).IsRequired();
+        builder.Property(x => x.SessionId).HasMaxLength(100);
         builder.Property(x => x.UpdatedByUserId).HasMaxLength(50).IsRequired();
         builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(false);
         

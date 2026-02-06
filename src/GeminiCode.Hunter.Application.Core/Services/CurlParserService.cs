@@ -5,14 +5,14 @@ namespace GeminiCode.Hunter.Application.Core.Services;
 
 public interface ICurlParserService
 {
-    (string Cookies, string XsrfToken, string DatasourceId, string ReportId) ParseCurlCommand(string curlCommand);
+    (string Cookies, string XsrfToken, string DatasourceId, string ReportId, string SessionId) ParseCurlCommand(string curlCommand);
 }
 
 public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserService
 {
     private readonly ILogger<CurlParserService> _logger = logger;
 
-    public (string Cookies, string XsrfToken, string DatasourceId, string ReportId) ParseCurlCommand(string curlCommand)
+    public (string Cookies, string XsrfToken, string DatasourceId, string ReportId, string SessionId) ParseCurlCommand(string curlCommand)
     {
         try
         {
@@ -49,10 +49,13 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
                 throw new InvalidOperationException("Could not extract datasourceId or reportId. Make sure you copied the batchedDataV2 POST request, not other requests.");
             }
 
-            _logger.LogInformation("Successfully parsed curl command. DatasourceId: {datasourceId}, ReportId: {reportId}", 
-                datasourceId, reportId);
+            // Extract sessionId from data payload
+            string sessionId = ExtractSessionId(normalizedCommand);
 
-            return (cookies, xsrfToken, datasourceId, reportId);
+            _logger.LogInformation("Successfully parsed curl command. DatasourceId: {datasourceId}, ReportId: {reportId}, SessionId: {sessionId}", 
+                datasourceId, reportId, sessionId ?? "(none)");
+
+            return (cookies, xsrfToken, datasourceId, reportId, sessionId);
         }
         catch (Exception ex)
         {
@@ -125,5 +128,31 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
         }
 
         return (datasourceId, reportId);
+    }
+
+    private string ExtractSessionId(string curlCommand)
+    {
+        // SessionId is in the data payload for getFirebaseAuthToken: "sessionId":"xxx"
+        var dataMatch = Regex.Match(curlCommand, @"--data-raw\s+'(.+?)'(?:\s|$)", RegexOptions.Singleline);
+        
+        if (!dataMatch.Success)
+        {
+            return string.Empty;
+        }
+
+        var dataPayload = dataMatch.Groups[1].Value;
+        
+        // Extract sessionId from JSON
+        var sessionMatch = Regex.Match(dataPayload, @"""sessionId"":\s*""([^""]+)""", RegexOptions.IgnoreCase);
+        
+        if (sessionMatch.Success)
+        {
+            var sessionId = sessionMatch.Groups[1].Value;
+            _logger.LogDebug("Extracted sessionId: {sessionId}", sessionId);
+            return sessionId;
+        }
+
+        _logger.LogDebug("SessionId not found in data payload (this is OK for batchedDataV2 requests)");
+        return string.Empty;
     }
 }

@@ -9,6 +9,7 @@ public class LookerStudioCredential : BaseEntity
     public required string XsrfToken { get; set; }
     public required string DatasourceId { get; set; }
     public required string ReportId { get; set; }
+    public string? SessionId { get; set; }
     public DateTime ExpiresAt { get; set; }
     public bool IsActive { get; set; }
     public required string UpdatedByUserId { get; set; }

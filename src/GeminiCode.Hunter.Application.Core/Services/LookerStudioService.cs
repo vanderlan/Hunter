@@ -52,9 +52,58 @@ public class LookerStudioService : ILookerStudioService
 
         try
         {
-            var cookies = _encryptionService.Decrypt(credential.EncryptedCookieData);
+            // First attempt
+            try
+            {
+                return await FetchDataFromLookerStudioAsync(credential, cancellationToken);
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _logger.LogWarning("Received 401 Unauthorized. Attempting token refresh...");
+                
+                // Try to refresh token
+                bool refreshed = await RefreshTokenAsync(credential, cancellationToken);
+                
+                if (!refreshed)
+                {
+                    _logger.LogError("Token refresh failed. Cannot proceed.");
+                    throw new UnauthorizedUserException("Looker Studio session expired and could not be refreshed. Please update credentials in Admin panel.");
+                }
+                
+                // Retry after refresh
+                _logger.LogInformation("Token refreshed successfully. Retrying data fetch...");
+                return await FetchDataFromLookerStudioAsync(credential, cancellationToken);
+            }
+        }
+        catch (UnauthorizedUserException)
+        {
+            throw;
+        }
+        catch (BusinessException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error downloading priority data from Looker Studio");
+            throw new BusinessException("Failed to download priority data from Looker Studio. " + ex.Message);
+        }
+    }
 
-            var request = new HttpRequestMessage(HttpMethod.Post, $"{_batchDataUrl}?appVersion=20260131_0900");
+    private async Task<bool> RefreshTokenAsync(Domain.Core.Entities.LookerStudioCredential credential, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(credential.SessionId))
+            {
+                _logger.LogWarning("SessionId not available. Cannot refresh token.");
+                return false;
+            }
+
+            var cookies = _encryptionService.Decrypt(credential.EncryptedCookieData);
+            
+            var refreshUrl = "https://lookerstudio.google.com/u/0/getFirebaseAuthToken?appVersion=20260131_0900";
+            var request = new HttpRequestMessage(HttpMethod.Post, refreshUrl);
             
             // Add headers
             request.Headers.Add("accept", "application/json, text/plain, */*");
@@ -62,62 +111,111 @@ public class LookerStudioService : ILookerStudioService
             request.Headers.Add("cookie", cookies);
             request.Headers.Add("origin", "https://lookerstudio.google.com");
             request.Headers.Add("referer", $"https://lookerstudio.google.com/u/0/reporting/{credential.ReportId}/page/p_bpbqbqp9ud");
-            request.Headers.Add("sec-fetch-dest", "empty");
-            request.Headers.Add("sec-fetch-mode", "cors");
-            request.Headers.Add("sec-fetch-site", "same-origin");
             request.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
             request.Headers.Add("x-rap-xsrf-token", credential.XsrfToken);
-
-            // Build request body (batchedDataV2 format)
+            
+            // Build refresh request body
             var requestBody = new
             {
-                dataRequest = new object[]
+                reportId = credential.ReportId,
+                sessionId = credential.SessionId,
+                datasourceId = new[] { credential.DatasourceId }
+            };
+            
+            var jsonBody = JsonSerializer.Serialize(requestBody);
+            request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+            
+            _logger.LogInformation("Sending token refresh request to Looker Studio");
+            
+            var response = await _httpClient.SendAsync(request, cancellationToken);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var refreshContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogInformation("Token refresh successful. Response length: {length}", refreshContent.Length);
+                return true;
+            }
+            else
+            {
+                _logger.LogWarning("Token refresh failed with status: {status}", response.StatusCode);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during token refresh");
+            return false;
+        }
+    }
+
+    private async Task<string> FetchDataFromLookerStudioAsync(Domain.Core.Entities.LookerStudioCredential credential, CancellationToken cancellationToken)
+    {
+        var cookies = _encryptionService.Decrypt(credential.EncryptedCookieData);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_batchDataUrl}?appVersion=20260131_0900");
+        
+        // Add headers
+        request.Headers.Add("accept", "application/json, text/plain, */*");
+        request.Headers.Add("accept-language", "en-US,en;q=0.9,pt;q=0.8");
+        request.Headers.Add("cookie", cookies);
+        request.Headers.Add("origin", "https://lookerstudio.google.com");
+        request.Headers.Add("referer", $"https://lookerstudio.google.com/u/0/reporting/{credential.ReportId}/page/p_bpbqbqp9ud");
+        request.Headers.Add("sec-fetch-dest", "empty");
+        request.Headers.Add("sec-fetch-mode", "cors");
+        request.Headers.Add("sec-fetch-site", "same-origin");
+        request.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
+        request.Headers.Add("x-rap-xsrf-token", credential.XsrfToken);
+
+        // Build request body (batchedDataV2 format)
+        var requestBody = new
+        {
+            dataRequest = new object[]
+            {
+                new
                 {
-                    new
+                    requestContext = new
                     {
-                        requestContext = new
+                        reportContext = new
                         {
-                            reportContext = new
-                            {
-                                reportId = credential.ReportId,
-                                pageId = "p_bpbqbqp9ud",
-                                mode = 1,
-                                componentId = "cd-9obqbqp9ud",
-                                displayType = "simple-table"
-                            },
-                            requestMode = 0
+                            reportId = credential.ReportId,
+                            pageId = "p_bpbqbqp9ud",
+                            mode = 1,
+                            componentId = "cd-9obqbqp9ud",
+                            displayType = "simple-table"
                         },
-                        datasetSpec = new
+                        requestMode = 0
+                    },
+                    datasetSpec = new
+                    {
+                        dataset = new object[]
                         {
-                            dataset = new object[]
+                            new
                             {
-                                new
+                                datasourceId = credential.DatasourceId,
+                                revisionNumber = 0,
+                                parameterOverrides = new object[] { }
+                            }
+                        },
+                        queryFields = new object[]
+                        {
+                            new { name = "qt_5a80lg6w8c", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "calc_ghhj7l5w8c" } },
+                            new { name = "qt_iktxej5w8c", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "_446936040_" } },
+                            new { name = "qt_6kzvc8r0wd", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "_n582882639_" } }
+                        },
+                        sortData = new object[]
+                        {
+                            new { sortColumn = new { name = "qt_dicimfp8ud", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "_n268175732_", aggregation = 5 } }, sortDir = 0 },
+                            new { sortColumn = new { name = "qt_5a80lg6w8c", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "calc_ghhj7l5w8c" } }, sortDir = 0 }
+                        },
+                        includeRowsCount = true,
+                        paginateInfo = new { startRow = 1, rowsCount = 5000 },
+                        dsFilterOverrides = new object[] { },
+                        filters = new object[]
+                        {
+                            new
+                            {
+                                filterDefinition = new
                                 {
-                                    datasourceId = credential.DatasourceId,
-                                    revisionNumber = 0,
-                                    parameterOverrides = new object[] { }
-                                }
-                            },
-                            queryFields = new object[]
-                            {
-                                new { name = "qt_5a80lg6w8c", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "calc_ghhj7l5w8c" } },
-                                new { name = "qt_iktxej5w8c", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "_446936040_" } },
-                                new { name = "qt_6kzvc8r0wd", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "_n582882639_" } }
-                            },
-                            sortData = new object[]
-                            {
-                                new { sortColumn = new { name = "qt_dicimfp8ud", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "_n268175732_", aggregation = 5 } }, sortDir = 0 },
-                                new { sortColumn = new { name = "qt_5a80lg6w8c", datasetNs = "d0", tableNs = "t0", dataTransformation = new { sourceFieldName = "calc_ghhj7l5w8c" } }, sortDir = 0 }
-                            },
-                            includeRowsCount = true,
-                            paginateInfo = new { startRow = 1, rowsCount = 5000 },
-                            dsFilterOverrides = new object[] { },
-                            filters = new object[]
-                            {
-                                new
-                                {
-                                    filterDefinition = new
-                                    {
                                         and = new
                                         {
                                             filterDefinitions = new object[]
@@ -176,54 +274,47 @@ public class LookerStudioService : ILookerStudioService
                 }
             };
 
-            var jsonBody = JsonSerializer.Serialize(requestBody);
-            request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+        var jsonBody = JsonSerializer.Serialize(requestBody);
+        request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
 
-            _logger.LogInformation("Sending request to Looker Studio batchedDataV2 API");
+        _logger.LogInformation("Sending request to Looker Studio batchedDataV2 API");
 
-            _httpClient.Timeout = TimeSpan.FromSeconds(_timeoutSeconds);
-            var response = await _httpClient.SendAsync(request, cancellationToken);
+        _httpClient.Timeout = TimeSpan.FromSeconds(_timeoutSeconds);
+        var response = await _httpClient.SendAsync(request, cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogError("Looker Studio API error. Status: {status}, Response: {response}", 
-                    response.StatusCode, errorContent);
-                throw new BusinessException($"Looker Studio API returned error: {response.StatusCode}");
-            }
-
-            var rawContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogError("Looker Studio API error. Status: {status}, Response: {response}", 
+                response.StatusCode, errorContent);
             
-            // Remove the )]}' prefix that Google uses for security
-            if (rawContent.StartsWith(")]}"))
+            // Throw specific exception for 401 to trigger retry
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                rawContent = rawContent.Substring(4);
+                throw new HttpRequestException("Unauthorized", null, System.Net.HttpStatusCode.Unauthorized);
             }
-
-            _logger.LogDebug("Received response from Looker Studio. Length: {length}", rawContent.Length);
-
-            // Parse JSON and convert to CSV
-            var csvContent = ConvertJsonToCsv(rawContent);
-
-            _logger.LogInformation("Successfully converted Looker Studio data to CSV. Rows: {rows}", csvContent.Split('\n').Length - 1);
-            _logger.LogDebug("CSV preview (first 500 chars): {preview}", 
-                csvContent.Length > 500 ? csvContent.Substring(0, 500) : csvContent);
-
-            return csvContent;
+            
+            throw new BusinessException($"Looker Studio API returned error: {response.StatusCode}");
         }
-        catch (UnauthorizedUserException)
+
+        var rawContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        
+        // Remove the )]}' prefix that Google uses for security
+        if (rawContent.StartsWith(")]}"))
         {
-            throw;
+            rawContent = rawContent.Substring(4);
         }
-        catch (BusinessException)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error downloading priority data from Looker Studio");
-            throw new BusinessException("Failed to download priority data from Looker Studio. " + ex.Message);
-        }
+
+        _logger.LogDebug("Received response from Looker Studio. Length: {length}", rawContent.Length);
+
+        // Parse JSON and convert to CSV
+        var csvContent = ConvertJsonToCsv(rawContent);
+
+        _logger.LogInformation("Successfully converted Looker Studio data to CSV. Rows: {rows}", csvContent.Split('\n').Length - 1);
+        _logger.LogDebug("CSV preview (first 500 chars): {preview}", 
+            csvContent.Length > 500 ? csvContent.Substring(0, 500) : csvContent);
+
+        return csvContent;
     }
 
     private string ConvertJsonToCsv(string jsonContent)

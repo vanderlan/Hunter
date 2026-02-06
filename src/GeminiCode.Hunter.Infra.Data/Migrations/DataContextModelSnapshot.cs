@@ -584,6 +584,10 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("SessionId")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<string>("UpdatedByUserId")
                         .IsRequired()
                         .HasMaxLength(50)
