@@ -77,7 +77,6 @@ public class AnalyzeCvRequestHandler(
 
             var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(cvText, jobSummaries);
             var filteredMatches = analysisResult.Matches
-                .Where(m => m.MatchPercentage > 60)
                 .OrderByDescending(m => m.MatchPercentage)
                 .ToList();
 

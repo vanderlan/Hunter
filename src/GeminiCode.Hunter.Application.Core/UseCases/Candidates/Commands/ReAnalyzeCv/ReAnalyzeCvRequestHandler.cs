@@ -42,7 +42,7 @@ public class ReAnalyzeCvRequestHandler(
             }
 
             string cvText;
-            using (var stream = new System.IO.MemoryStream(candidateFile.File.FileData))
+            using (var stream = new MemoryStream(candidateFile.File.FileData))
             {
                 cvText = await pdfService.ExtractTextFromPdfAsync(stream);
             }
@@ -72,8 +72,8 @@ public class ReAnalyzeCvRequestHandler(
             )).ToList();
 
             var analysisResult = await openAIService.AnalyzeCvAgainstJobsAsync(cvText, jobSummaries);
+            
             var filteredMatches = analysisResult.Matches
-                .Where(m => m.MatchPercentage > 60)
                 .OrderByDescending(m => m.MatchPercentage)
                 .ToList();
 
@@ -116,7 +116,9 @@ public class ReAnalyzeCvRequestHandler(
                         MustHaveSkills = job.MustHaveSkills,
                         NiceToHaveSkills = job.NiceToHaveSkills,
                         ReferralReason = match.ReferralReason,
-                        WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch
+                        WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch,
+                        Priority = job.Priority,
+                        CountryRestrictions = job.CountryRestrictions
                     };
                 }).ToList()
             };
