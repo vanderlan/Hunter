@@ -36,13 +36,9 @@ public class SyncJobPrioritiesRequestHandler(
             var jobPositionsDict = allJobPositions.ToDictionary(j => j.JobCode, j => j);
 
             logger.LogInformation("Found {count} job positions in database", jobPositionsDict.Count);
-            logger.LogDebug("Database job codes: {jobCodes}", 
-                string.Join(", ", jobPositionsDict.Keys.OrderBy(k => k).Take(10)));
-            logger.LogDebug("CSV job codes: {jobCodes}", 
-                string.Join(", ", priorities.Select(p => p.JobCode).OrderBy(k => k).Take(10)));
 
             // 4. Update job positions with priorities
-            var now = DateTime.UtcNow; // PostgreSQL timestamp with time zone requires UTC
+            var now = DateTime.UtcNow;
 
             foreach (var priority in priorities)
             {

@@ -20,23 +20,34 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     mat-chip {
       font-weight: 500;
       font-size: 0.875rem;
-      height: 28px;
-      padding: 4px 12px;
+      height: 32px;
+      padding: 6px 12px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      border-radius: 16px;
       
       mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
+        line-height: 18px;
         margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
       }
+    }
+
+    /* Override Material's default chip background */
+    ::ng-deep .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) {
+      background-color: transparent !important;
     }
 
     /* High Priority - Red/Fire Theme */
     .priority-high {
-      background: linear-gradient(135deg, #ff5252 0%, #ff1744 100%);
+      background: linear-gradient(135deg, #e96161 0%, #e96161 100%) !important;
       color: white !important;
       box-shadow: 0 2px 4px rgba(255, 23, 68, 0.3);
       
@@ -47,21 +58,21 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     /* Medium Priority - Green Theme */
     .priority-medium {
-      background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+      background: linear-gradient(135deg, #77b47a 0%, #77b47a 100%) !important;
       color: white !important;
       box-shadow: 0 2px 4px rgba(67, 160, 71, 0.3);
     }
 
     /* Low Priority - Light Blue Theme */
     .priority-low {
-      background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+      background: linear-gradient(135deg, #79a8ce 0%, #79a8ce 100%) !important;
       color: white !important;
       box-shadow: 0 2px 4px rgba(30, 136, 229, 0.3);
     }
 
     /* No Priority - Gray Theme */
     .priority-none {
-      background: #e0e0e0;
+      background: #e0e0e0 !important;
       color: #757575 !important;
     }
 
@@ -80,6 +91,18 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     /* Icon animations */
     .icon-high {
       filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+    }
+    
+    /* Override Material defaults */
+    ::ng-deep .mat-mdc-chip {
+      overflow: visible !important;
+    }
+    
+    ::ng-deep .mat-mdc-chip-action-label {
+      overflow: visible !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
     }
   `]
 })
@@ -118,9 +141,9 @@ export class PriorityBadgeComponent {
     if (!this.priority) return 'No priority set';
     
     const priorityLower = this.priority.toLowerCase();
-    if (priorityLower === 'high') return 'High Priority - Hot opportunity!';
-    if (priorityLower === 'medium') return 'Medium Priority - Good opportunity';
-    if (priorityLower === 'low') return 'Low Priority - Consider if interested';
+    if (priorityLower === 'high') return 'High Priority';
+    if (priorityLower === 'medium') return 'Medium Priority';
+    if (priorityLower === 'low') return 'Low Priority';
     return 'Priority not set';
   }
 }

@@ -4,6 +4,7 @@ using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.CvAnalysis.Queries.GetById;
 
@@ -54,12 +55,13 @@ public class GetCvAnalysisDetailRequestHandler(
                 ExternalUrl = m.JobPosition?.ExternalUrl ?? "",
                 MatchPercentage = m.MatchPercentage,
                 MatchReason = m.MatchReason,
-                MatchingSkills = System.Text.Json.JsonSerializer.Deserialize<List<string>>(m.MatchingSkills) ?? [],
-                MissingSkills = System.Text.Json.JsonSerializer.Deserialize<List<string>>(m.MissingSkills) ?? [],
+                MatchingSkills = JsonSerializer.Deserialize<List<string>>(m.MatchingSkills) ?? [],
+                MissingSkills = JsonSerializer.Deserialize<List<string>>(m.MissingSkills) ?? [],
                 Summary = m.JobSummary,
                 MustHaveSkills = m.MustHaveSkills,
                 NiceToHaveSkills = m.NiceToHaveSkills,
-                WhatIsMissingForPerfectMatch = m.WhatIsMissingForPerfectMatch
+                WhatIsMissingForPerfectMatch = m.WhatIsMissingForPerfectMatch,
+                Priority = m.JobPosition.Priority
             }).OrderByDescending(m => m.MatchPercentage).ToList()
         };
 
