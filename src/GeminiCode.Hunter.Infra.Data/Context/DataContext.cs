@@ -26,6 +26,7 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<CvAnalysisMatch> CvAnalysisMatches { get; set; }
     public DbSet<Parameter> Parameters { get; set; }
     public DbSet<Prompt> Prompts { get; set; }
+    public DbSet<LookerStudioCredential> LookerStudioCredentials { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -50,6 +51,7 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new CvAnalysisMatchMapping());
         modelBuilder.ApplyConfiguration(new ParameterMapping());
         modelBuilder.ApplyConfiguration(new PromptMapping());
+        modelBuilder.ApplyConfiguration(new LookerStudioCredentialMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

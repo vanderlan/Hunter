@@ -10,6 +10,7 @@ public interface IBaseEntityRepository<T> where T : class
     Task<T> AddAsync(T entity);
     Task DeleteAsync(string publicId);
     Task<IEnumerable<T>> SearchByAsync(Expression<Func<T, bool>> predicate);
+    Task<IEnumerable<T>> GetAllAsync();
     Task<T> GetByIdAsync(string publicId);
     void Update(T entity);
 }

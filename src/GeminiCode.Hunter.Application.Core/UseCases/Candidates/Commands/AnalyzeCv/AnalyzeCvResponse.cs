@@ -32,4 +32,6 @@ public class JobMatchDto
     public string? NiceToHaveSkills { get; set; }
     public string? ReferralReason { get; set; }
     public string? WhatIsMissingForPerfectMatch { get; set; }
+    public string? Priority { get; set; }
+    public string? CountryRestrictions { get; set; }
 }

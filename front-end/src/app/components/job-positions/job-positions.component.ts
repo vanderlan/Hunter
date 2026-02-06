@@ -9,6 +9,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -18,6 +19,7 @@ import { JobPosition } from '../../models/job.model';
 import { NotificationService } from '../../services/notification.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PriorityBadgeComponent } from '../shared/priority-badge.component';
 
 @Component({
     selector: 'app-job-positions',
@@ -32,16 +34,18 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatCheckboxModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    PriorityBadgeComponent
 ],
     templateUrl: './job-positions.component.html',
     styleUrl: './job-positions.component.scss'
 })
 export class JobPositionsComponent implements OnInit {
-  displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'isActive', 'actions'];
+  displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'priority', 'isActive', 'actions'];
   dataSource: JobPosition[] = [];
   totalCount = 0;
   pageSize = 10;
@@ -69,6 +73,7 @@ export class JobPositionsComponent implements OnInit {
       requirements: [''],
       mustHaveSkills: [''],
       niceToHaveSkills: [''],
+      priority: [''],
       isActive: [true]
     });
 

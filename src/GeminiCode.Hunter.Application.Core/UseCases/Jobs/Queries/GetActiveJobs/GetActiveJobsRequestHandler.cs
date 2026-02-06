@@ -26,6 +26,8 @@ public class GetActiveJobsRequestHandler(IUnitOfWork unitOfWork)
                 Requirements = j.Requirements,
                 MustHaveSkills = j.MustHaveSkills,
                 NiceToHaveSkills = j.NiceToHaveSkills,
+                Priority = j.Priority,
+                CountryRestrictions = j.CountryRestrictions,
                 CreatedAt = j.CreatedAt,
                 LastCheckedAt = j.LastCheckedAt
             }).ToList(),

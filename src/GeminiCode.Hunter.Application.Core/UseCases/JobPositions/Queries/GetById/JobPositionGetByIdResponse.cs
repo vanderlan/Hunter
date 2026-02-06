@@ -16,6 +16,8 @@ public class JobPositionGetByIdResponse
     public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
+    public string? Priority { get; set; }
+    public string? CountryRestrictions { get; set; }
     public bool IsActive { get; set; }
     public DateTime? ClosedAt { get; set; }
     public DateTime LastCheckedAt { get; set; }
@@ -40,6 +42,8 @@ public class JobPositionGetByIdResponse
             Requirements = jobPosition.Requirements,
             MustHaveSkills = jobPosition.MustHaveSkills,
             NiceToHaveSkills = jobPosition.NiceToHaveSkills,
+            Priority = jobPosition.Priority,
+            CountryRestrictions = jobPosition.CountryRestrictions,
             IsActive = jobPosition.IsActive,
             ClosedAt = jobPosition.ClosedAt?.ToApplicationTime(), // Convert to configured timezone
             LastCheckedAt = jobPosition.LastCheckedAt.ToApplicationTime(), // Convert to configured timezone

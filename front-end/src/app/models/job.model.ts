@@ -15,6 +15,9 @@ export interface JobPosition {
   lastCheckedAt?: Date;
   createdAt?: Date;
   lastUpdated?: Date;
+  priority?: string; // High, Medium, Low
+  countryRestrictions?: string;
+  priorityLastSyncedAt?: Date;
 }
 
 export interface PagedList<T> {
@@ -37,6 +40,8 @@ export interface JobMatch {
   niceToHaveSkills?: string;
   referralReason?: string;
   whatIsMissingForPerfectMatch?: string;
+  priority?: string; // High, Medium, Low
+  countryRestrictions?: string;
 }
 
 export interface CandidateInfo {

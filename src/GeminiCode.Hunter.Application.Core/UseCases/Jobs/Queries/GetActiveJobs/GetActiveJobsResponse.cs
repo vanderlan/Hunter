@@ -18,6 +18,8 @@ public class JobPositionDto
     public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
+    public string? Priority { get; set; }
+    public string? CountryRestrictions { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime LastCheckedAt { get; set; }
 }

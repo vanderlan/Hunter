@@ -113,7 +113,9 @@ public class AnalyzeCvRequestHandler(
                         MustHaveSkills = job.MustHaveSkills,
                         NiceToHaveSkills = job.NiceToHaveSkills,
                         ReferralReason = match.ReferralReason,
-                        WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch
+                        WhatIsMissingForPerfectMatch = match.WhatIsMissingForPerfectMatch,
+                        Priority = job.Priority,
+                        CountryRestrictions = job.CountryRestrictions
                     };
                 }).ToList()
             };

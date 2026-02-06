@@ -43,6 +43,11 @@ public abstract class BaseEntityRepository<T>(DataContext dataContext) : IBaseEn
         return await DataContext.Set<T>().AsNoTracking().Where(predicate).ToListAsync();
     }
 
+    public virtual async Task<IEnumerable<T>> GetAllAsync()
+    {
+        return await DataContext.Set<T>().AsNoTracking().ToListAsync();
+    }
+
     public virtual void Update(T entity)
     {
         DataContext.Entry(entity).State = EntityState.Modified;

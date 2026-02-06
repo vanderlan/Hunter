@@ -22,6 +22,7 @@ import { NotificationService } from '../../services/notification.service';
 import { JobMatch, CandidateInfo } from '../../models/job.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PriorityBadgeComponent } from '../shared/priority-badge.component';
 
 @Component({
     selector: 'app-cv-analyzer',
@@ -41,7 +42,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
         MatListModule,
         MatFormFieldModule,
         MatInputModule,
-        NgxFileDropModule
+        NgxFileDropModule,
+        PriorityBadgeComponent
     ],
     templateUrl: './cv-analyzer.component.html',
     styleUrl: './cv-analyzer.component.scss'

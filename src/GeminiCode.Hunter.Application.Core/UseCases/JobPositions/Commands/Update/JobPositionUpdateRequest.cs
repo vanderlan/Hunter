@@ -14,5 +14,6 @@ public class JobPositionUpdateRequest : IRequest
     public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
+    public string? Priority { get; set; }
     public bool IsActive { get; set; }
 }

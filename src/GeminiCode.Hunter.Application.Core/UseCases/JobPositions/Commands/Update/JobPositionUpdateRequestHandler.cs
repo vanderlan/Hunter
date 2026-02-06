@@ -24,6 +24,7 @@ public class JobPositionUpdateRequestHandler(IUnitOfWork unitOfWork, IStringLoca
         jobPosition.Requirements = request.Requirements;
         jobPosition.MustHaveSkills = request.MustHaveSkills;
         jobPosition.NiceToHaveSkills = request.NiceToHaveSkills;
+        jobPosition.Priority = request.Priority;
         jobPosition.IsActive = request.IsActive;
         jobPosition.LastCheckedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
 

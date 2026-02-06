@@ -14,13 +14,13 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
     public string? Requirements { get; set; }
     public string? MustHaveSkills { get; set; }
     public string? NiceToHaveSkills { get; set; }
+    public string? Priority { get; set; }
 
     public static explicit operator JobPosition(JobPositionCreateRequest request)
     {
         if (request is null)
             return default;
 
-#pragma warning disable CS9035 // Required member must be set
         return new JobPosition
         {
             Title = request.Title,
@@ -32,9 +32,9 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
             Requirements = request.Requirements,
             MustHaveSkills = request.MustHaveSkills,
             NiceToHaveSkills = request.NiceToHaveSkills,
+            Priority = request.Priority,
             IsActive = true,
             LastCheckedAt = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified)
         };
-#pragma warning restore CS9035
     }
 }

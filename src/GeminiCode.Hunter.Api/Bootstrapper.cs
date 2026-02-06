@@ -86,6 +86,7 @@ public static class Bootstrapper
         services.AddJobServices();
         services.AddAIServices();
         services.AddNotificationServices();
+        services.AddLookerStudioServices();
         services.AddFeatureManagement();
 
         services.AddHttpContextAccessor();
@@ -94,6 +95,7 @@ public static class Bootstrapper
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IApplicationAssembly).Assembly));
 
         services.AddHostedService<JobSyncBackgroundService>();
+        services.AddHostedService<PrioritySyncBackgroundService>();
 
         services.ConfigureRateLimit(configuration);
     }

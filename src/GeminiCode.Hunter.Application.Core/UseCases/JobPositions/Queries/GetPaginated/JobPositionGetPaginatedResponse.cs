@@ -12,6 +12,8 @@ public class JobPositionGetPaginatedResponse
     public string CompanyCode { get; set; }
     public string JobCode { get; set; }
     public string? Summary { get; set; }
+    public string? Priority { get; set; }
+    public string? CountryRestrictions { get; set; }
     public bool IsActive { get; set; }
     public DateTime? ClosedAt { get; set; }
     public DateTime LastCheckedAt { get; set; }
@@ -32,6 +34,8 @@ public class JobPositionGetPaginatedResponse
             CompanyCode = jobPosition.CompanyCode,
             JobCode = jobPosition.JobCode,
             Summary = jobPosition.Summary,
+            Priority = jobPosition.Priority,
+            CountryRestrictions = jobPosition.CountryRestrictions,
             IsActive = jobPosition.IsActive,
             ClosedAt = jobPosition.ClosedAt?.ToApplicationTime(), // Convert to configured timezone
             LastCheckedAt = jobPosition.LastCheckedAt.ToApplicationTime(), // Convert to configured timezone

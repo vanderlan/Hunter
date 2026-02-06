@@ -52,6 +52,9 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private IPromptRepository _promptRepository;
     public IPromptRepository PromptRepository => _promptRepository ??= new PromptRepository(DbContext);
 
+    private ILookerStudioCredentialRepository _lookerStudioCredentialRepository;
+    public ILookerStudioCredentialRepository LookerStudioCredentialRepository => _lookerStudioCredentialRepository ??= new LookerStudioCredentialRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try
