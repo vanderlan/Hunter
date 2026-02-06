@@ -16,6 +16,8 @@ public class SyncJobsRequestHandler(
     ILogger<SyncJobsRequestHandler> logger)
     : IRequestHandler<SyncJobsRequest, SyncJobsResponse>
 {
+    private const string DefaultPriority = "Low";
+
     public async Task<SyncJobsResponse> Handle(SyncJobsRequest request, CancellationToken cancellationToken)
     {
         var response = new SyncJobsResponse();
@@ -75,6 +77,7 @@ public class SyncJobsRequestHandler(
                         Requirements = enrichedDetails.Requirements,
                         MustHaveSkills = enrichedDetails.MustHaveSkills,
                         NiceToHaveSkills = enrichedDetails.NiceToHaveSkills,
+                        Priority = DefaultPriority,
                         IsActive = true,
                         LastCheckedAt = now
                     };
@@ -152,6 +155,9 @@ public class SyncJobsRequestHandler(
                             position.NiceToHaveSkills = enrichedDetails.NiceToHaveSkills;
                             position.LastCheckedAt = now;
                             
+                            if (string.IsNullOrWhiteSpace(position.Priority))
+                                position.Priority = DefaultPriority;
+                            
                             unitOfWork.JobPositionRepository.Update(position);
                             response.UpdatedPositions++;
                         }
@@ -165,6 +171,10 @@ public class SyncJobsRequestHandler(
                     else
                     {
                         position.LastCheckedAt = now;
+                        
+                        if (string.IsNullOrWhiteSpace(position.Priority))
+                            position.Priority = DefaultPriority;
+                        
                         unitOfWork.JobPositionRepository.Update(position);
                         response.UpdatedPositions++;
                     }

@@ -84,7 +84,21 @@
               <input matInput formControlName="niceToHaveSkills" placeholder="e.g., React, Docker">
             </mat-form-field>
           </div>
-          <mat-checkbox formControlName="isActive">Active Position</mat-checkbox>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Priority</mat-label>
+              <mat-select formControlName="priority">
+                <mat-option [value]="null">No Priority</mat-option>
+                <mat-option value="High">High</mat-option>
+                <mat-option value="Medium">Medium</mat-option>
+                <mat-option value="Low">Low</mat-option>
+              </mat-select>
+              <mat-hint>Set priority level for this position</mat-hint>
+            </mat-form-field>
+            <div class="form-field">
+              <mat-checkbox formControlName="isActive">Active Position</mat-checkbox>
+            </div>
+          </div>
         </form>
       </mat-card-content>
       <mat-card-actions>

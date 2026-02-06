@@ -9,6 +9,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -33,6 +34,7 @@ import { PriorityBadgeComponent } from '../shared/priority-badge.component';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatCheckboxModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
@@ -71,6 +73,7 @@ export class JobPositionsComponent implements OnInit {
       requirements: [''],
       mustHaveSkills: [''],
       niceToHaveSkills: [''],
+      priority: [''],
       isActive: [true]
     });
 
