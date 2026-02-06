@@ -379,14 +379,28 @@
   }
 }
 
-.skill-match {
+:host ::ng-deep mat-chip.skill-match,
+:host ::ng-deep .mat-mdc-chip.skill-match {
+  --mdc-chip-elevated-container-color: #c8e6c9 !important;
+  --mdc-chip-label-text-color: #2e7d32 !important;
   background-color: #c8e6c9 !important;
   color: #2e7d32 !important;
+  
+  .mdc-evolution-chip__action {
+    color: #2e7d32 !important;
+  }
 }
 
-.skill-missing {
+:host ::ng-deep mat-chip.skill-missing,
+:host ::ng-deep .mat-mdc-chip.skill-missing {
+  --mdc-chip-elevated-container-color: #ffcdd2 !important;
+  --mdc-chip-label-text-color: #c62828 !important;
   background-color: #ffcdd2 !important;
   color: #c62828 !important;
+  
+  .mdc-evolution-chip__action {
+    color: #c62828 !important;
+  }
 }
 
 mat-expansion-panel {
@@ -780,3 +794,7 @@ mat-card-actions {
     }
   }
 }
+
+
+
+
