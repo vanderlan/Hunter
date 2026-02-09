@@ -82,13 +82,124 @@ export interface PagedHiringProcesses {
 
 export enum HiringProcessStatus {
   New = 0,
-  ReferredByPartner = 1,
+  PendingAnalysis = 1,
   ReferredInternally = 2,
   Screening = 3,
   ConsultantTechnicalInterview = 4,
   ClientInterview = 5,
   Hired = 6,
   Reproved = 7
+}
+
+// Centralized configuration for all hiring process statuses
+export interface HiringProcessStatusConfig {
+  value: HiringProcessStatus;
+  backendKey: string; // What backend sends/expects
+  label: string; // User-friendly display name
+  cssClass: string; // CSS class for badge styling
+  materialColor: 'primary' | 'accent' | 'warn' | ''; // Material theme color
+  priority: number; // For sorting
+}
+
+export const HIRING_PROCESS_STATUS_CONFIG: Record<string, HiringProcessStatusConfig> = {
+  'New': {
+    value: HiringProcessStatus.New,
+    backendKey: 'New',
+    label: 'New',
+    cssClass: 'status-new',
+    materialColor: 'accent',
+    priority: 1
+  },
+  'PendingAnalysis': {
+    value: HiringProcessStatus.PendingAnalysis,
+    backendKey: 'PendingAnalysis',
+    label: 'Pending Analysis',
+    cssClass: 'status-referred-partner',
+    materialColor: 'accent',
+    priority: 2
+  },
+  'ReferredInternally': {
+    value: HiringProcessStatus.ReferredInternally,
+    backendKey: 'ReferredInternally',
+    label: 'Referred Internally',
+    cssClass: 'status-referred-internal',
+    materialColor: 'accent',
+    priority: 2
+  },
+  'Screening': {
+    value: HiringProcessStatus.Screening,
+    backendKey: 'Screening',
+    label: 'Screening',
+    cssClass: 'status-screening',
+    materialColor: 'accent',
+    priority: 3
+  },
+  'ConsultantTechnicalInterview': {
+    value: HiringProcessStatus.ConsultantTechnicalInterview,
+    backendKey: 'ConsultantTechnicalInterview',
+    label: 'Technical Interview',
+    cssClass: 'status-technical',
+    materialColor: 'accent',
+    priority: 4
+  },
+  'ClientInterview': {
+    value: HiringProcessStatus.ClientInterview,
+    backendKey: 'ClientInterview',
+    label: 'Client Interview',
+    cssClass: 'status-client',
+    materialColor: 'accent',
+    priority: 5
+  },
+  'Hired': {
+    value: HiringProcessStatus.Hired,
+    backendKey: 'Hired',
+    label: 'Hired',
+    cssClass: 'status-hired',
+    materialColor: 'primary',
+    priority: 6
+  },
+  'Reproved': {
+    value: HiringProcessStatus.Reproved,
+    backendKey: 'Reproved',
+    label: 'Reproved',
+    cssClass: 'status-reproved',
+    materialColor: 'warn',
+    priority: 7
+  }
+};
+
+// Helper functions to access status configuration
+export class HiringProcessStatusHelper {
+  static getConfig(status: string): HiringProcessStatusConfig | undefined {
+    return HIRING_PROCESS_STATUS_CONFIG[status];
+  }
+
+  static getLabel(status: string): string {
+    return this.getConfig(status)?.label || status;
+  }
+
+  static getCssClass(status: string): string {
+    return this.getConfig(status)?.cssClass || '';
+  }
+
+  static getMaterialColor(status: string): 'primary' | 'accent' | 'warn' | '' {
+    return this.getConfig(status)?.materialColor || '';
+  }
+
+  static getPriority(status: string): number {
+    return this.getConfig(status)?.priority || 999;
+  }
+
+  static getEnumValue(status: string): HiringProcessStatus {
+    return this.getConfig(status)?.value || HiringProcessStatus.New;
+  }
+
+  static getAllStatusOptions(): Array<{ value: HiringProcessStatus; label: string }> {
+    return Object.values(HIRING_PROCESS_STATUS_CONFIG).map(config => ({
+      value: config.value,
+      label: config.label
+    }));
+  }
 }
 
 export interface StartHiringProcessRequest {

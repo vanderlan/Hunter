@@ -7,8 +7,8 @@ public enum HiringProcessStatus
     [Description("New")]
     New = 0,
 
-    [Description("Referred by Partner")]
-    ReferredByPartner = 1,
+    [Description("Pending Analysis")]
+    PendingAnalysis = 1,
 
     [Description("Referred Internally")]
     ReferredInternally = 2,

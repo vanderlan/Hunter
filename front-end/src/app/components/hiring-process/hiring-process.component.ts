@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { HiringProcessService } from '../../services/hiring-process.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
-import { HiringProcessListItem, DashboardStats } from '../../models/hiring-process.model';
+import { HiringProcessListItem, DashboardStats, HiringProcessStatusHelper } from '../../models/hiring-process.model';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -113,25 +113,7 @@ export class HiringProcessComponent implements OnInit {
   }
 
   getStatusPriority(status: string): number {
-    switch (status) {
-      case 'New':
-        return 1;
-      case 'ReferredByPartner':
-      case 'ReferredInternally':
-        return 2;
-      case 'Screening':
-        return 3;
-      case 'ConsultantTechnicalInterview':
-        return 4;
-      case 'ClientInterview':
-        return 5;
-      case 'Hired':
-        return 6;
-      case 'Reproved':
-        return 7;
-      default:
-        return 8;
-    }
+    return HiringProcessStatusHelper.getPriority(status);
   }
 
   onPageChange(event: PageEvent): void {
@@ -158,40 +140,10 @@ export class HiringProcessComponent implements OnInit {
   }
 
   getStatusColor(status: string): string {
-    switch (status) {
-      case 'New':
-        return 'status-new';
-      case 'ReferredByPartner':
-        return 'status-referred-partner';
-      case 'ReferredInternally':
-        return 'status-referred-internal';
-      case 'Screening':
-        return 'status-screening';
-      case 'ConsultantTechnicalInterview':
-        return 'status-technical';
-      case 'ClientInterview':
-        return 'status-client';
-      case 'Hired':
-        return 'status-hired';
-      case 'Reproved':
-        return 'status-reproved';
-      default:
-        return '';
-    }
+    return HiringProcessStatusHelper.getCssClass(status);
   }
 
   getStatusLabel(status: string): string {
-    switch (status) {
-      case 'ReferredByPartner':
-        return 'Referred by Partner';
-      case 'ReferredInternally':
-        return 'Referred Internally';
-      case 'ConsultantTechnicalInterview':
-        return 'Technical Interview';
-      case 'ClientInterview':
-        return 'Client Interview';
-      default:
-        return status;
-    }
+    return HiringProcessStatusHelper.getLabel(status);
   }
 }

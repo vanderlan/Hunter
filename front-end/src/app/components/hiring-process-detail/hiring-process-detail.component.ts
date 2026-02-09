@@ -17,7 +17,7 @@ import { HiringProcessService } from '../../services/hiring-process.service';
 import { CvAnalysisService } from '../../services/cv-analysis.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
-import { HiringProcess, HiringProcessStatus } from '../../models/hiring-process.model';
+import { HiringProcess, HiringProcessStatus, HiringProcessStatusHelper } from '../../models/hiring-process.model';
 
 @Component({
     selector: 'app-hiring-process-detail',
@@ -50,16 +50,7 @@ export class HiringProcessDetailComponent implements OnInit {
   isAdmin = false;
   generatingInsights = false;
 
-  allStatusOptions = [
-    { value: HiringProcessStatus.New, label: 'New' },
-    { value: HiringProcessStatus.ReferredByPartner, label: 'Referred by Partner' },
-    { value: HiringProcessStatus.ReferredInternally, label: 'Referred Internally' },
-    { value: HiringProcessStatus.Screening, label: 'Screening' },
-    { value: HiringProcessStatus.ConsultantTechnicalInterview, label: 'Technical Interview' },
-    { value: HiringProcessStatus.ClientInterview, label: 'Client Interview' },
-    { value: HiringProcessStatus.Hired, label: 'Hired' },
-    { value: HiringProcessStatus.Reproved, label: 'Reproved' }
-  ];
+  allStatusOptions = HiringProcessStatusHelper.getAllStatusOptions();
 
   constructor(
     private route: ActivatedRoute,
@@ -98,26 +89,7 @@ export class HiringProcessDetailComponent implements OnInit {
   }
 
   mapStringToEnum(status: string): HiringProcessStatus {
-    switch (status) {
-      case 'New':
-        return HiringProcessStatus.New;
-      case 'ReferredByPartner':
-        return HiringProcessStatus.ReferredByPartner;
-      case 'ReferredInternally':
-        return HiringProcessStatus.ReferredInternally;
-      case 'Screening':
-        return HiringProcessStatus.Screening;
-      case 'ConsultantTechnicalInterview':
-        return HiringProcessStatus.ConsultantTechnicalInterview;
-      case 'ClientInterview':
-        return HiringProcessStatus.ClientInterview;
-      case 'Hired':
-        return HiringProcessStatus.Hired;
-      case 'Reproved':
-        return HiringProcessStatus.Reproved;
-      default:
-        return HiringProcessStatus.New;
-    }
+    return HiringProcessStatusHelper.getEnumValue(status);
   }
 
   updateStatus(): void {
@@ -202,36 +174,11 @@ export class HiringProcessDetailComponent implements OnInit {
   }
 
   getStatusColor(status: string): string {
-    switch (status) {
-      case 'Hired':
-        return 'primary';
-      case 'Reproved':
-        return 'warn';
-      case 'New':
-      case 'ReferredByPartner':
-      case 'ReferredInternally':
-      case 'Screening':
-      case 'ConsultantTechnicalInterview':
-      case 'ClientInterview':
-        return 'accent';
-      default:
-        return '';
-    }
+    return HiringProcessStatusHelper.getMaterialColor(status);
   }
 
   getStatusLabel(status: string): string {
-    switch (status) {
-      case 'ReferredByPartner':
-        return 'Referred by Partner';
-      case 'ReferredInternally':
-        return 'Referred Internally';
-      case 'ConsultantTechnicalInterview':
-        return 'Technical Interview';
-      case 'ClientInterview':
-        return 'Client Interview';
-      default:
-        return status;
-    }
+    return HiringProcessStatusHelper.getLabel(status);
   }
 
   get availableStatusOptions() {

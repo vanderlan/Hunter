@@ -34,7 +34,7 @@ namespace GeminiCode.Hunter.Test.Api.V1
         public async Task GetHiringProcessPaginated_WithFilter_ReturnsFilteredHiringProcesses()
         {
             //act
-            var getHiringProcessesHttpResponse = await AuthenticatedHttpClient.GetAsync($"/HiringProcess?filter.Status={(int)HiringProcessStatus.ReferredByPartner}");
+            var getHiringProcessesHttpResponse = await AuthenticatedHttpClient.GetAsync($"/HiringProcess?filter.Status={(int)HiringProcessStatus.PendingAnalysis}");
 
             var listHiringProcessesPaginated = await GetResultContentAsync<PagedList<HiringProcessGetPaginatedResponse>>(getHiringProcessesHttpResponse);
 

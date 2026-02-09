@@ -40,7 +40,7 @@ public class UpdateHiringProcessStatusRequestHandlerTests
     {
         // Arrange
         var publicId = "test-public-id";
-        var currentStatus = HiringProcessStatus.ReferredByPartner;
+        var currentStatus = HiringProcessStatus.PendingAnalysis;
         
         var user = new User
         {
@@ -92,7 +92,7 @@ public class UpdateHiringProcessStatusRequestHandlerTests
     {
         // Arrange
         var publicId = "test-public-id";
-        var currentStatus = HiringProcessStatus.ReferredByPartner;
+        var currentStatus = HiringProcessStatus.PendingAnalysis;
         var newStatus = HiringProcessStatus.Screening;
         
         var user = new User

@@ -57,7 +57,7 @@ public class StartHiringProcessRequestHandler(
         {
             CandidateId = candidate.CandidateId,
             JobPositionId = jobPosition.JobPositionId,
-            Status = HiringProcessStatus.ReferredByPartner,
+            Status = HiringProcessStatus.PendingAnalysis,
             CreatedByUserId = user.UserId,
             ReferralReason = request.ReferralReason
         };
@@ -72,9 +72,8 @@ public class StartHiringProcessRequestHandler(
         {
             HiringProcessId = hiringProcess.HiringProcessId,
             FromStatus = HiringProcessStatus.New,
-            ToStatus = HiringProcessStatus.ReferredByPartner,
-            ChangedByUserId = user.UserId,
-            Notes = "Initial hiring process creation"
+            ToStatus = HiringProcessStatus.PendingAnalysis,
+            ChangedByUserId = user.UserId
         };
 
         await unitOfWork.HiringProcessStatusHistoryRepository.AddAsync(statusHistory);

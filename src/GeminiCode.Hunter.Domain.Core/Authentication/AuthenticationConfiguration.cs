@@ -5,6 +5,6 @@ public static class AuthorizationConfiguration
     public static class Roles
     {
         public const string Admin = "admin";
-        public const string Partner = "operator";
+        public const string Partner = "partner";
     }
 }

@@ -70,7 +70,7 @@ public class CancelHiringProcessRequestHandlerTests
             PublicId = publicId,
             CandidateId = 1,
             JobPositionId = 1,
-            Status = HiringProcessStatus.ReferredByPartner,
+            Status = HiringProcessStatus.PendingAnalysis,
             CreatedByUserId = 1
         };
 
@@ -110,13 +110,13 @@ public class CancelHiringProcessRequestHandlerTests
             Profile = UserProfile.Admin
         };
 
-        var hiringProcess = new GeminiCode.Hunter.Domain.Core.Entities.HiringProcess
+        var hiringProcess = new Hunter.Domain.Core.Entities.HiringProcess
         {
             HiringProcessId = 1,
             PublicId = publicId,
             CandidateId = 1,
             JobPositionId = 1,
-            Status = HiringProcessStatus.ReferredByPartner,
+            Status = HiringProcessStatus.PendingAnalysis,
             CreatedByUserId = 1,
             Candidate = new Candidate
             {
@@ -145,7 +145,7 @@ public class CancelHiringProcessRequestHandlerTests
                 PublicId = "history-1",
                 HiringProcessId = 1,
                 FromStatus = HiringProcessStatus.New,
-                ToStatus = HiringProcessStatus.ReferredByPartner,
+                ToStatus = HiringProcessStatus.PendingAnalysis,
                 ChangedByUserId = 1
             }
         };
@@ -237,7 +237,7 @@ public class CancelHiringProcessRequestHandlerTests
             PublicId = publicId,
             CandidateId = 1,
             JobPositionId = 1,
-            Status = HiringProcessStatus.ReferredByPartner,
+            Status = HiringProcessStatus.PendingAnalysis,
             CreatedByUserId = 1,
             Candidate = new Candidate
             {

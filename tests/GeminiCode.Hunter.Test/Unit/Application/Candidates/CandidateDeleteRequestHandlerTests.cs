@@ -85,7 +85,7 @@ public class CandidateDeleteRequestHandlerTests
                 PublicId = "hp-id",
                 CandidateId = candidate.CandidateId,
                 JobPositionId = 1,
-                Status = HiringProcessStatus.ReferredByPartner,
+                Status = HiringProcessStatus.PendingAnalysis,
                 CreatedByUserId = 1
             }
         };
@@ -140,7 +140,7 @@ public class CandidateDeleteRequestHandlerTests
             PublicId = "hp-id",
             CandidateId = candidate.CandidateId,
             JobPositionId = 1,
-            Status = HiringProcessStatus.ReferredByPartner,
+            Status = HiringProcessStatus.PendingAnalysis,
             CreatedByUserId = 1
         };
 
