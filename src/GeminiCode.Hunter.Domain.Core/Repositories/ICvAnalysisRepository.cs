@@ -18,4 +18,5 @@ public interface ICvAnalysisRepository : IBaseEntityRepository<CvAnalysis>
     Task<CvAnalysis?> GetWithMatchesAsync(string publicId);
     Task DeleteByCandidateIdAsync(long candidateId);
     Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId);
+    Task DeleteMatchesByJobPositionIdAsync(long jobPositionId);
 }

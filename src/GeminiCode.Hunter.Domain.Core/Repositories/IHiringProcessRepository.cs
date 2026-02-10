@@ -16,4 +16,5 @@ public interface IHiringProcessRepository : IBaseEntityRepository<HiringProcess>
     Task<Dictionary<HiringProcessStatus, int>> GetDashboardStatsAsync();
     Task<Dictionary<HiringProcessStatus, int>> GetDashboardStatsByUserAsync(long userId);
     Task LoadRelatedEntitiesAsync(HiringProcess hiringProcess);
+    Task<bool> HasActiveProcessByJobPositionIdAsync(long jobPositionId);
 }

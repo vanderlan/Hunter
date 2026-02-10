@@ -141,4 +141,11 @@ public class HiringProcessRepository(DataContext dataContext) : BaseEntityReposi
 
         return query;
     }
+
+    public async Task<bool> HasActiveProcessByJobPositionIdAsync(long jobPositionId)
+    {
+        return await DataContext.Set<HiringProcess>()
+            .AnyAsync(x => x.JobPositionId == jobPositionId);
+    }
 }
+

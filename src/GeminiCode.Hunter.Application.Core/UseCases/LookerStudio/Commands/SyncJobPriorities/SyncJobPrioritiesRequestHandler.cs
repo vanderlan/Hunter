@@ -32,7 +32,7 @@ public class SyncJobPrioritiesRequestHandler(
             logger.LogInformation("Parsed {count} priorities from CSV", priorities.Count);
 
             // 3. Get all job positions
-            var allJobPositions = await unitOfWork.JobPositionRepository.GetAllAsync();
+            var allJobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
             var jobPositionsDict = allJobPositions.ToDictionary(j => j.JobCode, j => j);
 
             logger.LogInformation("Found {count} job positions in database", jobPositionsDict.Count);

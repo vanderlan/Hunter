@@ -147,4 +147,18 @@ public class CvAnalysisRepository(DataContext dataContext)
             .AsNoTracking()
             .FirstOrDefaultAsync();
     }
+
+    public async Task DeleteMatchesByJobPositionIdAsync(long jobPositionId)
+    {
+        var matches = await DataContext.CvAnalysisMatches
+            .Where(x => x.JobPositionId == jobPositionId)
+            .ToListAsync();
+
+        if (matches.Any())
+        {
+            DataContext.CvAnalysisMatches.RemoveRange(matches);
+            await DataContext.SaveChangesAsync();
+        }
+    }
 }
+
