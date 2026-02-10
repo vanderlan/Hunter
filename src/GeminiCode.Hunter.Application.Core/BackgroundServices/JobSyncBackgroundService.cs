@@ -12,7 +12,7 @@ public class JobSyncBackgroundService(
 {
     private readonly ILogger<JobSyncBackgroundService> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private static readonly TimeSpan SyncInterval = TimeSpan.FromHours(1);
+    private static readonly TimeSpan SyncInterval = TimeSpan.FromHours(24);
     private static readonly TimeOnly StartTime = new(8, 0);
     private static readonly TimeOnly EndTime = new(22, 0);
 

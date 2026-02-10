@@ -1,10 +1,11 @@
-using MediatR;
-using Microsoft.Extensions.Logging;
+using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
+using GeminiCode.Hunter.Application.Core.UseCases.LookerStudio.Commands.SyncJobPriorities;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Models;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
-using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Jobs.Commands.SyncJobs;
 
@@ -13,6 +14,7 @@ public class SyncJobsRequestHandler(
     IJobScraperService scraperService,
     IAIService openAIService,
     IPublisher publisher,
+    IMediator mediator,
     ILogger<SyncJobsRequestHandler> logger)
     : IRequestHandler<SyncJobsRequest, SyncJobsResponse>
 {
@@ -226,6 +228,8 @@ public class SyncJobsRequestHandler(
                     ClosedJobPositions = closedJobPositions,
                     SyncTimestamp = syncTimestamp
                 }, cancellationToken);
+
+                await mediator.Send(new SyncJobPrioritiesRequest(), cancellationToken);
             }
 
             return response;
