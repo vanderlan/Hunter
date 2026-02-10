@@ -47,7 +47,7 @@ public class LookerStudioService : ILookerStudioService
         if (credential.ExpiresAt < DateTime.UtcNow)
         {
             _logger.LogWarning("Looker Studio credentials expired on {expiresAt}", credential.ExpiresAt);
-            throw new UnauthorizedUserException("Looker Studio credentials have expired. Please update credentials in Admin panel.");
+            throw new ForbiddenException("Looker Studio credentials have expired. Please update credentials in Admin panel.");
         }
 
         try
@@ -67,7 +67,7 @@ public class LookerStudioService : ILookerStudioService
                 if (!refreshed)
                 {
                     _logger.LogError("Token refresh failed. Cannot proceed.");
-                    throw new UnauthorizedUserException("Looker Studio session expired and could not be refreshed. Please update credentials in Admin panel.");
+                    throw new ForbiddenException("Looker Studio session expired and could not be refreshed. Please update credentials in Admin panel.");
                 }
                 
                 // Retry after refresh
@@ -75,7 +75,7 @@ public class LookerStudioService : ILookerStudioService
                 return await FetchDataFromLookerStudioAsync(credential, cancellationToken);
             }
         }
-        catch (UnauthorizedUserException)
+        catch (ForbiddenException)
         {
             throw;
         }
@@ -416,7 +416,7 @@ public class LookerStudioService : ILookerStudioService
             var csv = await DownloadPriorityCsvAsync(CancellationToken.None);
             return !string.IsNullOrWhiteSpace(csv) && csv.Contains("Job");
         }
-        catch (UnauthorizedUserException)
+        catch (ForbiddenException)
         {
             return false;
         }

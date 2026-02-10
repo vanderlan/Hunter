@@ -130,7 +130,7 @@ public class PrioritySyncBackgroundService(
                     $"Warning: Looker Studio credentials will expire in {(int)daysUntilExpiration} day(s) on {credential.ExpiresAt:yyyy-MM-dd HH:mm}. Please update them in the Admin panel.");
             }
         }
-        catch (UnauthorizedUserException ex)
+        catch (ForbiddenException ex)
         {
             _logger.LogError(ex, "Looker Studio credentials are invalid");
             await SendCredentialAlertAsync(emailService, "Invalid Credentials",

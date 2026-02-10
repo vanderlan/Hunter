@@ -28,9 +28,9 @@ public class GetCvAnalysisDetailRequestHandler(
             var user = await unitOfWork.UserRepository.GetByIdAsync(currentUser.Id);
             if (analysis.UserId != user.UserId)
             {
-                throw new UnauthorizedUserException("You are not authorized to view this CV analysis");
+                throw new ForbiddenException("You are not authorized to view this CV analysis");
             }
-        }
+        }   
 
         var response = new CvAnalysisDetailResponse
         {

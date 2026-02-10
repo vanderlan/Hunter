@@ -42,6 +42,7 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
             NotFoundException => HttpStatusCode.NotFound,
             ConflictException => HttpStatusCode.Conflict,
             UnauthorizedUserException => HttpStatusCode.Unauthorized,
+            ForbiddenException => HttpStatusCode.Forbidden,
             BusinessException => HttpStatusCode.BadRequest,
             _ => HttpStatusCode.InternalServerError
         };
