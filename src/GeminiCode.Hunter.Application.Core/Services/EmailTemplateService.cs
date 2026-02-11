@@ -26,9 +26,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         
         var result = RenderTemplate(template, data);
         logger.LogInformation("Template rendered, result length: {Length}", result.Length);
-        logger.LogDebug("Rendered template preview: {Preview}", 
-            result.Length > 500 ? result.Substring(0, 500) + "..." : result);
-        
+
         return result;
     }
 
@@ -192,8 +190,6 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
                     }
                     else if (item is Dictionary<string, object> dict)
                     {
-                        logger.LogDebug("Processing dictionary item with keys: {Keys}", string.Join(", ", dict.Keys));
-                        
                         // Process nested loops recursively with the item's context
                         itemHtml = ProcessLoopsRecursive(itemHtml, dict, isTopLevel: false);
                         
@@ -206,8 +202,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
                     else if (item != null)
                     {
                         var itemDict = ObjectToDictionary(item);
-                        logger.LogDebug("Processing object item with properties: {Props}", string.Join(", ", itemDict.Keys));
-                        
+
                         // Process nested loops recursively with the item's context
                         itemHtml = ProcessLoopsRecursive(itemHtml, itemDict, isTopLevel: false);
                         
@@ -316,7 +311,6 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
             {
                 var value = kvp.Value?.ToString() ?? string.Empty;
                 result = result.Replace(placeholder, value);
-                logger.LogDebug("Replaced {Placeholder} with {Value}", placeholder, value.Length > 50 ? value.Substring(0, 50) + "..." : value);
             }
         }
 

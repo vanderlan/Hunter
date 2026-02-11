@@ -228,10 +228,9 @@ public class SyncJobsRequestHandler(
                     ClosedJobPositions = closedJobPositions,
                     SyncTimestamp = syncTimestamp
                 }, cancellationToken);
-
-                await mediator.Send(new SyncJobPrioritiesRequest(), cancellationToken);
             }
 
+            await mediator.Send(new SyncJobPrioritiesRequest(), cancellationToken);
             return response;
         }
         catch (Exception ex)

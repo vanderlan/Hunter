@@ -211,8 +211,6 @@ public class AIService : IAIService
             });
 
             var response = chatCompletion.Value.Content[0].Text.Trim();
-            
-            _logger.LogDebug("{Provider} Response: {Response}", _provider, response);
 
             return response;
         }

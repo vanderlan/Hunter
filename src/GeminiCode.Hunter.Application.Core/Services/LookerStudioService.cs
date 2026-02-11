@@ -46,8 +46,8 @@ public class LookerStudioService : ILookerStudioService
 
         if (credential.ExpiresAt < DateTime.UtcNow)
         {
-            _logger.LogWarning("Looker Studio credentials expired on {expiresAt}", credential.ExpiresAt);
-            throw new ForbiddenException("Looker Studio credentials have expired. Please update credentials in Admin panel.");
+            _logger.LogWarning("Looker Studio credentials expired on {expiresAt} UTC (expected ~1 hour after creation)", credential.ExpiresAt);
+            throw new ForbiddenException("Looker Studio credentials have expired. Google session cookies expire after ~1 hour. Please update credentials in Admin panel.");
         }
 
         try
@@ -59,19 +59,19 @@ public class LookerStudioService : ILookerStudioService
             }
             catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                _logger.LogWarning("Received 401 Unauthorized. Attempting token refresh...");
-                
+                _logger.LogWarning("Received 401 Unauthorized. Google session may have expired. Attempting reactive token refresh...");
+
                 // Try to refresh token
                 bool refreshed = await RefreshTokenAsync(credential, cancellationToken);
-                
+
                 if (!refreshed)
                 {
-                    _logger.LogError("Token refresh failed. Cannot proceed.");
-                    throw new ForbiddenException("Looker Studio session expired and could not be refreshed. Please update credentials in Admin panel.");
+                    _logger.LogError("Reactive token refresh failed. Session is likely expired.");
+                    throw new ForbiddenException("Looker Studio session expired and could not be refreshed. Google cookies typically expire after ~1 hour. Please update credentials in Admin panel.");
                 }
-                
+
                 // Retry after refresh
-                _logger.LogInformation("Token refreshed successfully. Retrying data fetch...");
+                _logger.LogInformation("Reactive token refresh successful. Retrying data fetch...");
                 return await FetchDataFromLookerStudioAsync(credential, cancellationToken);
             }
         }
@@ -96,15 +96,15 @@ public class LookerStudioService : ILookerStudioService
         {
             if (string.IsNullOrEmpty(credential.SessionId))
             {
-                _logger.LogWarning("SessionId not available. Cannot refresh token.");
+                _logger.LogWarning("SessionId not available. Cannot refresh token. Credentials may need to be updated.");
                 return false;
             }
 
             var cookies = _encryptionService.Decrypt(credential.EncryptedCookieData);
-            
+
             var refreshUrl = "https://lookerstudio.google.com/u/0/getFirebaseAuthToken?appVersion=20260131_0900";
             var request = new HttpRequestMessage(HttpMethod.Post, refreshUrl);
-            
+
             // Add headers
             request.Headers.Add("accept", "application/json, text/plain, */*");
             request.Headers.Add("accept-language", "en-US,en;q=0.9,pt;q=0.8");
@@ -113,7 +113,7 @@ public class LookerStudioService : ILookerStudioService
             request.Headers.Add("referer", $"https://lookerstudio.google.com/u/0/reporting/{credential.ReportId}/page/p_bpbqbqp9ud");
             request.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
             request.Headers.Add("x-rap-xsrf-token", credential.XsrfToken);
-            
+
             // Build refresh request body
             var requestBody = new
             {
@@ -121,29 +121,38 @@ public class LookerStudioService : ILookerStudioService
                 sessionId = credential.SessionId,
                 datasourceId = new[] { credential.DatasourceId }
             };
-            
+
             var jsonBody = JsonSerializer.Serialize(requestBody);
             request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-            
-            _logger.LogInformation("Sending token refresh request to Looker Studio");
-            
+
+            _logger.LogInformation("Sending reactive token refresh request (due to 401 error)");
+
+            _httpClient.Timeout = TimeSpan.FromSeconds(30);
             var response = await _httpClient.SendAsync(request, cancellationToken);
-            
+
             if (response.IsSuccessStatusCode)
             {
                 var refreshContent = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogInformation("Token refresh successful. Response length: {length}", refreshContent.Length);
+                _logger.LogInformation("Reactive token refresh successful. Response length: {length}", refreshContent.Length);
+
+                // NOTE: Google's getFirebaseAuthToken endpoint validates and refreshes the session server-side.
+                // The cookies remain valid after this call. We don't need to extract new cookies because
+                // the same cookies continue to work after the server-side refresh.
+                // This is a session keep-alive mechanism rather than a token exchange.
+
                 return true;
             }
             else
             {
-                _logger.LogWarning("Token refresh failed with status: {status}", response.StatusCode);
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning("Reactive token refresh failed with status: {status}. Response: {response}", 
+                    response.StatusCode, errorContent);
                 return false;
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during token refresh");
+            _logger.LogError(ex, "Error during reactive token refresh");
             return false;
         }
     }
@@ -305,14 +314,10 @@ public class LookerStudioService : ILookerStudioService
             rawContent = rawContent.Substring(4);
         }
 
-        _logger.LogDebug("Received response from Looker Studio. Length: {length}", rawContent.Length);
-
         // Parse JSON and convert to CSV
         var csvContent = ConvertJsonToCsv(rawContent);
 
         _logger.LogInformation("Successfully converted Looker Studio data to CSV. Rows: {rows}", csvContent.Split('\n').Length - 1);
-        _logger.LogDebug("CSV preview (first 500 chars): {preview}", 
-            csvContent.Length > 500 ? csvContent.Substring(0, 500) : csvContent);
 
         return csvContent;
     }

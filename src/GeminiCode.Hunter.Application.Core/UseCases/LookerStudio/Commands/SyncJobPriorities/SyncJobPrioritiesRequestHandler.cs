@@ -57,7 +57,7 @@ public class SyncJobPrioritiesRequestHandler(
                     response.MatchedJobs++;
                     response.UpdatedJobCodes.Add(priority.JobCode);
 
-                    logger.LogInformation("Updated job {jobCode}: Priority {oldPriority} ? {newPriority}, Country {oldCountry} ? {newCountry}", 
+                    logger.LogInformation("Updated job {jobCode}: Priority {oldPriority} : {newPriority}, Country {oldCountry} : {newCountry}", 
                         priority.JobCode, oldPriority ?? "(none)", priority.Priority, 
                         oldCountry ?? "(none)", priority.CountryRestrictions);
                 }

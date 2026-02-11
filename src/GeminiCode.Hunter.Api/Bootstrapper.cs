@@ -95,7 +95,7 @@ public static class Bootstrapper
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IApplicationAssembly).Assembly));
 
         services.AddHostedService<JobSyncBackgroundService>();
-        services.AddHostedService<PrioritySyncBackgroundService>();
+        services.AddHostedService<LookerStudioTokenRefreshBackgroundService>();
 
         services.ConfigureRateLimit(configuration);
     }

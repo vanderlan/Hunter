@@ -69,7 +69,6 @@ public class EmailService : IEmailService
         {
             if (!newJobs.Any() && !closedJobs.Any())
             {
-                _logger.LogDebug("No job changes to notify");
                 return;
             }
 
@@ -136,9 +135,8 @@ public class EmailService : IEmailService
                     await smtp.AuthenticateAsync(_smtpLogin, _password);
                     await smtp.SendAsync(message);
                     await smtp.DisconnectAsync(true);
-                    
+
                     successCount++;
-                    _logger.LogDebug("Job changes notification sent successfully to {Email}", email);
                 }
                 catch (Exception ex)
                 {

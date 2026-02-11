@@ -38,8 +38,8 @@ public class StoreLookerStudioCredentialsRequestHandler(
             await unitOfWork.LookerStudioCredentialRepository.DeactivateAllCredentialsAsync();
 
             // 4. Create new credential
-            var expiresAt = DateTime.SpecifyKind(DateTime.UtcNow.AddDays(request.ExpiresInDays), DateTimeKind.Unspecified);
-            
+            var expiresAt = DateTime.SpecifyKind(DateTime.UtcNow.AddHours(request.ExpiresInHours), DateTimeKind.Unspecified);
+
             var credential = await unitOfWork.LookerStudioCredentialRepository.AddAsync(new LookerStudioCredential
             {
                 PublicId = Guid.NewGuid().ToString(),
@@ -59,27 +59,27 @@ public class StoreLookerStudioCredentialsRequestHandler(
 
             // 5. Test credentials
             bool isValid = false;
-            string message = "Credentials stored successfully.";
+            string message = "Credentials stored successfully. Background service will keep session alive with proactive refreshes every 45 minutes.";
 
             try
             {
                 isValid = await lookerStudioService.ValidateCredentialsAsync();
-                
+
                 if (isValid)
                 {
-                    message = "Credentials stored and validated successfully!";
-                    logger.LogInformation("Credentials are valid and working");
+                    message = "Credentials stored and validated successfully! Session will be kept alive automatically during business hours.";
+                    logger.LogInformation("Credentials are valid and working. Proactive token refresh will maintain session.");
                 }
                 else
                 {
-                    message = "Credentials stored but validation failed. They may be expired or invalid.";
-                    logger.LogWarning("Credentials validation failed");
+                    message = "Credentials stored but validation failed. They may already be expired or invalid. Please copy a fresh curl command.";
+                    logger.LogWarning("Credentials validation failed immediately after storage");
                 }
             }
             catch (Exception ex)
             {
                 logger.LogWarning(ex, "Could not validate credentials immediately, but they were stored");
-                message = "Credentials stored but could not be validated at this time.";
+                message = "Credentials stored but could not be validated at this time. They will be tested during next sync.";
             }
 
             return new StoreLookerStudioCredentialsResponse

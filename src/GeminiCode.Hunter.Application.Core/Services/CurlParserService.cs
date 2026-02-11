@@ -16,8 +16,6 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
     {
         try
         {
-            _logger.LogDebug("Parsing bash curl command (length: {length})", curlCommand.Length);
-
             // Normalize bash line continuations (\)
             var normalizedCommand = curlCommand
                 .Replace("\\\r\n", " ")
@@ -72,7 +70,6 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
         if (match.Success)
         {
             var cookies = match.Groups[1].Value.Trim();
-            _logger.LogDebug("Extracted cookies (length: {length})", cookies.Length);
             return cookies;
         }
 
@@ -88,7 +85,6 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
         if (match.Success)
         {
             var token = match.Groups[1].Value.Trim();
-            _logger.LogDebug("Extracted XSRF token: {token}", token.Substring(0, Math.Min(20, token.Length)) + "...");
             return token;
         }
 
@@ -108,7 +104,6 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
         }
 
         var dataPayload = dataMatch.Groups[1].Value;
-        _logger.LogDebug("Found data payload (length: {length})", dataPayload.Length);
 
         // Extract datasourceId from JSON: "datasourceId":"xxx" (nested in dataRequest[0].datasetSpec.dataset[0])
         var datasourceMatch = Regex.Match(dataPayload, @"""datasourceId"":\s*""([^""]+)""", RegexOptions.IgnoreCase);
@@ -118,11 +113,7 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
         var reportMatch = Regex.Match(dataPayload, @"""reportId"":\s*""([^""]+)""", RegexOptions.IgnoreCase);
         var reportId = reportMatch.Success ? reportMatch.Groups[1].Value : string.Empty;
 
-        if (!string.IsNullOrEmpty(datasourceId) && !string.IsNullOrEmpty(reportId))
-        {
-            _logger.LogDebug("Extracted datasourceId: {datasourceId}, reportId: {reportId}", datasourceId, reportId);
-        }
-        else
+        if (string.IsNullOrEmpty(datasourceId) || string.IsNullOrEmpty(reportId))
         {
             _logger.LogWarning("Could not extract datasourceId or reportId from data payload");
         }
@@ -148,11 +139,9 @@ public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserS
         if (sessionMatch.Success)
         {
             var sessionId = sessionMatch.Groups[1].Value;
-            _logger.LogDebug("Extracted sessionId: {sessionId}", sessionId);
             return sessionId;
         }
 
-        _logger.LogDebug("SessionId not found in data payload (this is OK for batchedDataV2 requests)");
         return string.Empty;
     }
 }
