@@ -243,7 +243,9 @@ public class InfrastructureArchitectureTests
             .And()
             .AreClasses()
             .GetTypes()
-            .Where(t => t.Namespace != null && t.Namespace.EndsWith("Migrations"));
+            .Where(t => t.Namespace != null 
+                && t.Namespace.EndsWith("Migrations")
+                && t.Namespace.StartsWith("GeminiCode.Hunter"));
 
         // Assert
         foreach (var migration in migrations)
@@ -293,7 +295,8 @@ public class InfrastructureArchitectureTests
                 InfraNamespace,
                 DomainNamespace,
                 "System",
-                "Microsoft",
+                "Microsoft.EntityFrameworkCore",
+                "Microsoft.Extensions",
                 "Npgsql"
             )
             .GetResult();
