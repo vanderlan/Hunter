@@ -1,15 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
+using GeminiCode.Hunter.Domain.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
-
-public interface IEncryptionService
-{
-    string Encrypt(string plainText);
-    string Decrypt(string cipherText);
-}
 
 public class EncryptionService : IEncryptionService
 {

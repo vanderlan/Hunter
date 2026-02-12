@@ -78,7 +78,7 @@ public class NamingConventionsTests
         }
     }
 
-    [Fact(Skip = "Too strict - command verbs vary by domain")]
+    [Fact]
     public void Command_Names_Should_Be_Verb_Based()
     {
         // Arrange
@@ -93,7 +93,7 @@ public class NamingConventionsTests
         var validCommandVerbs = new[]
         {
             "Create", "Update", "Delete", "Change", "Add", "Remove",
-            "Register", "Login", "Refresh", "Send", "Analyze", "Enrich",
+            "Register", "Login", "Refresh", "Send", "Analyze", "ReAnalyze","Enrich",
             "Cancel", "Activate", "Deactivate", "Enable", "Disable",
             "Refer", "Screen", "Interview", "Hire", "Reprove", "Sync", "Store", "Start", "Generate", "Upload"
         };
@@ -169,7 +169,7 @@ public class NamingConventionsTests
         }
     }
 
-    [Fact(Skip = "Too strict - some handlers have valid reasons for different structure")]
+    [Fact]
     public void Handler_Names_Should_Match_Request_Names()
     {
         // Arrange

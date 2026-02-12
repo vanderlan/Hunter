@@ -1,14 +1,8 @@
 using System.Text.RegularExpressions;
+using GeminiCode.Hunter.Domain.Core.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
-
-public record JobPriorityDto(string JobCode, string Priority, string CountryRestrictions);
-
-public interface ICsvParserService
-{
-    List<JobPriorityDto> ParsePriorityCsv(string csvContent);
-}
 
 public class CsvParserService(ILogger<CsvParserService> logger) : ICsvParserService
 {

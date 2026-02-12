@@ -1,12 +1,8 @@
 using System.Text.RegularExpressions;
+using GeminiCode.Hunter.Domain.Core.Services;
 using Microsoft.Extensions.Logging;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
-
-public interface ICurlParserService
-{
-    (string Cookies, string XsrfToken, string DatasourceId, string ReportId, string SessionId) ParseCurlCommand(string curlCommand);
-}
 
 public class CurlParserService(ILogger<CurlParserService> logger) : ICurlParserService
 {

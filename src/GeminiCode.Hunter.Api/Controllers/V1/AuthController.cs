@@ -17,7 +17,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiVersion(1.0)]
 [Route("[controller]")]
 [AllowAnonymous]
-public class AuthController(IMediator mediator, IConfiguration configuration) : ApiController(mediator)
+public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ApiController(mediator)
 {
     [HttpPost("Login")]
     [EnableRateLimiting("login")]

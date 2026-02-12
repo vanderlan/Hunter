@@ -18,7 +18,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiController]
 [Route("[controller]")]
 [AuthorizeFor(Roles.Admin)]
-public class ParametersController(IMediator mediator) : ApiController(mediator)
+public sealed class ParametersController(IMediator mediator) : ApiController(mediator)
 {
     /// <summary>
     /// Gets all system parameters

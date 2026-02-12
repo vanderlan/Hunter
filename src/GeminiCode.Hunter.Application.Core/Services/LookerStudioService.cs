@@ -4,14 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
+using GeminiCode.Hunter.Domain.Core.Services;
 
 namespace GeminiCode.Hunter.Application.Core.Services;
-
-public interface ILookerStudioService
-{
-    Task<string> DownloadPriorityCsvAsync(CancellationToken cancellationToken);
-    Task<bool> ValidateCredentialsAsync();
-}
 
 public class LookerStudioService : ILookerStudioService
 {

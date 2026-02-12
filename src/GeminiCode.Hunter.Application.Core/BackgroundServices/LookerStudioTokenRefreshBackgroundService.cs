@@ -6,6 +6,7 @@ using GeminiCode.Hunter.Application.Core.Services;
 using System.Text;
 using System.Text.Json;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Services;
 
 namespace GeminiCode.Hunter.Application.Core.BackgroundServices;
 

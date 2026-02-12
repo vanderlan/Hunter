@@ -22,7 +22,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiController]
 [Route("[controller]")]
 [AuthorizeFor(Roles.Admin, Roles.Partner)]
-public class HiringProcessController(IMediator mediator) : ApiController(mediator)
+public sealed class HiringProcessController(IMediator mediator) : ApiController(mediator)
 {
     [HttpGet]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success response with a list of hiring processes paginated", typeof(PagedList<HiringProcessGetPaginatedResponse>))]

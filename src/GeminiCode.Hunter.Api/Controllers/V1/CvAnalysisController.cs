@@ -16,7 +16,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiController]
 [Route("[controller]")]
 [AuthorizeFor(Roles.Admin, Roles.Partner)]
-public class CvAnalysisController(IMediator mediator) : ApiController(mediator)
+public sealed class CvAnalysisController(IMediator mediator) : ApiController(mediator)
 {
     [HttpGet("history")]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success response with CV analysis history", typeof(PagedList<CvAnalysisHistoryResponse>))]

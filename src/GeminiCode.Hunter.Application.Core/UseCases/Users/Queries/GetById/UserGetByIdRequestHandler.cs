@@ -4,7 +4,7 @@ using MediatR;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Queries.GetById;
 
-public class UserGetByIdHandler(IUnitOfWork unitOfWork) : IRequestHandler<UserGetByIdRequest, UserGetByIdResponse>
+public class UserGetByIdRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<UserGetByIdRequest, UserGetByIdResponse>
 {
     public async Task<UserGetByIdResponse> Handle(UserGetByIdRequest request, CancellationToken cancellationToken)
     {

@@ -10,7 +10,7 @@ using static GeminiCode.Hunter.Crosscutting.Resources.Messages.MessagesKeys;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.ChangePassword;
 
-public class UserUpdatePasswordRequestHandler(
+public class UserChangePasswordRequestHandler(
     IUnitOfWork unitOfWork,
     ICurrentUser currentUser,
     IMediator mediator,

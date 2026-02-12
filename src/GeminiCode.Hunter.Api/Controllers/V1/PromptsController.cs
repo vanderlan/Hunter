@@ -17,7 +17,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiController]
 [Route("[controller]")]
 [AuthorizeFor(Roles.Admin)]
-public class PromptsController(IMediator mediator) : ApiController(mediator)
+public sealed class PromptsController(IMediator mediator) : ApiController(mediator)
 {
     /// <summary>
     /// Gets all AI prompts

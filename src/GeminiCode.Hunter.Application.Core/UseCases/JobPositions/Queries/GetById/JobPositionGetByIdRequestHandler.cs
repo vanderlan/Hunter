@@ -4,7 +4,7 @@ using MediatR;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Queries.GetById;
 
-public class JobPositionGetByIdHandler(IUnitOfWork unitOfWork) : IRequestHandler<JobPositionGetByIdRequest, JobPositionGetByIdResponse>
+public class JobPositionGetByIdRequestHandler(IUnitOfWork unitOfWork) : IRequestHandler<JobPositionGetByIdRequest, JobPositionGetByIdResponse>
 {
     public async Task<JobPositionGetByIdResponse> Handle(JobPositionGetByIdRequest request, CancellationToken cancellationToken)
     {

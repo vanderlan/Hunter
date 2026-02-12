@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Application.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
+using GeminiCode.Hunter.Domain.Core.Services;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.LookerStudio.Commands.SyncJobPriorities;
 

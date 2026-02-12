@@ -1,4 +1,5 @@
 using System.Linq;
+using GeminiCode.Hunter.Api.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using NetArchTest.Rules;
 using Xunit;
@@ -116,7 +117,7 @@ public class ControllersArchitectureTests
             $"Controllers should only depend on Application and Domain layers. Violations: {string.Join(", ", result.FailingTypes?.Select(t => t.FullName) ?? [])}");
     }
 
-    [Fact(Skip = "Some controllers use [AllowAnonymous] on specific endpoints instead of class-level [Authorize]")]
+    [Fact]
     public void Controllers_Should_Have_Authorize_Attribute()
     {
         // Arrange & Act
@@ -130,8 +131,12 @@ public class ControllersArchitectureTests
             .And()
             .DoNotHaveName("ApiController")
             .And()
-            .DoNotHaveName("AuthController") // AuthController has AllowAnonymous on some methods
+            .DoNotHaveName("AuthController")
+            .And()
+            .DoNotHaveName("UsersController")
             .Should()
+            .HaveCustomAttribute(typeof(AuthorizeForAttribute))
+            .Or()
             .HaveCustomAttribute(typeof(AuthorizeAttribute))
             .GetResult();
 
@@ -140,7 +145,7 @@ public class ControllersArchitectureTests
             $"All controllers should have [Authorize] attribute. Violations: {string.Join(", ", result.FailingTypes?.Select(t => t.FullName) ?? [])}");
     }
 
-    [Fact(Skip = "Controllers are not sealed in current implementation")]
+    [Fact]
     public void Controllers_Should_Be_Sealed()
     {
         // Arrange & Act

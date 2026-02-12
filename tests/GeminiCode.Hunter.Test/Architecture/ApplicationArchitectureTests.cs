@@ -113,7 +113,7 @@ public class ApplicationArchitectureTests
             $"All service implementations must end with 'Service'. Violations: {string.Join(", ", result.FailingTypes?.Select(t => t.FullName) ?? [])}");
     }
 
-    [Fact(Skip = "Not all services require domain interfaces - some are internal implementation details")]
+    [Fact]
     public void Service_Implementations_Should_Implement_Interface_From_Domain()
     {
         // Arrange
@@ -219,7 +219,7 @@ public class ApplicationArchitectureTests
             $"Use cases should use IUnitOfWork, not DbContext directly. Violations: {string.Join(", ", result.FailingTypes?.Select(t => t.FullName) ?? [])}");
     }
 
-    [Fact(Skip = "Too strict - some requests don't have responses (Unit returns) or validators")]
+    [Fact]
     public void Request_Response_Validator_Should_Be_In_Same_Folder()
     {
         // Arrange
@@ -265,10 +265,6 @@ public class ApplicationArchitectureTests
 
             // Handler must exist
             Assert.NotNull(handler);
-            
-            // Response should exist for most cases (except void/Unit returns)
-            // Validator should exist for most cases
-            // These are recommendations, not strict requirements
         }
     }
 

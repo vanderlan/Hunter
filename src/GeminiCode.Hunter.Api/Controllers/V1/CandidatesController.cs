@@ -24,7 +24,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 [ApiController]
 [Route("[controller]")]
 [AuthorizeFor(Roles.Admin, Roles.Partner)]
-public class CandidatesController(IMediator mediator) : ApiController(mediator)
+public sealed class CandidatesController(IMediator mediator) : ApiController(mediator)
 {
     [HttpGet]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success response with a list of Candidates paginated", typeof(PagedList<CandidateGetPaginatedResponse>))]
