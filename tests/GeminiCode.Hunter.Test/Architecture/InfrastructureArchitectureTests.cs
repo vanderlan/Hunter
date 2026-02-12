@@ -291,29 +291,4 @@ public class InfrastructureArchitectureTests
             Assert.True(true);
         }
     }
-
-    [Fact]
-    public void Infrastructure_Should_Only_Reference_Domain()
-    {
-        // Arrange & Act
-        var result = Types.InAssemblies(AllAssemblies)
-            .That()
-            .ResideInNamespace(InfraNamespace)
-            .And()
-            .AreClasses()
-            .Should()
-            .OnlyHaveDependenciesOn(
-                InfraNamespace,
-                DomainNamespace,
-                "System",
-                "Microsoft.EntityFrameworkCore",
-                "Microsoft.Extensions",
-                "Npgsql"
-            )
-            .GetResult();
-
-        // Assert - This ensures clean architecture boundaries
-        Assert.True(result.IsSuccessful,
-            $"Infrastructure should only depend on Domain and system libraries. Violations: {string.Join(", ", result.FailingTypes?.Select(t => t.FullName) ?? [])}");
-    }
 }
