@@ -8,7 +8,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository;
 
-public class LookerStudioCredentialRepository(DataContext dataContext) 
+public sealed class LookerStudioCredentialRepository(DataContext dataContext) 
     : BaseEntityRepository<LookerStudioCredential>(dataContext), ILookerStudioCredentialRepository
 {
     public async Task<LookerStudioCredential?> GetActiveCredentialAsync()

@@ -9,7 +9,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository.Implementations;
 
-public class PromptRepository(DataContext dataContext) : BaseEntityRepository<Prompt>(dataContext), IPromptRepository
+public sealed class PromptRepository(DataContext dataContext) : BaseEntityRepository<Prompt>(dataContext), IPromptRepository
 {
     public async Task<Prompt?> GetByKeyAsync(string key)
     {

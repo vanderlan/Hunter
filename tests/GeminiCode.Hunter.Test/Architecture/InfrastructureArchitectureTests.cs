@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using NetArchTest.Rules;
 using Xunit;
 
@@ -10,6 +11,16 @@ namespace GeminiCode.Hunter.Test.Architecture;
 /// </summary>
 public class InfrastructureArchitectureTests
 {
+    // Explicit assembly references for deterministic scanning (works same locally and in CI)
+    private static readonly Assembly[] AllAssemblies =
+    [
+        typeof(GeminiCode.Hunter.Api.Bootstrapper).Assembly,                              // API
+        typeof(GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Create.UserCreateRequest).Assembly, // Application
+        typeof(GeminiCode.Hunter.Domain.Core.Entities.User).Assembly,                      // Domain
+        typeof(GeminiCode.Hunter.Infra.Data.Context.DataContext).Assembly,                 // Infrastructure
+        typeof(GeminiCode.Hunter.Crosscutting.Ioc.Dependencies.DependenciesInjectionConfiguration).Assembly // IoC
+    ];
+
     private const string InfraNamespace = "GeminiCode.Hunter.Infra.Data";
     private const string RepositoryNamespace = "GeminiCode.Hunter.Infra.Data.Repository";
     private const string RepositoryImplementationsNamespace = "GeminiCode.Hunter.Infra.Data.Repository.Implementations";
@@ -19,7 +30,7 @@ public class InfrastructureArchitectureTests
     public void Infrastructure_Should_Not_Depend_On_Application()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(InfraNamespace)
             .ShouldNot()
@@ -35,7 +46,7 @@ public class InfrastructureArchitectureTests
     public void Infrastructure_Should_Not_Depend_On_Api()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(InfraNamespace)
             .ShouldNot()
@@ -51,7 +62,7 @@ public class InfrastructureArchitectureTests
     public void Repository_Implementations_Should_Have_Repository_Suffix()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(RepositoryImplementationsNamespace)
             .And()
@@ -71,7 +82,7 @@ public class InfrastructureArchitectureTests
     public void Repository_Implementations_Should_Be_Sealed()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(RepositoryImplementationsNamespace)
             .And()
@@ -91,7 +102,7 @@ public class InfrastructureArchitectureTests
     public void Repository_Implementations_Should_Inherit_BaseEntityRepository()
     {
         // Arrange & Act
-        var baseEntityRepository = Types.InCurrentDomain()
+        var baseEntityRepository = Types.InAssemblies(AllAssemblies)
             .That()
             .HaveName("BaseEntityRepository`1")
             .GetTypes()
@@ -104,7 +115,7 @@ public class InfrastructureArchitectureTests
             return;
         }
 
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(RepositoryImplementationsNamespace)
             .And()
@@ -124,7 +135,7 @@ public class InfrastructureArchitectureTests
     public void Repository_Implementation_Should_Match_Interface_Name()
     {
         // Arrange
-        var repositoryImplementations = Types.InCurrentDomain()
+        var repositoryImplementations = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(RepositoryImplementationsNamespace)
             .And()
@@ -150,7 +161,7 @@ public class InfrastructureArchitectureTests
     public void Entity_Mappings_Should_Have_Mapping_Suffix()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Infra.Data.Mapping")
             .And()
@@ -168,7 +179,7 @@ public class InfrastructureArchitectureTests
     public void Entity_Mappings_Should_Implement_IEntityTypeConfiguration()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Infra.Data.Mapping")
             .And()
@@ -188,7 +199,7 @@ public class InfrastructureArchitectureTests
     public void DataContext_Should_Be_In_Context_Namespace()
     {
         // Arrange & Act
-        var dataContext = Types.InCurrentDomain()
+        var dataContext = Types.InAssemblies(AllAssemblies)
             .That()
             .HaveName("DataContext")
             .And()
@@ -212,7 +223,7 @@ public class InfrastructureArchitectureTests
     public void DataContext_Should_Inherit_DbContext()
     {
         // Arrange & Act
-        var dataContext = Types.InCurrentDomain()
+        var dataContext = Types.InAssemblies(AllAssemblies)
             .That()
             .HaveName("DataContext")
             .And()
@@ -237,7 +248,7 @@ public class InfrastructureArchitectureTests
     public void Migrations_Should_Be_In_Migrations_Namespace()
     {
         // Arrange & Act
-        var migrations = Types.InCurrentDomain()
+        var migrations = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespaceContaining("Migrations")
             .And()
@@ -258,7 +269,7 @@ public class InfrastructureArchitectureTests
     public void UnitOfWork_Should_Implement_IUnitOfWork()
     {
         // Arrange & Act
-        var unitOfWork = Types.InCurrentDomain()
+        var unitOfWork = Types.InAssemblies(AllAssemblies)
             .That()
             .HaveName("UnitOfWork")
             .And()
@@ -285,7 +296,7 @@ public class InfrastructureArchitectureTests
     public void Infrastructure_Should_Only_Reference_Domain()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace(InfraNamespace)
             .And()

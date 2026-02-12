@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reflection;
 using NetArchTest.Rules;
 using Xunit;
 
@@ -10,11 +11,20 @@ namespace GeminiCode.Hunter.Test.Architecture;
 /// </summary>
 public class CleanArchitectureTests
 {
+    // Explicit assembly references for deterministic scanning (works same locally and in CI)
+    private static readonly Assembly[] AllAssemblies =
+    [
+        typeof(GeminiCode.Hunter.Api.Bootstrapper).Assembly,                              // API
+        typeof(GeminiCode.Hunter.Application.Core.UseCases.Users.Commands.Create.UserCreateRequest).Assembly, // Application
+        typeof(GeminiCode.Hunter.Domain.Core.Entities.User).Assembly,                      // Domain
+        typeof(GeminiCode.Hunter.Infra.Data.Context.DataContext).Assembly,                 // Infrastructure
+        typeof(GeminiCode.Hunter.Crosscutting.Ioc.Dependencies.DependenciesInjectionConfiguration).Assembly // IoC
+    ];
     [Fact]
     public void Domain_Should_Not_Depend_On_Any_Other_Project_Layer()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Domain.Core")
             .ShouldNot()
@@ -35,7 +45,7 @@ public class CleanArchitectureTests
     public void Application_Should_Only_Depend_On_Domain()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Application.Core")
             .ShouldNot()
@@ -55,7 +65,7 @@ public class CleanArchitectureTests
     public void Infrastructure_Should_Only_Depend_On_Domain()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Infra.Data")
             .ShouldNot()
@@ -77,7 +87,7 @@ public class CleanArchitectureTests
         // API can depend on all layers (it's the composition root)
         // But no other layer should depend on API (except tests and Program)
 
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .DoNotResideInNamespace("GeminiCode.Hunter.Api")
             .And()
@@ -96,7 +106,7 @@ public class CleanArchitectureTests
     public void All_Classes_Should_Have_Namespace_Matching_Folder_Structure()
     {
         // This validates that namespace matches physical folder structure
-        var allTypes = Types.InCurrentDomain()
+        var allTypes = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespaceStartingWith("GeminiCode.Hunter")
             .GetTypes();
@@ -114,7 +124,7 @@ public class CleanArchitectureTests
     public void Interfaces_Should_Start_With_I()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespaceStartingWith("GeminiCode.Hunter")
             .And()
@@ -132,13 +142,15 @@ public class CleanArchitectureTests
     public void Classes_Should_Not_Start_With_I()
     {
         // Arrange & Act
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespaceStartingWith("GeminiCode.Hunter")
             .And()
             .AreClasses()
             .And()
             .DoNotResideInNamespace("GeminiCode.Hunter.Test") // Exclude test classes (can start with Integration/Implementation)
+            .And()
+            .DoNotResideInNamespaceContaining("Migrations") // Exclude EF Core migrations (can start with 'Initial')
             .ShouldNot()
             .HaveNameStartingWith("I")
             .GetResult();
@@ -152,7 +164,7 @@ public class CleanArchitectureTests
     public void Project_Should_Follow_Namespace_Convention()
     {
         // All namespaces should start with GeminiCode.Hunter
-        var result = Types.InCurrentDomain()
+        var result = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespaceStartingWith("GeminiCode")
             .Should()
@@ -170,7 +182,7 @@ public class CleanArchitectureTests
         // This is the dependency rule of Clean Architecture
         
         // Already tested in individual tests, this is a summary assertion
-        var domainIndependent = Types.InCurrentDomain()
+        var domainIndependent = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Domain.Core")
             .ShouldNot()
@@ -182,7 +194,7 @@ public class CleanArchitectureTests
             .GetResult()
             .IsSuccessful;
 
-        var applicationDependsOnlyDomain = Types.InCurrentDomain()
+        var applicationDependsOnlyDomain = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Application.Core")
             .ShouldNot()
@@ -193,7 +205,7 @@ public class CleanArchitectureTests
             .GetResult()
             .IsSuccessful;
 
-        var infrastructureDependsOnlyDomain = Types.InCurrentDomain()
+        var infrastructureDependsOnlyDomain = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespace("GeminiCode.Hunter.Infra.Data")
             .ShouldNot()
@@ -212,7 +224,7 @@ public class CleanArchitectureTests
     public void All_Public_Classes_Should_Be_In_Correct_Layer()
     {
         // This ensures no classes are misplaced
-        var allPublicClasses = Types.InCurrentDomain()
+        var allPublicClasses = Types.InAssemblies(AllAssemblies)
             .That()
             .ResideInNamespaceStartingWith("GeminiCode.Hunter")
             .And()

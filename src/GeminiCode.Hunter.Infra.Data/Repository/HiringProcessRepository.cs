@@ -12,7 +12,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository;
 
-public class HiringProcessRepository(DataContext dataContext) : BaseEntityRepository<HiringProcess>(dataContext), IHiringProcessRepository
+public sealed class HiringProcessRepository(DataContext dataContext) : BaseEntityRepository<HiringProcess>(dataContext), IHiringProcessRepository
 {
     public override async Task<HiringProcess> GetByIdAsync(string publicId)
     {

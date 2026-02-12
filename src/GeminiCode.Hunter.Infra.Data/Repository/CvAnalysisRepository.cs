@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository;
 
-public class CvAnalysisRepository(DataContext dataContext) 
+public sealed class CvAnalysisRepository(DataContext dataContext) 
     : BaseEntityRepository<CvAnalysis>(dataContext), ICvAnalysisRepository
 {
     public async Task<List<CvAnalysis>> GetByUserIdAsync(long userId, int page = 1, int pageSize = 10)

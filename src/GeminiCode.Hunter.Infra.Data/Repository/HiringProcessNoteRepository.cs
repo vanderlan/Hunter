@@ -9,7 +9,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository;
 
-public class HiringProcessNoteRepository(DataContext dataContext) : BaseEntityRepository<HiringProcessNote>(dataContext), IHiringProcessNoteRepository
+public sealed class HiringProcessNoteRepository(DataContext dataContext) : BaseEntityRepository<HiringProcessNote>(dataContext), IHiringProcessNoteRepository
 {
     public async Task<List<HiringProcessNote>> GetByHiringProcessIdAsync(long hiringProcessId)
     {

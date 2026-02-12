@@ -11,7 +11,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository;
 
-public class CandidateRepository(DataContext dataContext) : BaseEntityRepository<Candidate>(dataContext), ICandidateRepository
+public sealed class CandidateRepository(DataContext dataContext) : BaseEntityRepository<Candidate>(dataContext), ICandidateRepository
 {
     public override async Task<Candidate> GetByIdAsync(string publicId)
     {

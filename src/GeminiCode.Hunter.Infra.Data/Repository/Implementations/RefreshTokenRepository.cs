@@ -5,5 +5,5 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository.Implementations;
 
-internal class RefreshTokenRepository(DataContext context)
+internal sealed class RefreshTokenRepository(DataContext context)
     : BaseEntityRepository<RefreshToken>(context), IRefreshTokenRepository;

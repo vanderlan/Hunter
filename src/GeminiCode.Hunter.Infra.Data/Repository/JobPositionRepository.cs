@@ -12,7 +12,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository;
 
-public class JobPositionRepository(DataContext dataContext) : BaseEntityRepository<JobPosition>(dataContext), IJobPositionRepository
+public sealed class JobPositionRepository(DataContext dataContext) : BaseEntityRepository<JobPosition>(dataContext), IJobPositionRepository
 {
     public async Task<JobPosition?> GetByExternalUrlAsync(string externalUrl)
     {

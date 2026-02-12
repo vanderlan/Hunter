@@ -9,7 +9,7 @@ using GeminiCode.Hunter.Infra.Data.Repository.Generic;
 
 namespace GeminiCode.Hunter.Infra.Data.Repository.Implementations;
 
-public class ParameterRepository(DataContext dataContext) : BaseEntityRepository<Parameter>(dataContext), IParameterRepository
+public sealed class ParameterRepository(DataContext dataContext) : BaseEntityRepository<Parameter>(dataContext), IParameterRepository
 {
     public async Task<Parameter?> GetByKeyAsync(string key)
     {
