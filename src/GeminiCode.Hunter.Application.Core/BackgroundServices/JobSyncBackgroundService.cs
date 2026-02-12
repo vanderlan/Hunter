@@ -12,9 +12,10 @@ public class JobSyncBackgroundService(
 {
     private readonly ILogger<JobSyncBackgroundService> _logger = logger;
     private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
-    private static readonly TimeSpan SyncInterval = TimeSpan.FromHours(24);
-    private static readonly TimeOnly StartTime = new(8, 0);
-    private static readonly TimeOnly EndTime = new(22, 0);
+    private static readonly TimeSpan SyncInterval = TimeSpan.FromMinutes(60);
+
+    private static readonly TimeOnly StartTime = new(11, 0);  // 8:00 AM BRT = 11:00 AM UTC
+    private static readonly TimeOnly EndTime = new(22, 0);    // 7:00 PM BRT = 10:00 PM UTC
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
