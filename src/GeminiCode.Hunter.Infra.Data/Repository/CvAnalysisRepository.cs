@@ -116,11 +116,11 @@ public sealed class CvAnalysisRepository(DataContext dataContext)
             .FirstOrDefaultAsync(x => x.PublicId == publicId);
     }
 
-    public async Task DeleteByCandidateIdAsync(long candidateId)
+    public async Task DeleteByCandidateIdAsync(long candidateId, long userId)
     {
         var existingAnalyses = await DataContext.CvAnalyses
             .Include(x => x.Matches)
-            .Where(x => x.CandidateId == candidateId)
+            .Where(x => x.CandidateId == candidateId && x.UserId == userId)
             .ToListAsync();
 
         if (existingAnalyses.Any())

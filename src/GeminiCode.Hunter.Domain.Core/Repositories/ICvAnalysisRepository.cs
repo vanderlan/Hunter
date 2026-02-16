@@ -16,7 +16,7 @@ public interface ICvAnalysisRepository : IBaseEntityRepository<CvAnalysis>
     Task<PagedList<CvAnalysis>> GetByUserIdWithFilterAsync(long userId, CvAnalysisFilter filter);
     Task<PagedList<CvAnalysis>> GetAllWithFilterAsync(CvAnalysisFilter filter);
     Task<CvAnalysis?> GetWithMatchesAsync(string publicId);
-    Task DeleteByCandidateIdAsync(long candidateId);
+    Task DeleteByCandidateIdAsync(long candidateId, long userId);
     Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId);
     Task DeleteMatchesByJobPositionIdAsync(long jobPositionId);
 }

@@ -73,7 +73,7 @@ public class CandidateDeleteRequestHandler(
 
         // 2. Delete CV Analysis data (CvAnalysisMatch has cascade delete from CvAnalysis)
         logger.LogInformation("Deleting CV analysis records for candidate {CandidateId}", candidate.CandidateId);
-        await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId);
+        await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId, user.UserId);
 
         // 3. Delete Candidate Files and related File entities
         var candidateFiles = await unitOfWork.CandidateFileRepository.GetByCandidateIdAsync(candidate.CandidateId);

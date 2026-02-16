@@ -28,17 +28,22 @@ public class GetCvAnalysisHistoryRequestHandler(
             analyses = await unitOfWork.CvAnalysisRepository.GetByUserIdWithFilterAsync(user.UserId, request);
         }
 
-        var response = analyses.Items.Select(a => new CvAnalysisHistoryResponse
+        var latestAnalyses = analyses.Items
+            .GroupBy(a => a.Candidate?.CandidateId)
+            .Select(g => g.OrderByDescending(a => a.AnalyzedAt).First())
+            .ToList();
+
+        var response = latestAnalyses.Select(a => new CvAnalysisHistoryResponse
         {
             AnalysisId = a.PublicId,
-            CandidateName = a.Candidate?.Name ?? "Unknown",
-            CandidateEmail = a.Candidate?.Email ?? "",
+            CandidateName = a.Candidate?.Name,
+            CandidateEmail = a.Candidate?.Email,
             AnalyzedAt = a.AnalyzedAt.ToApplicationTime(),
-            AnalyzedByUserName = a.User?.Name ?? "",
+            AnalyzedByUserName = a.User?.Name,
             TotalPositionsAnalyzed = a.TotalPositionsAnalyzed,
             MatchesFound = a.MatchesFound
         }).ToList();
 
-        return new PagedList<CvAnalysisHistoryResponse>(response, analyses.Count);
+        return new PagedList<CvAnalysisHistoryResponse>(response, latestAnalyses.Count);
     }
 }
