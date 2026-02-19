@@ -58,6 +58,35 @@ public class SyncJobsRequestHandler(
                     if (existingPosition != null)
                         continue;
 
+                    // Check if a position with the same JobCode exists (title might have changed)
+                    var positionByJobCode = await unitOfWork.JobPositionRepository.GetByJobCodeAsync(newJob.JobCode);
+                    if (positionByJobCode != null)
+                    {
+                        // Capture old values for logging
+                        var oldTitle = positionByJobCode.Title;
+                        var oldCompanyCode = positionByJobCode.CompanyCode;
+
+                        // Update existing position instead of creating a new one
+                        positionByJobCode.Title = newJob.Title;
+                        positionByJobCode.CompanyCode = newJob.CompanyCode;
+                        positionByJobCode.ExternalUrl = newJob.Url;
+                        positionByJobCode.LastCheckedAt = now;
+                        positionByJobCode.IsActive = true;
+                        positionByJobCode.ClosedAt = null;
+
+                        unitOfWork.JobPositionRepository.Update(positionByJobCode);
+                        await unitOfWork.CommitAsync();
+
+                        response.UpdatedPositions++;
+
+                        logger.LogInformation(
+                            "Updated existing position with JobCode {JobCode}: Title changed from '{OldTitle}' to '{NewTitle}'",
+                            newJob.JobCode, oldTitle, newJob.Title
+                        );
+
+                        continue;
+                    }
+
                     // Scrape raw HTML content
                     var scrapedDetails = await scraperService.ScrapeJobDetailsAsync(newJob.Url);
 
@@ -183,23 +212,45 @@ public class SyncJobsRequestHandler(
                 }
                 else if (scrapedJob != null && scrapedJob.Title != position.Title)
                 {
-                    logger.LogWarning(
-                        "Job title changed from '{OldTitle}' to '{NewTitle}'. Treating as closed and new.",
-                        position.Title, scrapedJob.Title
-                    );
-
-                    await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
-                    response.ClosedPositions++;
-                    response.ClosedJobTitles.Add(position.Title);
-                    
-                    // Add to closed email data list
-                    closedJobPositions.Add(new JobPositionEmailData
+                    // Check if JobCode is the same - if so, just update the title and company code
+                    if (scrapedJob.JobCode == position.JobCode)
                     {
-                        PublicId = position.PublicId,
-                        Title = position.Title,
-                        JobCode = position.JobCode,
-                        CompanyCode = position.CompanyCode
-                    });
+                        logger.LogInformation(
+                            "Job title changed from '{OldTitle}' to '{NewTitle}' with same JobCode {JobCode}. Updating position.",
+                            position.Title, scrapedJob.Title, position.JobCode
+                        );
+
+                        position.Title = scrapedJob.Title;
+                        position.CompanyCode = scrapedJob.CompanyCode;
+                        position.LastCheckedAt = now;
+
+                        if (string.IsNullOrWhiteSpace(position.Priority))
+                            position.Priority = DefaultPriority;
+
+                        unitOfWork.JobPositionRepository.Update(position);
+                        response.UpdatedPositions++;
+                    }
+                    else
+                    {
+                        // JobCode changed - this is a completely different position
+                        logger.LogWarning(
+                            "Job title and JobCode changed from '{OldTitle}' (JobCode: {OldJobCode}) to '{NewTitle}' (JobCode: {NewJobCode}). Treating as closed and new.",
+                            position.Title, position.JobCode, scrapedJob.Title, scrapedJob.JobCode
+                        );
+
+                        await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
+                        response.ClosedPositions++;
+                        response.ClosedJobTitles.Add(position.Title);
+
+                        // Add to closed email data list
+                        closedJobPositions.Add(new JobPositionEmailData
+                        {
+                            PublicId = position.PublicId,
+                            Title = position.Title,
+                            JobCode = position.JobCode,
+                            CompanyCode = position.CompanyCode
+                        });
+                    }
                 }
             }
 
