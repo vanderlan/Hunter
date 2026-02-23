@@ -92,15 +92,30 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
         try
         {
             // Extract company code and job code from title
-            // Format: "CompanyCode - Title - JobCodeXXXX"
+            // Format examples: 
+            //   "CompanyCode - Title - JobCodeXXXX"
+            //   "MS- Ssr. Data Engineer B. - Job6642" (company code without space before dash)
+
+            // Find the first dash (with or without surrounding spaces)
+            var firstDashIndex = title.IndexOf('-');
+            if (firstDashIndex == -1)
+                return null;
+
+            // Extract company code (everything before the first dash, trimmed)
+            var companyCode = title.Substring(0, firstDashIndex).Trim();
+
+            // Limit to 10 characters to match database constraint
+            if (companyCode.Length > 10)
+                companyCode = companyCode.Substring(0, 10);
+
+            // Split by " - " to get the last part for job code
             var parts = title.Split(" - ", StringSplitOptions.RemoveEmptyEntries);
-            
+
             if (parts.Length < 2)
                 return null;
 
-            var companyCode = parts[0].Trim();
             var jobCodePart = parts[^1].Trim(); // Last part
-            
+
             // Extract job code (e.g., "Job2495" from "Identity - Job2495")
             var jobCode = jobCodePart.Contains("Job") 
                 ? jobCodePart.Split(' ').LastOrDefault(p => p.StartsWith("Job"))?.Trim() ?? jobCodePart
