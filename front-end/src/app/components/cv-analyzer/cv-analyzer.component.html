@@ -186,7 +186,15 @@
                   <mat-card-title>
                     {{ match.jobTitle }}
                   </mat-card-title>
-                  <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
+                  <div class="subtitle-with-link">
+                    <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
+                    @if (match.externalUrl) {
+                      <a [href]="match.externalUrl" target="_blank" rel="noopener noreferrer" class="external-link">
+                        <mat-icon>link</mat-icon>
+                        <span>View External Link</span>
+                      </a>
+                    }
+                  </div>
                 </div>
                 <div class="match-card-priority">
                   <app-priority-badge [priority]="match.priority"></app-priority-badge>

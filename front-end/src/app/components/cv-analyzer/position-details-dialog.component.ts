@@ -31,8 +31,16 @@ import { JobPosition } from '../../models/job.model';
             <mat-icon class="position-meta-icon">code</mat-icon>
             <span class="position-meta-text">{{ data.jobCode }}</span>
           </div>
+          @if (data.externalUrl) {
+            <div class="position-meta-item">
+              <a [href]="data.externalUrl" target="_blank" rel="noopener noreferrer" class="external-link">
+                <mat-icon class="position-meta-icon">open_in_new</mat-icon>
+                <span class="position-meta-text">View External Link</span>
+              </a>
+            </div>
+          }
         </div>
-    
+
         <mat-divider class="position-section-divider"></mat-divider>
     
         @if (data.summary) {
@@ -164,6 +172,35 @@ import { JobPosition } from '../../models/job.model';
             font-size: 14px;
             color: #666;
             font-weight: 500;
+          }
+        }
+
+        .external-link {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          text-decoration: none;
+          color: #5f1f1f;
+          transition: all 0.2s ease;
+
+          .position-meta-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            color: #5f1f1f;
+          }
+
+          .position-meta-text {
+            font-size: 14px;
+            line-height: 1.2;
+          }
+
+          &:hover {
+            color: #8b2f2f;
+
+            .position-meta-text {
+              text-decoration: underline;
+            }
           }
         }
       }
