@@ -80,8 +80,9 @@ public class CsvParserService(ILogger<CsvParserService> logger) : ICsvParserServ
         
         if (!jobCodeMatch.Success)
         {
-            _logger.LogWarning("Could not extract job code from role: {role}", role);
-            return null;
+            // New pattern: no job code present (e.g., "GraphQL Engineer"), match by title
+            _logger.LogInformation("No job code found in role: {role}. Will match by title.", role);
+            return new JobPriorityDto(string.Empty, priority, countryRestrictions, role.Trim());
         }
 
         var jobCode = jobCodeMatch.Value;
