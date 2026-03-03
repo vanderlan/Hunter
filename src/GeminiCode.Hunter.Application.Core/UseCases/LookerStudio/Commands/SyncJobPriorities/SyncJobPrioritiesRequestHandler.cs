@@ -43,7 +43,21 @@ public class SyncJobPrioritiesRequestHandler(
 
             foreach (var priority in priorities)
             {
-                if (jobPositionsDict.TryGetValue(priority.JobCode, out var jobPosition))
+                Domain.Core.Entities.JobPosition? jobPosition = null;
+                var matchIdentifier = !string.IsNullOrEmpty(priority.JobCode) ? priority.JobCode : priority.JobTitle ?? string.Empty;
+
+                if (!string.IsNullOrEmpty(priority.JobCode) && jobPositionsDict.TryGetValue(priority.JobCode, out jobPosition))
+                {
+                    // Old pattern: matched by job code
+                }
+                else if (!string.IsNullOrEmpty(priority.JobTitle))
+                {
+                    // New pattern: match by title (Looker Studio title is part of DB job title)
+                    jobPosition = allJobPositions.FirstOrDefault(j =>
+                        j.Title.Contains(priority.JobTitle, StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (jobPosition != null)
                 {
                     // Update priority information
                     var oldPriority = jobPosition.Priority;
@@ -56,19 +70,18 @@ public class SyncJobPrioritiesRequestHandler(
                     unitOfWork.JobPositionRepository.Update(jobPosition);
 
                     response.MatchedJobs++;
-                    response.UpdatedJobCodes.Add(priority.JobCode);
+                    response.UpdatedJobCodes.Add(matchIdentifier);
 
-                    logger.LogInformation("Updated job {jobCode}: Priority {oldPriority} : {newPriority}, Country {oldCountry} : {newCountry}", 
-                        priority.JobCode, oldPriority ?? "(none)", priority.Priority, 
+                    logger.LogInformation("Updated job {identifier}: Priority {oldPriority} : {newPriority}, Country {oldCountry} : {newCountry}", 
+                        matchIdentifier, oldPriority ?? "(none)", priority.Priority, 
                         oldCountry ?? "(none)", priority.CountryRestrictions);
                 }
                 else
                 {
                     response.UnmatchedJobs++;
-                    response.UnmatchedJobCodes.Add(priority.JobCode);
+                    response.UnmatchedJobCodes.Add(matchIdentifier);
                     
-                    logger.LogWarning("Job code {jobCode} from CSV not found in database", 
-                        priority.JobCode);
+                    logger.LogWarning("Job {identifier} from CSV not found in database", matchIdentifier);
                 }
             }
 

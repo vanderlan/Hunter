@@ -358,14 +358,13 @@ public class LookerStudioService : ILookerStudioService
 
             for (int i = 0; i < rowCount; i++)
             {
-                // Extract job code from role (e.g., "Python Engineer - Job8903  https://...")
                 var roleFull = roleValues[i];
-                var jobCode = ExtractJobCode(roleFull);
-                
+                var escapedRole = EscapeCsvValue(roleFull);
+
                 var priority = priorityValues[i];
                 var country = EscapeCsvValue(countryValues[i]);
 
-                csvBuilder.AppendLine($"{jobCode},{priority},{country}");
+                csvBuilder.AppendLine($"{escapedRole},{priority},{country}");
             }
 
             return csvBuilder.ToString();
