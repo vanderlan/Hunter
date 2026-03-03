@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using GeminiCode.Hunter.Application.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
+using System.Text.RegularExpressions;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.LookerStudio.Commands.SyncJobPriorities;
 
@@ -44,17 +45,18 @@ public class SyncJobPrioritiesRequestHandler(
             foreach (var priority in priorities)
             {
                 Domain.Core.Entities.JobPosition? jobPosition = null;
-                var matchIdentifier = !string.IsNullOrEmpty(priority.JobCode) ? priority.JobCode : priority.JobTitle ?? string.Empty;
+                var jobTitle = priority.JobTitle is not null ? Regex.Replace(priority.JobTitle, @"https?://\S+", "").Trim() : string.Empty;
+
+                var matchIdentifier = !string.IsNullOrEmpty(priority.JobCode) ? priority.JobCode : jobTitle ?? string.Empty;
 
                 if (!string.IsNullOrEmpty(priority.JobCode) && jobPositionsDict.TryGetValue(priority.JobCode, out jobPosition))
                 {
                     // Old pattern: matched by job code
                 }
-                else if (!string.IsNullOrEmpty(priority.JobTitle))
+                else if (!string.IsNullOrEmpty(jobTitle))
                 {
                     // New pattern: match by title (Looker Studio title is part of DB job title)
-                    jobPosition = allJobPositions.FirstOrDefault(j =>
-                        j.Title.Contains(priority.JobTitle, StringComparison.OrdinalIgnoreCase));
+                    jobPosition = allJobPositions.FirstOrDefault(j =>j.Title.Contains(jobTitle, StringComparison.OrdinalIgnoreCase));
                 }
 
                 if (jobPosition != null)
