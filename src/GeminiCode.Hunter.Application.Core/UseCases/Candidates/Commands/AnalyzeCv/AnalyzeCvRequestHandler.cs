@@ -231,7 +231,7 @@ public class AnalyzeCvRequestHandler(
     {
         try
         {
-            await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidateId, userId);
+            await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAndUserAsync(candidateId, userId);
 
             var cvAnalysis = new CvAnalysisEntity
             {

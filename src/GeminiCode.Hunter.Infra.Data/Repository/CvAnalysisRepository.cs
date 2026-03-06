@@ -116,26 +116,37 @@ public sealed class CvAnalysisRepository(DataContext dataContext)
             .FirstOrDefaultAsync(x => x.PublicId == publicId);
     }
 
-    public async Task DeleteByCandidateIdAsync(long candidateId, long userId)
+    public async Task DeleteByCandidateIdAndUserAsync(long candidateId, long userId)
     {
         var existingAnalyses = await DataContext.CvAnalyses
             .Include(x => x.Matches)
             .Where(x => x.CandidateId == candidateId && x.UserId == userId)
             .ToListAsync();
 
+        await DeletePreviousAnalysis(existingAnalyses);
+    }
+
+    private async Task DeletePreviousAnalysis(List<CvAnalysis> existingAnalyses)
+    {
         if (existingAnalyses.Any())
         {
-            // Delete all matches first (due to foreign key constraint)
             foreach (var analysis in existingAnalyses)
             {
                 DataContext.CvAnalysisMatches.RemoveRange(analysis.Matches);
             }
 
-            // Then delete all analyses
             DataContext.CvAnalyses.RemoveRange(existingAnalyses);
-            
-            await DataContext.SaveChangesAsync();
         }
+    }
+
+    public async Task DeleteByCandidateIdAsync(long candidateId)
+    {
+        var existingAnalyses = await DataContext.CvAnalyses
+            .Include(x => x.Matches)
+            .Where(x => x.CandidateId == candidateId)
+            .ToListAsync();
+
+        await DeletePreviousAnalysis(existingAnalyses);
     }
 
     public async Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId)
