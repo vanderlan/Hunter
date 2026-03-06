@@ -95,14 +95,24 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
             // Format examples: 
             //   "CompanyCode - Title - JobCodeXXXX"
             //   "MS- Ssr. Data Engineer B. - Job6642" (company code without space before dash)
+            //   "102272 - Android Engineer" (numeric job code with no company code, defaults to "TL")
 
             // Find the first dash (with or without surrounding spaces)
             var firstDashIndex = title.IndexOf('-');
             if (firstDashIndex == -1)
                 return null;
 
-            // Extract company code (everything before the first dash, trimmed)
-            var companyCode = title.Substring(0, firstDashIndex).Trim();
+            var firstPart = title.Substring(0, firstDashIndex).Trim();
+
+            // New format: numeric job code prefix (e.g., "102272 - Android Engineer")
+            if (long.TryParse(firstPart, out _))
+            {
+                var jobCode = firstPart;
+                return new ScrapedJobPosition(title, url, "TL", jobCode);
+            }
+
+            // Old format: "CompanyCode - Title - JobCodeXXXX"
+            var companyCode = firstPart;
 
             // Limit to 10 characters to match database constraint
             if (companyCode.Length > 10)
@@ -117,11 +127,11 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
             var jobCodePart = parts[^1].Trim(); // Last part
 
             // Extract job code (e.g., "Job2495" from "Identity - Job2495")
-            var jobCode = jobCodePart.Contains("Job") 
+            var jobCode2 = jobCodePart.Contains("Job") 
                 ? jobCodePart.Split(' ').LastOrDefault(p => p.StartsWith("Job"))?.Trim() ?? jobCodePart
                 : jobCodePart;
 
-            return new ScrapedJobPosition(title, url, companyCode, jobCode);
+            return new ScrapedJobPosition(title, url, companyCode, jobCode2);
         }
         catch
         {
