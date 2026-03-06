@@ -6,7 +6,7 @@ public class SyncJobPrioritiesResponse
     public int MatchedJobs { get; set; }
     public int UnmatchedJobs { get; set; }
     public int UpdatedJobs { get; set; }
-    public List<string> UnmatchedJobCodes { get; set; } = new();
-    public List<string> UpdatedJobCodes { get; set; } = new();
+    public List<string> UnmatchedJobCodes { get; set; } = [];
+    public List<string> UpdatedJobCodes { get; set; } = [];
     public string Message { get; set; }
 }

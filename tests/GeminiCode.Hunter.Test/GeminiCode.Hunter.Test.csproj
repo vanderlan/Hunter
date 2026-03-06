@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Unit\Application\JobPositions\**" />
+    <EmbeddedResource Remove="Unit\Application\JobPositions\**" />
+    <None Remove="Unit\Application\JobPositions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="coverlet.msbuild">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,10 +34,6 @@
     <ProjectReference Include="..\..\src\GeminiCode.Hunter.Domain.Core\GeminiCode.Hunter.Domain.Core.csproj" />
     <ProjectReference Include="..\..\src\GeminiCode.Hunter.Crosscutting.Ioc\GeminiCode.Hunter.Crosscutting.Ioc.csproj" />
     <ProjectReference Include="..\..\src\GeminiCode.Hunter.Crosscutting.Resources\GeminiCode.Hunter.Crosscutting.Resources.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Unit\Application\JobPositions\" />
   </ItemGroup>
 
 </Project>

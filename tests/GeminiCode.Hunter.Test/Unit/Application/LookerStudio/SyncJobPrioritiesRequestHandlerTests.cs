@@ -66,7 +66,7 @@ public class SyncJobPrioritiesRequestHandlerTests
         _csvParserServiceMock.Setup(x => x.ParsePriorityCsv("csv-content"))
             .Returns(priorities);
         _jobPositionRepositoryMock.Setup(x => x.GetActivePositionsAsync())
-            .ReturnsAsync(new List<JobPosition> { jobPosition });
+            .ReturnsAsync([jobPosition]);
 
         // Act
         var result = await _handler.Handle(new SyncJobPrioritiesRequest(), CancellationToken.None);
@@ -106,7 +106,7 @@ public class SyncJobPrioritiesRequestHandlerTests
         _csvParserServiceMock.Setup(x => x.ParsePriorityCsv("csv-content"))
             .Returns(priorities);
         _jobPositionRepositoryMock.Setup(x => x.GetActivePositionsAsync())
-            .ReturnsAsync(new List<JobPosition> { jobPosition });
+            .ReturnsAsync([jobPosition]);
 
         // Act
         var result = await _handler.Handle(new SyncJobPrioritiesRequest(), CancellationToken.None);
@@ -158,7 +158,7 @@ public class SyncJobPrioritiesRequestHandlerTests
         _csvParserServiceMock.Setup(x => x.ParsePriorityCsv("csv-content"))
             .Returns(priorities);
         _jobPositionRepositoryMock.Setup(x => x.GetActivePositionsAsync())
-            .ReturnsAsync(new List<JobPosition> { oldPatternJob, newPatternJob });
+            .ReturnsAsync([oldPatternJob, newPatternJob]);
 
         // Act
         var result = await _handler.Handle(new SyncJobPrioritiesRequest(), CancellationToken.None);
@@ -196,7 +196,7 @@ public class SyncJobPrioritiesRequestHandlerTests
         _csvParserServiceMock.Setup(x => x.ParsePriorityCsv("csv-content"))
             .Returns(priorities);
         _jobPositionRepositoryMock.Setup(x => x.GetActivePositionsAsync())
-            .ReturnsAsync(new List<JobPosition> { jobPosition });
+            .ReturnsAsync([jobPosition]);
 
         // Act
         var result = await _handler.Handle(new SyncJobPrioritiesRequest(), CancellationToken.None);

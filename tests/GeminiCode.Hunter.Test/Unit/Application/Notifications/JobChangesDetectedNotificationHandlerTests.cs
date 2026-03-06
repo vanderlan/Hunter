@@ -5,6 +5,7 @@ using GeminiCode.Hunter.Domain.Core.Models;
 using GeminiCode.Hunter.Domain.Core.Repositories;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
+using GeminiCode.Hunter.Test.Shared.Faker;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -48,16 +49,20 @@ public class JobChangesDetectedNotificationHandlerTests
             NewPositionsCount = 2,
             ClosedPositionsCount = 0,
             UpdatedPositionsCount = 0,
-            NewJobTitles = new List<string> { "Senior Developer", "Junior Developer" },
-            ClosedJobTitles = new List<string>(),
+            NewJobTitles = ["Senior Developer", "Junior Developer"],
+            ClosedJobTitles = [],
             SyncTimestamp = DateTime.UtcNow
         };
 
         var allUsers = new List<User>
         {
-            new User { UserId = 1, Name = "Admin User", Email = "admin@test.com", Profile = UserProfile.Admin, Password = "test", ReceiveJobChangeNotifications = true },
-            new User { UserId = 2, Name = "Partner User", Email = "partner@test.com", Profile = UserProfile.Partner, Password = "test", ReceiveJobChangeNotifications = true }
+            UserFaker.Get(),
+            UserFaker.Get()
         };
+        allUsers[0].Profile = UserProfile.Admin;
+        allUsers[0].ReceiveJobChangeNotifications = true;
+        allUsers[1].Profile = UserProfile.Partner;
+        allUsers[1].ReceiveJobChangeNotifications = true;
 
         _userRepositoryMock
             .Setup(x => x.GetUsersWithJobNotificationsEnabledAsync())
@@ -73,7 +78,7 @@ public class JobChangesDetectedNotificationHandlerTests
         // Assert
         _emailServiceMock.Verify(
             x => x.SendJobChangesNotificationAsync(
-                It.Is<List<string>>(emails => emails.Count == 2 && emails.Contains("admin@test.com") && emails.Contains("partner@test.com")),
+                It.Is<List<string>>(emails => emails.Count == 2 && emails.Contains(allUsers[0].Email) && emails.Contains(allUsers[1].Email)),
                 It.Is<List<string>>(newJobs => newJobs.Count == 2),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 0),
                 It.IsAny<List<JobPositionEmailData>>(),
@@ -91,16 +96,20 @@ public class JobChangesDetectedNotificationHandlerTests
             NewPositionsCount = 0,
             ClosedPositionsCount = 2,
             UpdatedPositionsCount = 0,
-            NewJobTitles = new List<string>(),
-            ClosedJobTitles = new List<string> { "Old Position 1", "Old Position 2" },
+            NewJobTitles = [],
+            ClosedJobTitles = ["Old Position 1", "Old Position 2"],
             SyncTimestamp = DateTime.UtcNow
         };
 
         var allUsers = new List<User>
         {
-            new User { UserId = 1, Name = "Admin User", Email = "admin@test.com", Profile = UserProfile.Admin, Password = "test", ReceiveJobChangeNotifications = true },
-            new User { UserId = 2, Name = "Partner User", Email = "partner@test.com", Profile = UserProfile.Partner, Password = "test", ReceiveJobChangeNotifications = true }
+            UserFaker.Get(),
+            UserFaker.Get()
         };
+        allUsers[0].Profile = UserProfile.Admin;
+        allUsers[0].ReceiveJobChangeNotifications = true;
+        allUsers[1].Profile = UserProfile.Partner;
+        allUsers[1].ReceiveJobChangeNotifications = true;
 
         var adminUsers = allUsers.Where(u => u.Profile == UserProfile.Admin).ToList();
 
@@ -118,7 +127,7 @@ public class JobChangesDetectedNotificationHandlerTests
         // Assert
         _emailServiceMock.Verify(
             x => x.SendJobChangesNotificationAsync(
-                It.Is<List<string>>(emails => emails.Count == 1 && emails.Contains("admin@test.com")),
+                It.Is<List<string>>(emails => emails.Count == 1 && emails.Contains(allUsers[0].Email)),
                 It.Is<List<string>>(newJobs => newJobs.Count == 0),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 2),
                 It.IsAny<List<JobPositionEmailData>>(),
@@ -136,16 +145,20 @@ public class JobChangesDetectedNotificationHandlerTests
             NewPositionsCount = 1,
             ClosedPositionsCount = 1,
             UpdatedPositionsCount = 0,
-            NewJobTitles = new List<string> { "New Position" },
-            ClosedJobTitles = new List<string> { "Closed Position" },
+            NewJobTitles = ["New Position"],
+            ClosedJobTitles = ["Closed Position"],
             SyncTimestamp = DateTime.UtcNow
         };
 
         var allUsers = new List<User>
         {
-            new User { UserId = 1, Name = "Admin User", Email = "admin@test.com", Profile = UserProfile.Admin, Password = "test", ReceiveJobChangeNotifications = true },
-            new User { UserId = 2, Name = "Partner User", Email = "partner@test.com", Profile = UserProfile.Partner, Password = "test", ReceiveJobChangeNotifications = true }
+            UserFaker.Get(),
+            UserFaker.Get()
         };
+        allUsers[0].Profile = UserProfile.Admin;
+        allUsers[0].ReceiveJobChangeNotifications = true;
+        allUsers[1].Profile = UserProfile.Partner;
+        allUsers[1].ReceiveJobChangeNotifications = true;
 
         var adminUsers = allUsers.Where(u => u.Profile == UserProfile.Admin).ToList();
 
@@ -175,7 +188,7 @@ public class JobChangesDetectedNotificationHandlerTests
         // Should send notification for closed positions to admin users only
         _emailServiceMock.Verify(
             x => x.SendJobChangesNotificationAsync(
-                It.Is<List<string>>(emails => emails.Count == 1 && emails.Contains("admin@test.com")),
+                It.Is<List<string>>(emails => emails.Count == 1 && emails.Contains(allUsers[0].Email)),
                 It.Is<List<string>>(newJobs => newJobs.Count == 0),
                 It.Is<List<string>>(closedJobs => closedJobs.Count == 1),
                 It.IsAny<List<JobPositionEmailData>>(),
@@ -204,18 +217,18 @@ public class JobChangesDetectedNotificationHandlerTests
             NewPositionsCount = 1,
             ClosedPositionsCount = 1,
             UpdatedPositionsCount = 0,
-            NewJobTitles = new List<string> { "New Position" },
-            ClosedJobTitles = new List<string> { "Closed Position" },
+            NewJobTitles = ["New Position"],
+            ClosedJobTitles = ["Closed Position"],
             SyncTimestamp = DateTime.UtcNow
         };
 
         _userRepositoryMock
             .Setup(x => x.GetUsersWithJobNotificationsEnabledAsync())
-            .ReturnsAsync(new List<User>());
+            .ReturnsAsync([]);
 
         _userRepositoryMock
             .Setup(x => x.GetAdminUsersWithJobNotificationsEnabledAsync())
-            .ReturnsAsync(new List<User>());
+            .ReturnsAsync([]);
 
         // Act
         await _handler.Handle(notification, CancellationToken.None);
@@ -241,8 +254,8 @@ public class JobChangesDetectedNotificationHandlerTests
             NewPositionsCount = 0,
             ClosedPositionsCount = 0,
             UpdatedPositionsCount = 5,
-            NewJobTitles = new List<string>(),
-            ClosedJobTitles = new List<string>(),
+            NewJobTitles = [],
+            ClosedJobTitles = [],
             SyncTimestamp = DateTime.UtcNow
         };
 

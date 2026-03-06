@@ -15,5 +15,5 @@ public class CvAnalysis : BaseEntity
     
     public virtual Candidate Candidate { get; set; } = null!;
     public virtual User User { get; set; } = null!;
-    public virtual ICollection<CvAnalysisMatch> Matches { get; set; } = new List<CvAnalysisMatch>();
+    public virtual ICollection<CvAnalysisMatch> Matches { get; set; } = [];
 }

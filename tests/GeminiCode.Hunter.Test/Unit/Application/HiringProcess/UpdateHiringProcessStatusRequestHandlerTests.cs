@@ -4,6 +4,7 @@ using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
+using GeminiCode.Hunter.Test.Shared.Faker;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -39,32 +40,18 @@ public class UpdateHiringProcessStatusRequestHandlerTests
     public async Task Handle_WhenStatusIsSameAsCurrentStatus_ShouldThrowBusinessException()
     {
         // Arrange
-        var publicId = "test-public-id";
         var currentStatus = HiringProcessStatus.PendingAnalysis;
-        
-        var user = new User
-        {
-            UserId = 1,
-            PublicId = "user-public-id",
-            Name = "Test User",
-            Email = "test@test.com",
-            Password = "password",
-            Profile = UserProfile.Admin
-        };
 
-        var hiringProcess = new GeminiCode.Hunter.Domain.Core.Entities.HiringProcess
-        {
-            HiringProcessId = 1,
-            PublicId = publicId,
-            CandidateId = 1,
-            JobPositionId = 1,
-            Status = currentStatus,
-            CreatedByUserId = 1
-        };
+        var user = UserFaker.Get();
+        user.Profile = UserProfile.Admin;
+
+        var hiringProcess = HiringProcessFaker.Get();
+        hiringProcess.Status = currentStatus;
+        hiringProcess.CreatedByUserId = user.UserId;
 
         var request = new UpdateHiringProcessStatusRequest
         {
-            PublicId = publicId,
+            PublicId = hiringProcess.PublicId,
             NewStatus = currentStatus,
             Notes = "Test notes"
         };
@@ -72,7 +59,7 @@ public class UpdateHiringProcessStatusRequestHandlerTests
         _currentUserMock.Setup(x => x.Id).Returns(user.PublicId);
         _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(user.PublicId))
             .ReturnsAsync(user);
-        _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByIdAsync(publicId))
+        _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByIdAsync(hiringProcess.PublicId))
             .ReturnsAsync(hiringProcess);
 
         // Act & Assert
@@ -91,33 +78,19 @@ public class UpdateHiringProcessStatusRequestHandlerTests
     public async Task Handle_WhenStatusIsDifferent_ShouldUpdateSuccessfully()
     {
         // Arrange
-        var publicId = "test-public-id";
         var currentStatus = HiringProcessStatus.PendingAnalysis;
         var newStatus = HiringProcessStatus.Screening;
-        
-        var user = new User
-        {
-            UserId = 1,
-            PublicId = "user-public-id",
-            Name = "Test User",
-            Email = "test@test.com",
-            Password = "password",
-            Profile = UserProfile.Admin
-        };
 
-        var hiringProcess = new GeminiCode.Hunter.Domain.Core.Entities.HiringProcess
-        {
-            HiringProcessId = 1,
-            PublicId = publicId,
-            CandidateId = 1,
-            JobPositionId = 1,
-            Status = currentStatus,
-            CreatedByUserId = 1
-        };
+        var user = UserFaker.Get();
+        user.Profile = UserProfile.Admin;
+
+        var hiringProcess = HiringProcessFaker.Get();
+        hiringProcess.Status = currentStatus;
+        hiringProcess.CreatedByUserId = user.UserId;
 
         var request = new UpdateHiringProcessStatusRequest
         {
-            PublicId = publicId,
+            PublicId = hiringProcess.PublicId,
             NewStatus = newStatus,
             Notes = "Moving to screening"
         };
@@ -125,7 +98,7 @@ public class UpdateHiringProcessStatusRequestHandlerTests
         _currentUserMock.Setup(x => x.Id).Returns(user.PublicId);
         _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(user.PublicId))
             .ReturnsAsync(user);
-        _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByIdAsync(publicId))
+        _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByIdAsync(hiringProcess.PublicId))
             .ReturnsAsync(hiringProcess);
         _unitOfWorkMock.Setup(x => x.HiringProcessStatusHistoryRepository.AddAsync(It.IsAny<HiringProcessStatusHistory>()))
             .ReturnsAsync((HiringProcessStatusHistory h) => h);
@@ -159,15 +132,8 @@ public class UpdateHiringProcessStatusRequestHandlerTests
             NewStatus = HiringProcessStatus.Screening
         };
 
-        var user = new User
-        {
-            UserId = 1,
-            PublicId = "user-public-id",
-            Name = "Test User",
-            Email = "test@test.com",
-            Password = "password",
-            Profile = UserProfile.Admin
-        };
+        var user = UserFaker.Get();
+        user.Profile = UserProfile.Admin;
 
         _currentUserMock.Setup(x => x.Id).Returns(user.PublicId);
         _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(user.PublicId))

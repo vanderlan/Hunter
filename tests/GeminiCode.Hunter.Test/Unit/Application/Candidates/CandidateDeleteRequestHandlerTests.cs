@@ -4,6 +4,7 @@ using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
+using GeminiCode.Hunter.Test.Shared.Faker;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -54,48 +55,23 @@ public class CandidateDeleteRequestHandlerTests
     public async Task Handle_WhenPartnerUserTriesToDeleteCandidateWithHiringProcess_ShouldThrowUnauthorizedException()
     {
         // Arrange
-        var publicId = "candidate-id";
-        var userPublicId = "user-id";
-        
-        var partnerUser = new User
-        {
-            UserId = 1,
-            PublicId = userPublicId,
-            Name = "Partner User",
-            Email = "partner@test.com",
-            Password = "password",
-            Profile = UserProfile.Partner
-        };
+        var partnerUser = UserFaker.Get();
+        partnerUser.Profile = UserProfile.Partner;
 
-        var candidate = new Candidate
-        {
-            CandidateId = 1,
-            PublicId = publicId,
-            UserId = 1,
-            Name = "Test Candidate",
-            Email = "candidate@test.com",
-            AnalyzedAt = DateTime.UtcNow
-        };
+        var candidate = CandidateFaker.Get();
+        candidate.UserId = partnerUser.UserId;
 
-        var hiringProcesses = new List<Hunter.Domain.Core.Entities.HiringProcess>
-        {
-            new()
-            {
-                HiringProcessId = 1,
-                PublicId = "hp-id",
-                CandidateId = candidate.CandidateId,
-                JobPositionId = 1,
-                Status = HiringProcessStatus.PendingAnalysis,
-                CreatedByUserId = 1
-            }
-        };
+        var hiringProcess = HiringProcessFaker.Get();
+        hiringProcess.CandidateId = candidate.CandidateId;
+        hiringProcess.CreatedByUserId = partnerUser.UserId;
+        var hiringProcesses = new List<Hunter.Domain.Core.Entities.HiringProcess> { hiringProcess };
 
-        var request = new CandidateDeleteRequest { PublicId = publicId };
+        var request = new CandidateDeleteRequest { PublicId = candidate.PublicId };
 
-        _currentUserMock.Setup(x => x.Id).Returns(userPublicId);
-        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(publicId))
+        _currentUserMock.Setup(x => x.Id).Returns(partnerUser.PublicId);
+        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(candidate.PublicId))
             .ReturnsAsync(candidate);
-        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(userPublicId))
+        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(partnerUser.PublicId))
             .ReturnsAsync(partnerUser);
         _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByCandidateIdAsync(candidate.CandidateId))
             .ReturnsAsync(hiringProcesses);
@@ -111,52 +87,29 @@ public class CandidateDeleteRequestHandlerTests
     public async Task Handle_WhenAdminUserDeletesCandidateWithHiringProcess_ShouldSucceed()
     {
         // Arrange
-        var publicId = "candidate-id";
-        var userPublicId = "admin-id";
-        
-        var adminUser = new User
-        {
-            UserId = 1,
-            PublicId = userPublicId,
-            Name = "Admin User",
-            Email = "admin@test.com",
-            Password = "password",
-            Profile = UserProfile.Admin
-        };
+        var adminUser = UserFaker.Get();
+        adminUser.Profile = UserProfile.Admin;
 
-        var candidate = new Candidate
-        {
-            CandidateId = 1,
-            PublicId = publicId,
-            UserId = 1,
-            Name = "Test Candidate",
-            Email = "candidate@test.com",
-            AnalyzedAt = DateTime.UtcNow
-        };
+        var candidate = CandidateFaker.Get();
+        candidate.UserId = adminUser.UserId;
 
-        var hiringProcess = new GeminiCode.Hunter.Domain.Core.Entities.HiringProcess
-        {
-            HiringProcessId = 1,
-            PublicId = "hp-id",
-            CandidateId = candidate.CandidateId,
-            JobPositionId = 1,
-            Status = HiringProcessStatus.PendingAnalysis,
-            CreatedByUserId = 1
-        };
+        var hiringProcess = HiringProcessFaker.Get();
+        hiringProcess.CandidateId = candidate.CandidateId;
+        hiringProcess.CreatedByUserId = adminUser.UserId;
 
-        var request = new CandidateDeleteRequest { PublicId = publicId };
+        var request = new CandidateDeleteRequest { PublicId = candidate.PublicId };
 
-        _currentUserMock.Setup(x => x.Id).Returns(userPublicId);
-        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(publicId))
+        _currentUserMock.Setup(x => x.Id).Returns(adminUser.PublicId);
+        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(candidate.PublicId))
             .ReturnsAsync(candidate);
-        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(userPublicId))
+        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(adminUser.PublicId))
             .ReturnsAsync(adminUser);
         _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByCandidateIdAsync(candidate.CandidateId))
-            .ReturnsAsync(new List<Hunter.Domain.Core.Entities.HiringProcess> { hiringProcess });
+            .ReturnsAsync([hiringProcess]);
         _unitOfWorkMock.Setup(x => x.HiringProcessNoteRepository.GetByHiringProcessIdAsync(hiringProcess.HiringProcessId))
-            .ReturnsAsync(new List<HiringProcessNote>());
+            .ReturnsAsync([]);
         _unitOfWorkMock.Setup(x => x.CandidateFileRepository.GetByCandidateIdAsync(candidate.CandidateId))
-            .ReturnsAsync(new List<CandidateFile>());
+            .ReturnsAsync([]);
         _unitOfWorkMock.Setup(x => x.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId))
             .Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(x => x.HiringProcessNoteRepository.DeleteAsync(It.IsAny<string>()))
@@ -175,7 +128,7 @@ public class CandidateDeleteRequestHandlerTests
         _unitOfWorkMock.Verify(x => x.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId), Times.Once);
         _unitOfWorkMock.Verify(x => x.HiringProcessNoteRepository.GetByHiringProcessIdAsync(hiringProcess.HiringProcessId), Times.Once);
         _unitOfWorkMock.Verify(x => x.HiringProcessRepository.DeleteAsync(hiringProcess.PublicId), Times.Once);
-        _unitOfWorkMock.Verify(x => x.CandidateRepository.DeleteAsync(publicId), Times.Once);
+        _unitOfWorkMock.Verify(x => x.CandidateRepository.DeleteAsync(candidate.PublicId), Times.Once);
         _unitOfWorkMock.Verify(x => x.CommitAsync(), Times.AtLeastOnce);
     }
 
@@ -183,40 +136,23 @@ public class CandidateDeleteRequestHandlerTests
     public async Task Handle_WhenPartnerUserDeletesCandidateWithoutHiringProcess_ShouldSucceed()
     {
         // Arrange
-        var publicId = "candidate-id";
-        var userPublicId = "partner-id";
-        
-        var partnerUser = new User
-        {
-            UserId = 1,
-            PublicId = userPublicId,
-            Name = "Partner User",
-            Email = "partner@test.com",
-            Password = "password",
-            Profile = UserProfile.Partner
-        };
+        var partnerUser = UserFaker.Get();
+        partnerUser.Profile = UserProfile.Partner;
 
-        var candidate = new Candidate
-        {
-            CandidateId = 1,
-            PublicId = publicId,
-            UserId = 1,
-            Name = "Test Candidate",
-            Email = "candidate@test.com",
-            AnalyzedAt = DateTime.UtcNow
-        };
+        var candidate = CandidateFaker.Get();
+        candidate.UserId = partnerUser.UserId;
 
-        var request = new CandidateDeleteRequest { PublicId = publicId };
+        var request = new CandidateDeleteRequest { PublicId = candidate.PublicId };
 
-        _currentUserMock.Setup(x => x.Id).Returns(userPublicId);
-        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(publicId))
+        _currentUserMock.Setup(x => x.Id).Returns(partnerUser.PublicId);
+        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(candidate.PublicId))
             .ReturnsAsync(candidate);
-        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(userPublicId))
+        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(partnerUser.PublicId))
             .ReturnsAsync(partnerUser);
         _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByCandidateIdAsync(candidate.CandidateId))
-            .ReturnsAsync(new List<GeminiCode.Hunter.Domain.Core.Entities.HiringProcess>());
+            .ReturnsAsync([]);
         _unitOfWorkMock.Setup(x => x.CandidateFileRepository.GetByCandidateIdAsync(candidate.CandidateId))
-            .ReturnsAsync(new List<CandidateFile>());
+            .ReturnsAsync([]);
         _unitOfWorkMock.Setup(x => x.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId))
             .Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(x => x.CandidateRepository.DeleteAsync(It.IsAny<string>()))
@@ -229,7 +165,7 @@ public class CandidateDeleteRequestHandlerTests
 
         // Assert
         _unitOfWorkMock.Verify(x => x.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId), Times.Once);
-        _unitOfWorkMock.Verify(x => x.CandidateRepository.DeleteAsync(publicId), Times.Once);
+        _unitOfWorkMock.Verify(x => x.CandidateRepository.DeleteAsync(candidate.PublicId), Times.Once);
         _unitOfWorkMock.Verify(x => x.CommitAsync(), Times.AtLeastOnce);
     }
 
@@ -237,60 +173,30 @@ public class CandidateDeleteRequestHandlerTests
     public async Task Handle_WhenCandidateHasFilesAndCvAnalysis_ShouldDeleteAll()
     {
         // Arrange
-        var publicId = "candidate-id";
-        var userPublicId = "admin-id";
-        
-        var adminUser = new User
-        {
-            UserId = 1,
-            PublicId = userPublicId,
-            Name = "Admin User",
-            Email = "admin@test.com",
-            Password = "password",
-            Profile = UserProfile.Admin
-        };
+        var adminUser = UserFaker.Get();
+        adminUser.Profile = UserProfile.Admin;
 
-        var candidate = new Candidate
-        {
-            CandidateId = 1,
-            PublicId = publicId,
-            UserId = 1,
-            Name = "Test Candidate",
-            Email = "candidate@test.com",
-            AnalyzedAt = DateTime.UtcNow
-        };
+        var candidate = CandidateFaker.Get();
+        candidate.UserId = adminUser.UserId;
 
-        var file = new File
-        {
-            FileId = 1,
-            PublicId = "file-id",
-            FileName = "resume.pdf",
-            ContentType = "application/pdf",
-            FileSize = 1024,
-            StorageType = StorageType.Database
-        };
+        var file = FileFaker.Get();
 
-        var candidateFile = new CandidateFile
-        {
-            CandidateFileId = 1,
-            PublicId = "cf-id",
-            CandidateId = candidate.CandidateId,
-            FileId = file.FileId,
-            FileType = "Resume",
-            File = file
-        };
+        var candidateFile = CandidateFileFaker.Get();
+        candidateFile.CandidateId = candidate.CandidateId;
+        candidateFile.FileId = file.FileId;
+        candidateFile.File = file;
 
-        var request = new CandidateDeleteRequest { PublicId = publicId };
+        var request = new CandidateDeleteRequest { PublicId = candidate.PublicId };
 
-        _currentUserMock.Setup(x => x.Id).Returns(userPublicId);
-        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(publicId))
+        _currentUserMock.Setup(x => x.Id).Returns(adminUser.PublicId);
+        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(candidate.PublicId))
             .ReturnsAsync(candidate);
-        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(userPublicId))
+        _unitOfWorkMock.Setup(x => x.UserRepository.GetByIdAsync(adminUser.PublicId))
             .ReturnsAsync(adminUser);
         _unitOfWorkMock.Setup(x => x.HiringProcessRepository.GetByCandidateIdAsync(candidate.CandidateId))
-            .ReturnsAsync(new List<Hunter.Domain.Core.Entities.HiringProcess>());
+            .ReturnsAsync([]);
         _unitOfWorkMock.Setup(x => x.CandidateFileRepository.GetByCandidateIdAsync(candidate.CandidateId))
-            .ReturnsAsync(new List<CandidateFile> { candidateFile });
+            .ReturnsAsync([candidateFile]);
         _unitOfWorkMock.Setup(x => x.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId))
             .Returns(Task.CompletedTask);
         _unitOfWorkMock.Setup(x => x.CandidateFileRepository.DeleteAsync(It.IsAny<string>()))
@@ -309,7 +215,7 @@ public class CandidateDeleteRequestHandlerTests
         _unitOfWorkMock.Verify(x => x.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId), Times.Once);
         _unitOfWorkMock.Verify(x => x.CandidateFileRepository.DeleteAsync(candidateFile.PublicId), Times.Once);
         _unitOfWorkMock.Verify(x => x.FileRepository.DeleteAsync(file.PublicId), Times.Once);
-        _unitOfWorkMock.Verify(x => x.CandidateRepository.DeleteAsync(publicId), Times.Once);
+        _unitOfWorkMock.Verify(x => x.CandidateRepository.DeleteAsync(candidate.PublicId), Times.Once);
         _unitOfWorkMock.Verify(x => x.CommitAsync(), Times.AtLeastOnce);
     }
 }

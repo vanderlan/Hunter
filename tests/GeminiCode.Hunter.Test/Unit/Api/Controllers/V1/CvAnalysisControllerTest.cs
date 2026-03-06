@@ -55,7 +55,7 @@ public class CvAnalysisControllerTest
             },
             TotalPositionsAnalyzed = 5,
             MatchesFound = 2,
-            Matches = new List<JobMatchDto>()
+            Matches = []
         };
 
         mediatorMock.Setup(x => x.Send(It.IsAny<GetCvAnalysisDetailRequest>(), It.IsAny<CancellationToken>()))

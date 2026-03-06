@@ -2,6 +2,7 @@ using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.Update;
 using GeminiCode.Hunter.Domain.Core.Entities;
 using GeminiCode.Hunter.Domain.Core.Exceptions;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
+using GeminiCode.Hunter.Test.Shared.Faker;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Threading;
@@ -55,27 +56,17 @@ public class CandidateUpdateRequestHandlerTests
     public async Task Handle_WhenValidRequest_ShouldUpdateCandidateSuccessfully()
     {
         // Arrange
-        var publicId = "test-public-id";
-
-        var candidate = new Candidate
-        {
-            CandidateId = 1,
-            PublicId = publicId,
-            UserId = 1,
-            Name = "Original Name",
-            Email = "original@test.com",
-            PhoneNumber = "000000000"
-        };
+        var candidate = CandidateFaker.Get();
 
         var request = new CandidateUpdateRequest
         {
-            PublicId = publicId,
+            PublicId = candidate.PublicId,
             Name = "Updated Name",
             Email = "updated@test.com",
             PhoneNumber = "123456789"
         };
 
-        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(publicId))
+        _unitOfWorkMock.Setup(x => x.CandidateRepository.GetByIdAsync(candidate.PublicId))
             .ReturnsAsync(candidate);
 
         // Act
