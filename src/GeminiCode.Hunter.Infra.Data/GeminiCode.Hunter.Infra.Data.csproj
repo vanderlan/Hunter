@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" VersionOverride="10.0.5" />
     <ProjectReference Include="..\GeminiCode.Hunter.Domain.Core\GeminiCode.Hunter.Domain.Core.csproj" />
   </ItemGroup>
 
