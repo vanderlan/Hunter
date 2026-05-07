@@ -35,15 +35,7 @@ public class CvAnalysisMatchMapping : IEntityTypeConfiguration<CvAnalysisMatch>
         builder.Property(x => x.JobTitle)
             .IsRequired()
             .HasMaxLength(200);
-        
-        builder.Property(x => x.JobCode)
-            .IsRequired()
-            .HasMaxLength(50);
-        
-        builder.Property(x => x.CompanyCode)
-            .IsRequired()
-            .HasMaxLength(10);
-        
+
         builder.Property(x => x.CreatedAt)
             .IsRequired()
             .HasColumnType("timestamp without time zone");

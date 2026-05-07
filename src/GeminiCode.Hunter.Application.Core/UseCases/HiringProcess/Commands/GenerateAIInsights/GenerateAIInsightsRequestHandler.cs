@@ -69,7 +69,7 @@ public class GenerateAIInsightsRequestHandler(
         var referralPrompt = $@"You are an expert HR recruiter. Based on the following information, write a professional referral reason (2-4 sentences) explaining WHY this candidate is a strong potential fit for the position.
 
 CANDIDATE: {candidate.Name}
-COMPANY: {jobPosition.CompanyCode}
+POSITION: {jobPosition.Title}
 POSITION: {jobPosition.Title}
 
 JOB REQUIREMENTS:

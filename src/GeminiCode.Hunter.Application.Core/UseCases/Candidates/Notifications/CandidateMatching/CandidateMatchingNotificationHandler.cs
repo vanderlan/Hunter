@@ -79,9 +79,7 @@ ILogger<CandidateMatchingNotificationHandler> logger)
                 logger.LogInformation("Analyzing candidates for position: {Title}", position.Title);
 
                 var positionSummary = new JobPositionSummary(
-                    position.JobCode,
                     position.Title,
-                    position.CompanyCode,
                     position.Summary,
                     position.Responsibilities,
                     position.Requirements,
@@ -150,8 +148,6 @@ ILogger<CandidateMatchingNotificationHandler> logger)
                     matchResults.Add(new PositionMatchResult
                     {
                         JobTitle = position.Title,
-                        JobCode = position.JobCode,
-                        CompanyCode = position.CompanyCode,
                         ExternalUrl = position.ExternalUrl,
                         TotalMatches = candidateMatches.Count,
                         Candidates = candidateMatches.OrderByDescending(c => c.MatchPercentage).ToList()
@@ -196,8 +192,6 @@ ILogger<CandidateMatchingNotificationHandler> logger)
 public class PositionMatchResult
 {
     public string JobTitle { get; set; }
-    public string JobCode { get; set; }
-    public string CompanyCode { get; set; }
     public string ExternalUrl { get; set; }
     public int TotalMatches { get; set; }
     public List<CandidateMatchInfo> Candidates { get; set; }

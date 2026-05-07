@@ -41,7 +41,7 @@ public class SyncJobPrioritiesRequestHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithOldPattern_ShouldMatchByJobCode()
+    public async Task Handle_WithTitleMatch_ShouldMatchByTitle()
     {
         // Arrange
         var jobPosition = new JobPosition
@@ -50,15 +50,13 @@ public class SyncJobPrioritiesRequestHandlerTests
             PublicId = "pub-1",
             Title = "Frontend Engineer B. - Job0522",
             ExternalUrl = "https://example.com",
-            CompanyCode = "ACME",
-            JobCode = "Job0522",
             IsActive = true,
             LastCheckedAt = DateTime.UtcNow
         };
 
         var priorities = new List<JobPriorityDto>
         {
-            new JobPriorityDto("Job0522", "High", "USA")
+            new JobPriorityDto(string.Empty, "High", "USA", "Frontend Engineer")
         };
 
         _lookerStudioServiceMock.Setup(x => x.DownloadPriorityCsvAsync(It.IsAny<CancellationToken>()))
@@ -74,7 +72,7 @@ public class SyncJobPrioritiesRequestHandlerTests
         // Assert
         Assert.Equal(1, result.MatchedJobs);
         Assert.Equal(0, result.UnmatchedJobs);
-        Assert.Contains("Job0522", result.UpdatedJobCodes);
+        Assert.Contains("Frontend Engineer", result.UpdatedJobCodes);
         Assert.Equal("High", jobPosition.Priority);
         Assert.Equal("USA", jobPosition.CountryRestrictions);
     }
@@ -89,13 +87,10 @@ public class SyncJobPrioritiesRequestHandlerTests
             PublicId = "pub-2",
             Title = "GraphQL Engineer B.",
             ExternalUrl = "https://example.com",
-            CompanyCode = "ACME",
-            JobCode = "Job1234",
             IsActive = true,
             LastCheckedAt = DateTime.UtcNow
         };
 
-        // New pattern: no job code, uses JobTitle for matching
         var priorities = new List<JobPriorityDto>
         {
             new JobPriorityDto(string.Empty, "Medium", "Brazil", "GraphQL Engineer")
@@ -120,36 +115,32 @@ public class SyncJobPrioritiesRequestHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithMixedPatterns_ShouldMatchBoth()
+    public async Task Handle_WithMultipleTitles_ShouldMatchBoth()
     {
         // Arrange
-        var oldPatternJob = new JobPosition
+        var firstJob = new JobPosition
         {
             JobPositionId = 1,
             PublicId = "pub-1",
             Title = "Python Engineer with AWS B. - Job8903",
             ExternalUrl = "https://example.com",
-            CompanyCode = "ACME",
-            JobCode = "Job8903",
             IsActive = true,
             LastCheckedAt = DateTime.UtcNow
         };
 
-        var newPatternJob = new JobPosition
+        var secondJob = new JobPosition
         {
             JobPositionId = 2,
             PublicId = "pub-2",
             Title = "GraphQL Engineer Senior",
             ExternalUrl = "https://example.com",
-            CompanyCode = "ACME",
-            JobCode = "Job9999",
             IsActive = true,
             LastCheckedAt = DateTime.UtcNow
         };
 
         var priorities = new List<JobPriorityDto>
         {
-            new JobPriorityDto("Job8903", "High", "USA"),
+            new JobPriorityDto(string.Empty, "High", "USA", "Python Engineer"),
             new JobPriorityDto(string.Empty, "Low", "Global", "GraphQL Engineer")
         };
 
@@ -158,7 +149,7 @@ public class SyncJobPrioritiesRequestHandlerTests
         _csvParserServiceMock.Setup(x => x.ParsePriorityCsv("csv-content"))
             .Returns(priorities);
         _jobPositionRepositoryMock.Setup(x => x.GetActivePositionsAsync())
-            .ReturnsAsync([oldPatternJob, newPatternJob]);
+            .ReturnsAsync([firstJob, secondJob]);
 
         // Act
         var result = await _handler.Handle(new SyncJobPrioritiesRequest(), CancellationToken.None);
@@ -166,12 +157,12 @@ public class SyncJobPrioritiesRequestHandlerTests
         // Assert
         Assert.Equal(2, result.MatchedJobs);
         Assert.Equal(0, result.UnmatchedJobs);
-        Assert.Equal("High", oldPatternJob.Priority);
-        Assert.Equal("Low", newPatternJob.Priority);
+        Assert.Equal("High", firstJob.Priority);
+        Assert.Equal("Low", secondJob.Priority);
     }
 
     [Fact]
-    public async Task Handle_WithNewPatternNotFoundInDatabase_ShouldReportUnmatched()
+    public async Task Handle_WithTitleNotFoundInDatabase_ShouldReportUnmatched()
     {
         // Arrange
         var jobPosition = new JobPosition
@@ -180,8 +171,6 @@ public class SyncJobPrioritiesRequestHandlerTests
             PublicId = "pub-1",
             Title = "Java Developer",
             ExternalUrl = "https://example.com",
-            CompanyCode = "ACME",
-            JobCode = "Job1111",
             IsActive = true,
             LastCheckedAt = DateTime.UtcNow
         };

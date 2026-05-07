@@ -72,9 +72,7 @@ public class HiringProcessGetByIdRequestHandler(
             JobPosition = new JobPositionInfo
             {
                 PublicId = hiringProcess.JobPosition?.PublicId ?? string.Empty,
-                Title = hiringProcess.JobPosition?.Title ?? string.Empty,
-                CompanyCode = hiringProcess.JobPosition?.CompanyCode ?? string.Empty,
-                JobCode = hiringProcess.JobPosition?.JobCode ?? string.Empty
+                Title = hiringProcess.JobPosition?.Title ?? string.Empty
             },
             CreatedByUser = new UserInfo
             {

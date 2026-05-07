@@ -61,9 +61,7 @@ public class ReAnalyzeCvRequestHandler(
             }
 
             var jobSummaries = jobPositions.Select(j => new JobPositionSummary(
-                j.JobCode,
                 j.Title,
-                j.CompanyCode,
                 j.Summary,
                 j.Responsibilities,
                 j.Requirements,
@@ -100,13 +98,11 @@ public class ReAnalyzeCvRequestHandler(
                 },
                 Matches = filteredMatches.Select(match =>
                 {
-                    var job = jobPositions.First(j => j.JobCode == match.JobCode);
+                    var job = jobPositions.First(j => j.Title == match.JobTitle);
                     return new JobMatchDto
                     {
                         JobPositionId = job.PublicId,
-                        JobCode = match.JobCode,
                         JobTitle = match.JobTitle,
-                        CompanyCode = job.CompanyCode,
                         ExternalUrl = job.ExternalUrl,
                         MatchPercentage = match.MatchPercentage,
                         MatchReason = match.MatchReason,
@@ -161,8 +157,8 @@ public class ReAnalyzeCvRequestHandler(
 
             foreach (var match in matches)
             {
-                var job = jobPositions.First(j => j.JobCode == match.JobCode);
-                
+                var job = jobPositions.First(j => j.Title == match.JobTitle);
+
                 var analysisMatch = new CvAnalysisMatchEntity
                 {
                     CvAnalysisId = cvAnalysis.CvAnalysisId,
@@ -172,8 +168,6 @@ public class ReAnalyzeCvRequestHandler(
                     MatchingSkills = System.Text.Json.JsonSerializer.Serialize(match.MatchingSkills),
                     MissingSkills = System.Text.Json.JsonSerializer.Serialize(match.MissingSkills),
                     JobTitle = job.Title,
-                    JobCode = job.JobCode,
-                    CompanyCode = job.CompanyCode,
                     JobSummary = job.Summary,
                     MustHaveSkills = job.MustHaveSkills,
                     NiceToHaveSkills = job.NiceToHaveSkills,

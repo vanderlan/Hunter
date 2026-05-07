@@ -7,7 +7,6 @@ public record CvAnalysisResult(
 );
 
 public record JobMatchResult(
-    string JobCode,
     string JobTitle,
     decimal MatchPercentage,
     string MatchReason,

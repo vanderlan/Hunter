@@ -19,9 +19,7 @@ public class CandidateInfoDto
 public class JobMatchDto
 {
     public string JobPositionId { get; set; } = string.Empty;
-    public string JobCode { get; set; } = string.Empty;
     public string JobTitle { get; set; } = string.Empty;
-    public string CompanyCode { get; set; } = string.Empty;
     public string ExternalUrl { get; set; } = string.Empty;
     public decimal MatchPercentage { get; set; }
     public string MatchReason { get; set; } = string.Empty;

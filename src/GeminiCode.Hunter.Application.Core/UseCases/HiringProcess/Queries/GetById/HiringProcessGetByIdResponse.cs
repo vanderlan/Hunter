@@ -29,8 +29,6 @@ public class JobPositionInfo
 {
     public string PublicId { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
-    public string CompanyCode { get; set; } = string.Empty;
-    public string JobCode { get; set; } = string.Empty;
 }
 
 public class UserInfo

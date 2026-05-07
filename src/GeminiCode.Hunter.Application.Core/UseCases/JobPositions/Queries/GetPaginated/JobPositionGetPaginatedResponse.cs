@@ -9,8 +9,6 @@ public class JobPositionGetPaginatedResponse
     public long JobPositionId { get; set; }
     public string Title { get; set; }
     public string ExternalUrl { get; set; }
-    public string CompanyCode { get; set; }
-    public string JobCode { get; set; }
     public string? Summary { get; set; }
     public string? Priority { get; set; }
     public string? CountryRestrictions { get; set; }
@@ -31,8 +29,6 @@ public class JobPositionGetPaginatedResponse
             JobPositionId = jobPosition.JobPositionId,
             Title = jobPosition.Title,
             ExternalUrl = jobPosition.ExternalUrl,
-            CompanyCode = jobPosition.CompanyCode,
-            JobCode = jobPosition.JobCode,
             Summary = jobPosition.Summary,
             Priority = jobPosition.Priority,
             CountryRestrictions = jobPosition.CountryRestrictions,

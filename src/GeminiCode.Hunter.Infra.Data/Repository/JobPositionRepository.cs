@@ -20,12 +20,6 @@ public sealed class JobPositionRepository(DataContext dataContext) : BaseEntityR
             .FirstOrDefaultAsync(x => x.ExternalUrl == externalUrl);
     }
 
-    public async Task<JobPosition?> GetByJobCodeAsync(string jobCode)
-    {
-        return await DataContext.JobPositions
-            .FirstOrDefaultAsync(x => x.JobCode == jobCode);
-    }
-
     public async Task<List<JobPosition>> GetActivePositionsAsync()
     {
         return await DataContext.JobPositions
@@ -73,7 +67,6 @@ public sealed class JobPositionRepository(DataContext dataContext) : BaseEntityR
             var searchTerm = filter.Query.ToLower();
             query = query.Where(x => 
                                 x.Title.ToLower().Contains(searchTerm) 
-                                || x.CompanyCode.ToLower().Contains(searchTerm)
                                 || x.Requirements.ToLower().Contains(searchTerm)
                                 || x.Responsibilities.ToLower().Contains(searchTerm)
                                 || x.MustHaveSkills.ToLower().Contains(searchTerm)

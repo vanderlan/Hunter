@@ -7,8 +7,6 @@ public class JobPositionUpdateRequest : IRequest
     public string PublicId { get; set; }
     public string Title { get; set; }
     public string ExternalUrl { get; set; }
-    public string CompanyCode { get; set; }
-    public string JobCode { get; set; }
     public string? Summary { get; set; }
     public string? Responsibilities { get; set; }
     public string? Requirements { get; set; }

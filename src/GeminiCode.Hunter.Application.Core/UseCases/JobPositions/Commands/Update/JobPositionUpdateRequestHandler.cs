@@ -18,8 +18,6 @@ public class JobPositionUpdateRequestHandler(IUnitOfWork unitOfWork, IStringLoca
 
         jobPosition.Title = request.Title;
         jobPosition.ExternalUrl = request.ExternalUrl;
-        jobPosition.CompanyCode = request.CompanyCode;
-        jobPosition.JobCode = request.JobCode;
         jobPosition.Summary = request.Summary;
         jobPosition.Responsibilities = request.Responsibilities;
         jobPosition.Requirements = request.Requirements;

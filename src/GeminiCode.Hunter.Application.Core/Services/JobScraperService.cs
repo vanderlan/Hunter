@@ -91,47 +91,11 @@ public class JobScraperService(IConfiguration configuration, ILogger<JobScraperS
     {
         try
         {
-            // Extract company code and job code from title
-            // Format examples: 
-            //   "CompanyCode - Title - JobCodeXXXX"
-            //   "MS- Ssr. Data Engineer B. - Job6642" (company code without space before dash)
-            //   "102272 - Android Engineer" (numeric job code with no company code, defaults to "TL")
-
-            // Find the first dash (with or without surrounding spaces)
-            var firstDashIndex = title.IndexOf('-');
-            if (firstDashIndex == -1)
+            // Simply return title and URL - no more parsing needed
+            if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(url))
                 return null;
 
-            var firstPart = title.Substring(0, firstDashIndex).Trim();
-
-            // New format: numeric job code prefix (e.g., "102272 - Android Engineer")
-            if (long.TryParse(firstPart, out _))
-            {
-                var jobCode = firstPart;
-                return new ScrapedJobPosition(title, url, "TL", jobCode);
-            }
-
-            // Old format: "CompanyCode - Title - JobCodeXXXX"
-            var companyCode = firstPart;
-
-            // Limit to 10 characters to match database constraint
-            if (companyCode.Length > 10)
-                companyCode = companyCode.Substring(0, 10);
-
-            // Split by " - " to get the last part for job code
-            var parts = title.Split(" - ", StringSplitOptions.RemoveEmptyEntries);
-
-            if (parts.Length < 2)
-                return null;
-
-            var jobCodePart = parts[^1].Trim(); // Last part
-
-            // Extract job code (e.g., "Job2495" from "Identity - Job2495")
-            var jobCode2 = jobCodePart.Contains("Job") 
-                ? jobCodePart.Split(' ').LastOrDefault(p => p.StartsWith("Job"))?.Trim() ?? jobCodePart
-                : jobCodePart;
-
-            return new ScrapedJobPosition(title, url, companyCode, jobCode2);
+            return new ScrapedJobPosition(title, url);
         }
         catch
         {

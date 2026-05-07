@@ -82,8 +82,6 @@ namespace GeminiCode.Hunter.Test.Api.V1
 
             Assert.NotNull(jobPositionCreated);
             Assert.Equal(request.Title, jobPositionCreated.Title);
-            Assert.Equal(request.JobCode, jobPositionCreated.JobCode);
-            Assert.Equal(request.CompanyCode, jobPositionCreated.CompanyCode);
             Assert.True(jobPositionCreated.CreatedAt > DateTime.MinValue);
             Assert.True(jobPositionCreated.LastUpdated > DateTime.MinValue);
             Assert.NotNull(jobPositionCreated.PublicId);
@@ -110,7 +108,6 @@ namespace GeminiCode.Hunter.Test.Api.V1
             //assert
             Assert.NotNull(jobPosition);
             Assert.Equal(jobPositionUpdateRequest.Title, jobPosition.Title);
-            Assert.Equal(jobPositionUpdateRequest.CompanyCode, jobPosition.CompanyCode);
             Assert.NotNull(jobPosition.PublicId);
         }
 

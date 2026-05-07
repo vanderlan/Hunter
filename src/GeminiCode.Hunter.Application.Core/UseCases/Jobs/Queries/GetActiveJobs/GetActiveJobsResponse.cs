@@ -11,8 +11,6 @@ public class JobPositionDto
     public string PublicId { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string ExternalUrl { get; set; } = string.Empty;
-    public string CompanyCode { get; set; } = string.Empty;
-    public string JobCode { get; set; } = string.Empty;
     public string? Summary { get; set; }
     public string? Responsibilities { get; set; }
     public string? Requirements { get; set; }

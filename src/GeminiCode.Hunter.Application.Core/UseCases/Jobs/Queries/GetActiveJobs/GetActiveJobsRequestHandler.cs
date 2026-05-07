@@ -16,8 +16,6 @@ public class GetActiveJobsRequestHandler(IUnitOfWork unitOfWork): IRequestHandle
                 PublicId = jobPosition.PublicId,
                 Title = jobPosition.Title,
                 ExternalUrl = jobPosition.ExternalUrl,
-                CompanyCode = jobPosition.CompanyCode,
-                JobCode = jobPosition.JobCode,
                 Summary = jobPosition.Summary,
                 Responsibilities = jobPosition.Responsibilities,
                 Requirements = jobPosition.Requirements,

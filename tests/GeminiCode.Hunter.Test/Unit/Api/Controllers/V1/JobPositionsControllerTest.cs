@@ -39,7 +39,6 @@ public class JobPositionsControllerTest
 
         Assert.IsType<JobPositionGetByIdResponse>(contentResult.Value);
         Assert.Equal(_validJobPosition.Title, jobPosition.Title);
-        Assert.Equal(_validJobPosition.JobCode, jobPosition.JobCode);
     }
 
     [Fact]

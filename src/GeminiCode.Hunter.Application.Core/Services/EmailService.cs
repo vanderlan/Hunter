@@ -95,16 +95,12 @@ public class EmailService : IEmailService
                 {
                     ["PublicId"] = j.PublicId,
                     ["Title"] = j.Title,
-                    ["JobCode"] = j.JobCode,
-                    ["CompanyCode"] = j.CompanyCode,
                     ["Url"] = $"{_applicationUrl}/open-positions?jobId={j.PublicId}"
                 }).Cast<object>().ToList(),
                 ["ClosedJobPositions"] = closedJobPositions.Select(j => new Dictionary<string, object>
                 {
                     ["PublicId"] = j.PublicId,
                     ["Title"] = j.Title,
-                    ["JobCode"] = j.JobCode,
-                    ["CompanyCode"] = j.CompanyCode,
                     ["Url"] = $"{_applicationUrl}/open-positions?jobId={j.PublicId}"
                 }).Cast<object>().ToList()
             };

@@ -17,7 +17,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.2")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -172,21 +172,11 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("CvAnalysisMatchId"));
 
-                    b.Property<string>("CompanyCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<long>("CvAnalysisId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("JobCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
 
                     b.Property<long>("JobPositionId")
                         .HasColumnType("bigint");
@@ -461,11 +451,6 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("CompanyCode")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
                     b.Property<string>("CountryRestrictions")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -482,11 +467,6 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
-
-                    b.Property<string>("JobCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("LastCheckedAt")
                         .HasColumnType("timestamp without time zone");
@@ -528,14 +508,10 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
 
                     b.HasKey("JobPositionId");
 
-                    b.HasIndex("CompanyCode");
-
                     b.HasIndex("ExternalUrl")
                         .IsUnique();
 
                     b.HasIndex("IsActive");
-
-                    b.HasIndex("JobCode");
 
                     b.HasIndex("PublicId")
                         .IsUnique();

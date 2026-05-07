@@ -7,8 +7,6 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
 {
     public string Title { get; set; }
     public string ExternalUrl { get; set; }
-    public string CompanyCode { get; set; }
-    public string JobCode { get; set; }
     public string? Summary { get; set; }
     public string? Responsibilities { get; set; }
     public string? Requirements { get; set; }
@@ -25,8 +23,6 @@ public class JobPositionCreateRequest : IRequest<JobPositionCreateResponse>
         {
             Title = request.Title,
             ExternalUrl = request.ExternalUrl,
-            CompanyCode = request.CompanyCode,
-            JobCode = request.JobCode,
             Summary = request.Summary,
             Responsibilities = request.Responsibilities,
             Requirements = request.Requirements,

@@ -58,35 +58,6 @@ public class SyncJobsRequestHandler(
                     if (existingPosition != null)
                         continue;
 
-                    // Check if a position with the same JobCode exists (title might have changed)
-                    var positionByJobCode = await unitOfWork.JobPositionRepository.GetByJobCodeAsync(newJob.JobCode);
-                    if (positionByJobCode != null)
-                    {
-                        // Capture old values for logging
-                        var oldTitle = positionByJobCode.Title;
-                        var oldCompanyCode = positionByJobCode.CompanyCode;
-
-                        // Update existing position instead of creating a new one
-                        positionByJobCode.Title = newJob.Title;
-                        positionByJobCode.CompanyCode = newJob.CompanyCode;
-                        positionByJobCode.ExternalUrl = newJob.Url;
-                        positionByJobCode.LastCheckedAt = now;
-                        positionByJobCode.IsActive = true;
-                        positionByJobCode.ClosedAt = null;
-
-                        unitOfWork.JobPositionRepository.Update(positionByJobCode);
-                        await unitOfWork.CommitAsync();
-
-                        response.UpdatedPositions++;
-
-                        logger.LogInformation(
-                            "Updated existing position with JobCode {JobCode}: Title changed from '{OldTitle}' to '{NewTitle}'",
-                            newJob.JobCode, oldTitle, newJob.Title
-                        );
-
-                        continue;
-                    }
-
                     // Scrape raw HTML content
                     var scrapedDetails = await scraperService.ScrapeJobDetailsAsync(newJob.Url);
 
@@ -101,8 +72,6 @@ public class SyncJobsRequestHandler(
                     {
                         Title = newJob.Title,
                         ExternalUrl = newJob.Url,
-                        CompanyCode = newJob.CompanyCode,
-                        JobCode = newJob.JobCode,
                         Summary = enrichedDetails.Summary,
                         Responsibilities = enrichedDetails.Responsibilities,
                         Requirements = enrichedDetails.Requirements,
@@ -118,14 +87,12 @@ public class SyncJobsRequestHandler(
 
                     response.NewPositions++;
                     response.NewJobTitles.Add(newJob.Title);
-                    
+
                     // Add to email data list
                     newJobPositions.Add(new JobPositionEmailData
                     {
                         PublicId = position.PublicId,
-                        Title = position.Title,
-                        JobCode = position.JobCode,
-                        CompanyCode = position.CompanyCode
+                        Title = position.Title
                     });
                 }
                 catch (Exception ex)
@@ -146,14 +113,12 @@ public class SyncJobsRequestHandler(
                 await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
                 response.ClosedPositions++;
                 response.ClosedJobTitles.Add(position.Title);
-                
+
                 // Add to email data list
                 closedJobPositions.Add(new JobPositionEmailData
                 {
                     PublicId = position.PublicId,
-                    Title = position.Title,
-                    JobCode = position.JobCode,
-                    CompanyCode = position.CompanyCode
+                    Title = position.Title
                 });
             }
 
@@ -185,10 +150,10 @@ public class SyncJobsRequestHandler(
                             position.MustHaveSkills = enrichedDetails.MustHaveSkills;
                             position.NiceToHaveSkills = enrichedDetails.NiceToHaveSkills;
                             position.LastCheckedAt = now;
-                            
+
                             if (string.IsNullOrWhiteSpace(position.Priority))
                                 position.Priority = DefaultPriority;
-                            
+
                             unitOfWork.JobPositionRepository.Update(position);
                             response.UpdatedPositions++;
                         }
@@ -202,55 +167,30 @@ public class SyncJobsRequestHandler(
                     else
                     {
                         position.LastCheckedAt = now;
-                        
+
                         if (string.IsNullOrWhiteSpace(position.Priority))
                             position.Priority = DefaultPriority;
-                        
+
                         unitOfWork.JobPositionRepository.Update(position);
                         response.UpdatedPositions++;
                     }
                 }
                 else if (scrapedJob != null && scrapedJob.Title != position.Title)
                 {
-                    // Check if JobCode is the same - if so, just update the title and company code
-                    if (scrapedJob.JobCode == position.JobCode)
-                    {
-                        logger.LogInformation(
-                            "Job title changed from '{OldTitle}' to '{NewTitle}' with same JobCode {JobCode}. Updating position.",
-                            position.Title, scrapedJob.Title, position.JobCode
-                        );
+                    // Title changed for same URL - update the title
+                    logger.LogInformation(
+                        "Job title changed from '{OldTitle}' to '{NewTitle}' for URL {Url}. Updating position.",
+                        position.Title, scrapedJob.Title, position.ExternalUrl
+                    );
 
-                        position.Title = scrapedJob.Title;
-                        position.CompanyCode = scrapedJob.CompanyCode;
-                        position.LastCheckedAt = now;
+                    position.Title = scrapedJob.Title;
+                    position.LastCheckedAt = now;
 
-                        if (string.IsNullOrWhiteSpace(position.Priority))
-                            position.Priority = DefaultPriority;
+                    if (string.IsNullOrWhiteSpace(position.Priority))
+                        position.Priority = DefaultPriority;
 
-                        unitOfWork.JobPositionRepository.Update(position);
-                        response.UpdatedPositions++;
-                    }
-                    else
-                    {
-                        // JobCode changed - this is a completely different position
-                        logger.LogWarning(
-                            "Job title and JobCode changed from '{OldTitle}' (JobCode: {OldJobCode}) to '{NewTitle}' (JobCode: {NewJobCode}). Treating as closed and new.",
-                            position.Title, position.JobCode, scrapedJob.Title, scrapedJob.JobCode
-                        );
-
-                        await unitOfWork.JobPositionRepository.MarkAsClosedAsync(position.JobPositionId);
-                        response.ClosedPositions++;
-                        response.ClosedJobTitles.Add(position.Title);
-
-                        // Add to closed email data list
-                        closedJobPositions.Add(new JobPositionEmailData
-                        {
-                            PublicId = position.PublicId,
-                            Title = position.Title,
-                            JobCode = position.JobCode,
-                            CompanyCode = position.CompanyCode
-                        });
-                    }
+                    unitOfWork.JobPositionRepository.Update(position);
+                    response.UpdatedPositions++;
                 }
             }
 

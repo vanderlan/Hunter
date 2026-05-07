@@ -49,9 +49,7 @@ public class GetCvAnalysisDetailRequestHandler(
             Matches = analysis.Matches.Select(m => new JobMatchDto
             {
                 JobPositionId = m.JobPosition?.PublicId ?? "",
-                JobCode = m.JobCode,
                 JobTitle = m.JobTitle,
-                CompanyCode = m.CompanyCode,
                 ExternalUrl = m.JobPosition?.ExternalUrl ?? "",
                 MatchPercentage = m.MatchPercentage,
                 MatchReason = m.MatchReason,

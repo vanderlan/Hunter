@@ -149,7 +149,7 @@ public class CancelHiringProcessRequestHandlerTests
                 It.Is<List<string>>(emails => emails.Count == 1 && emails[0] == adminUser.Email),
                 candidate.Name,
                 jobPosition.Title,
-                jobPosition.JobCode,
+                "N/A",
                 user.Name,
                 "Test cancellation reason"),
             Times.Once);

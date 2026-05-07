@@ -42,7 +42,7 @@ public class CancelHiringProcessRequestHandler(
         // Store data for email notification before deletion
         var candidateName = hiringProcess.Candidate?.Name ?? "Unknown";
         var jobTitle = hiringProcess.JobPosition?.Title ?? "Unknown";
-        var jobCode = hiringProcess.JobPosition?.JobCode ?? "N/A";
+        var jobCode = "N/A";
         var cancelledByUserName = user.Name;
 
         // Delete status history

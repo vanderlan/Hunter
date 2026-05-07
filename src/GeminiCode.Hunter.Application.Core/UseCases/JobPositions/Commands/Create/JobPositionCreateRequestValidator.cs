@@ -18,11 +18,5 @@ public class JobPositionCreateRequestValidator : AbstractValidator<JobPositionCr
 
         RuleFor(c => c.ExternalUrl)
             .NotEmpty().WithMessage(stringLocalizer[MessagesKeys.JobPositionMessages.EmptyExternalUrl]);
-
-        RuleFor(c => c.CompanyCode)
-            .NotEmpty().WithMessage(stringLocalizer[MessagesKeys.JobPositionMessages.EmptyCompanyCode]);
-
-        RuleFor(c => c.JobCode)
-            .NotEmpty().WithMessage(stringLocalizer[MessagesKeys.JobPositionMessages.EmptyJobCode]);
     }
 }

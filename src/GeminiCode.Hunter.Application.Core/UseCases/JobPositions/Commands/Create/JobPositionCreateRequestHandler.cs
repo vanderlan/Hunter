@@ -24,9 +24,9 @@ public class JobPositionCreateRequestHandler(
 
     private async Task ValidateJobPosition(JobPositionCreateRequest request)
     {
-        var jobPositionFound = await unitOfWork.JobPositionRepository.GetByJobCodeAsync(request.JobCode);
+        var jobPositionFound = await unitOfWork.JobPositionRepository.GetByExternalUrlAsync(request.ExternalUrl);
 
         if (jobPositionFound != null)
-            throw new ConflictException(resourceMessages[JobPositionMessages.JobCodeExists], resourceMessages[ExceptionsTitles.ValidationError]);
+            throw new ConflictException("External URL already exists", resourceMessages[ExceptionsTitles.ValidationError]);
     }
 }

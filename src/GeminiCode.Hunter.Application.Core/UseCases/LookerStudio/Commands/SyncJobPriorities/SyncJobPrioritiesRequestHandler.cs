@@ -35,9 +35,8 @@ public class SyncJobPrioritiesRequestHandler(
 
             // 3. Get all job positions
             var allJobPositions = await unitOfWork.JobPositionRepository.GetActivePositionsAsync();
-            var jobPositionsDict = allJobPositions.ToDictionary(j => j.JobCode, j => j);
 
-            logger.LogInformation("Found {count} job positions in database", jobPositionsDict.Count);
+            logger.LogInformation("Found {count} job positions in database", allJobPositions.Count);
 
             // 4. Update job positions with priorities
             var now = DateTime.UtcNow;
@@ -47,15 +46,11 @@ public class SyncJobPrioritiesRequestHandler(
                 Domain.Core.Entities.JobPosition? jobPosition = null;
                 var jobTitle = priority.JobTitle is not null ? Regex.Replace(priority.JobTitle, @"https?://\S+", "").Trim() : string.Empty;
 
-                var matchIdentifier = !string.IsNullOrEmpty(priority.JobCode) ? priority.JobCode : jobTitle ?? string.Empty;
+                var matchIdentifier = jobTitle ?? string.Empty;
 
-                if (!string.IsNullOrEmpty(priority.JobCode) && jobPositionsDict.TryGetValue(priority.JobCode, out jobPosition))
+                if (!string.IsNullOrEmpty(jobTitle))
                 {
-                    // Old pattern: matched by job code
-                }
-                else if (!string.IsNullOrEmpty(jobTitle))
-                {
-                    // New pattern: match by title (Looker Studio title is part of DB job title)
+                    // Match by title (Looker Studio title is part of DB job title)
                     jobPosition = allJobPositions.FirstOrDefault(j =>j.Title.Contains(jobTitle, StringComparison.OrdinalIgnoreCase));
                 }
 
@@ -64,7 +59,7 @@ public class SyncJobPrioritiesRequestHandler(
                     // Update priority information
                     var oldPriority = jobPosition.Priority;
                     var oldCountry = jobPosition.CountryRestrictions;
-                    
+
                     jobPosition.Priority = priority.Priority;
                     jobPosition.CountryRestrictions = priority.CountryRestrictions;
                     jobPosition.PriorityLastSyncedAt = now;
@@ -82,7 +77,7 @@ public class SyncJobPrioritiesRequestHandler(
                 {
                     response.UnmatchedJobs++;
                     response.UnmatchedJobCodes.Add(matchIdentifier);
-                    
+
                     logger.LogWarning("Job {identifier} from CSV not found in database", matchIdentifier);
                 }
             }

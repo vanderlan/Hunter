@@ -175,7 +175,6 @@ public class AIService : IAIService
 
             var cvAnalysisResult = new CvAnalysisResult(
                 result.Matches.Select(m => new JobMatchResult(
-                    m.JobCode,
                     m.JobTitle,
                     m.MatchPercentage,
                     m.MatchReason,
@@ -251,13 +250,11 @@ public class AIService : IAIService
     private static string BuildJobPositionsSection(List<JobPositionSummary> jobPositions)
     {
         var sb = new StringBuilder();
-        
+
         foreach (var job in jobPositions)
         {
-            sb.AppendLine($"## Job Code: {job.JobCode}");
-            sb.AppendLine($"**Title:** {job.Title}");
-            sb.AppendLine($"**Company:** {job.CompanyCode}");
-            
+            sb.AppendLine($"## {job.Title}");
+
             if (!string.IsNullOrWhiteSpace(job.Summary))
             {
                 sb.AppendLine($"**Summary:** {job.Summary}");

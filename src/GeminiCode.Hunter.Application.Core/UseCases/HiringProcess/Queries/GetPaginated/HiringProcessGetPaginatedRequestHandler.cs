@@ -38,8 +38,6 @@ public class HiringProcessGetPaginatedRequestHandler(
             CandidateName = hp.Candidate?.Name ?? "Unknown",
             CandidateEmail = hp.Candidate?.Email ?? "",
             JobTitle = hp.JobPosition?.Title ?? "",
-            JobCode = hp.JobPosition?.JobCode ?? "",
-            CompanyCode = hp.JobPosition?.CompanyCode ?? "",
             CreatedByUserName = hp.CreatedByUser?.Name ?? "",
             CreatedAt = hp.CreatedAt.ToApplicationTime(), // Convert to configured timezone
             LastUpdated = hp.LastUpdated.ToApplicationTime() // Convert to configured timezone

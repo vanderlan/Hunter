@@ -86,7 +86,6 @@ public class StartHiringProcessRequestHandler(
             CandidateName = candidate.Name ?? "Unknown",
             CandidateEmail = candidate.Email ?? "",
             JobTitle = jobPosition.Title,
-            JobCode = jobPosition.JobCode,
             StartedByUserName = currentUser.Name,
             ReferralReason = request.ReferralReason
         }, cancellationToken);
