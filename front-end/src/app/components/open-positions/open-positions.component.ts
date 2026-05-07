@@ -115,8 +115,6 @@ export class OpenPositionsComponent implements OnInit, OnDestroy {
     const searchLower = this.searchQuery.toLowerCase();
     const filtered = this.positions.filter(position => 
       position.title.toLowerCase().includes(searchLower) ||
-      position.companyCode.toLowerCase().includes(searchLower) ||
-      position.jobCode.toLowerCase().includes(searchLower) ||
       (position.summary && position.summary.toLowerCase().includes(searchLower))
     );
     this.filteredPositions = this.sortByPriority(filtered);

@@ -163,7 +163,7 @@
           </div>
 
           <div class="updated-jobs" *ngIf="lastSyncResult.updatedJobCodes.length > 0">
-            <p><strong>Updated job codes:</strong></p>
+            <p><strong>Updated job titles:</strong></p>
             <mat-chip-listbox>
               <mat-chip *ngFor="let code of lastSyncResult.updatedJobCodes.slice(0, 10)">
                 {{ code }}
@@ -175,7 +175,7 @@
           </div>
 
           <div class="unmatched-jobs" *ngIf="lastSyncResult.unmatchedJobCodes.length > 0">
-            <p><strong>Unmatched job codes (not found in database):</strong></p>
+            <p><strong>Unmatched job titles (not found in database):</strong></p>
             <mat-chip-listbox>
               <mat-chip *ngFor="let code of lastSyncResult.unmatchedJobCodes" color="warn">
                 {{ code }}

@@ -42,13 +42,9 @@ export class JobService {
     );
   }
 
-  getActiveJobs(companyCode?: string): Observable<JobPosition[]> {
-    const url = companyCode 
-      ? `${this.apiUrl}/JobPositions/Active?companyCode=${companyCode}`
-      : `${this.apiUrl}/JobPositions/Active`;
-
+  getActiveJobs(): Observable<JobPosition[]> {
     return this.http.get<{ jobs: JobPosition[], totalCount: number }>(
-      url,
+      `${this.apiUrl}/JobPositions/Active`,
       {
         headers: this.getHeaders()
       }

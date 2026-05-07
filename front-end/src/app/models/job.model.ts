@@ -3,8 +3,6 @@ export interface JobPosition {
   jobPositionId?: number;
   title: string;
   externalUrl: string;
-  companyCode: string;
-  jobCode: string;
   summary?: string;
   responsibilities?: string;
   requirements?: string;
@@ -27,9 +25,7 @@ export interface PagedList<T> {
 
 export interface JobMatch {
   jobPositionId?: string;
-  jobCode: string;
   jobTitle: string;
-  companyCode: string;
   externalUrl: string;
   matchPercentage: number;
   matchReason: string;

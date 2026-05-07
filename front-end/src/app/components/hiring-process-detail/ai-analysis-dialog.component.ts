@@ -56,7 +56,6 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
             <mat-card class="match-card">
               <mat-card-header>
                 <mat-card-title>{{ match.jobTitle }}</mat-card-title>
-                <mat-card-subtitle>{{ match.companyCode }} - {{ match.jobCode }}</mat-card-subtitle>
               </mat-card-header>
               <mat-card-content>
                 <div class="match-percentage">

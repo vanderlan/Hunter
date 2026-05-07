@@ -23,14 +23,6 @@ import { JobPosition } from '../../models/job.model';
     
       <mat-dialog-content class="position-details-body">
         <div class="position-meta-info">
-          <div class="position-meta-item">
-            <mat-icon class="position-meta-icon">business</mat-icon>
-            <span class="position-meta-text">{{ data.companyCode }}</span>
-          </div>
-          <div class="position-meta-item">
-            <mat-icon class="position-meta-icon">code</mat-icon>
-            <span class="position-meta-text">{{ data.jobCode }}</span>
-          </div>
           @if (data.externalUrl) {
             <div class="position-meta-item">
               <a [href]="data.externalUrl" target="_blank" rel="noopener noreferrer" class="external-link">

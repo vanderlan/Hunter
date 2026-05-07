@@ -19,8 +19,6 @@ export interface HiringProcessListItem {
   candidateName: string;
   candidateEmail: string;
   jobTitle: string;
-  jobCode: string;
-  companyCode: string;
   createdByUserName: string;
   createdAt: Date;
   lastUpdated: Date;
@@ -37,8 +35,6 @@ export interface CandidateInfo {
 export interface JobPositionInfo {
   publicId: string;
   title: string;
-  companyCode: string;
-  jobCode: string;
 }
 
 export interface UserInfo {

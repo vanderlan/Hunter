@@ -45,7 +45,7 @@ import { PriorityBadgeComponent } from '../shared/priority-badge.component';
     styleUrl: './job-positions.component.scss'
 })
 export class JobPositionsComponent implements OnInit {
-  displayedColumns: string[] = ['title', 'companyCode', 'jobCode', 'priority', 'isActive', 'actions'];
+  displayedColumns: string[] = ['title', 'priority', 'isActive', 'actions'];
   dataSource: JobPosition[] = [];
   totalCount = 0;
   pageSize = 10;
@@ -66,8 +66,6 @@ export class JobPositionsComponent implements OnInit {
     this.jobPositionForm = this.fb.group({
       title: ['', Validators.required],
       externalUrl: ['', Validators.required],
-      companyCode: ['', Validators.required],
-      jobCode: ['', Validators.required],
       summary: [''],
       responsibilities: [''],
       requirements: [''],
