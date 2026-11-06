@@ -52,11 +52,11 @@ import { Candidate } from '../../models/candidate.model';
       display: flex;
       align-items: center;
       gap: 12px;
-      color: #5f1f1f;
+      color: var(--hunter-brand);
       margin-bottom: 20px;
 
       mat-icon {
-        color: #5f1f1f;
+        color: var(--hunter-brand);
       }
     }
 
@@ -75,26 +75,26 @@ import { Candidate } from '../../models/candidate.model';
       display: flex;
       gap: 12px;
       padding: 12px;
-      background-color: #f9f9f9;
+      background-color: var(--hunter-surface-variant);
       border-radius: 4px;
-      border-left: 3px solid #5f1f1f;
+      border-left: 3px solid var(--hunter-brand);
     }
 
     .detail-label {
       font-weight: 600;
-      color: #333;
+      color: var(--hunter-text-primary);
       min-width: 140px;
     }
 
     .detail-value {
-      color: #666;
+      color: var(--hunter-text-secondary);
       flex: 1;
       word-break: break-word;
     }
 
     mat-dialog-actions {
       padding: 16px 24px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--hunter-border);
     }
 
     @media (max-width: 600px) {

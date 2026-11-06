@@ -15,20 +15,20 @@
       gap: 12px;
       font-size: 28px;
       font-weight: 500;
-      color: #5f1f1f;
+      color: var(--hunter-brand);
 
       mat-icon {
         font-size: 32px;
         width: 32px;
         height: 32px;
-        color: #5f1f1f;
+        color: var(--hunter-brand);
       }
     }
 
     mat-card-subtitle {
       margin-top: 8px;
       font-size: 14px;
-      color: #666;
+      color: var(--hunter-text-secondary);
     }
   }
 }
@@ -41,7 +41,7 @@
     font-size: 20px;
 
     mat-icon {
-      color: #5f1f1f;
+      color: var(--hunter-brand);
     }
   }
 
@@ -50,7 +50,7 @@
   }
 
   .sync-description {
-    background-color: #e8f4f8;
+    background-color: var(--hunter-info-bg);
     border-left: 4px solid #2196f3;
     padding: 16px;
     border-radius: 4px;
@@ -62,7 +62,7 @@
       align-items: flex-start;
       gap: 12px;
       line-height: 1.6;
-      color: #333;
+      color: var(--hunter-text-primary);
 
       .info-icon {
         color: #2196f3;
@@ -73,7 +73,7 @@
   }
 
   .sync-info {
-    background-color: #f8f8f8;
+    background-color: var(--hunter-surface-variant);
     padding: 20px;
     border-radius: 8px;
     margin-top: 20px;
@@ -82,14 +82,14 @@
       margin: 0 0 16px 0;
       font-size: 16px;
       font-weight: 600;
-      color: #333;
+      color: var(--hunter-text-primary);
     }
 
     h5 {
       margin: 16px 0 8px 0;
       font-size: 14px;
       font-weight: 600;
-      color: #666;
+      color: var(--hunter-text-secondary);
     }
 
     .sync-stats {
@@ -103,7 +103,7 @@
         align-items: center;
         gap: 12px;
         padding: 12px;
-        background-color: white;
+        background-color: var(--hunter-surface);
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
@@ -136,13 +136,13 @@
           .stat-value {
             font-size: 24px;
             font-weight: 700;
-            color: #333;
+            color: var(--hunter-text-primary);
             line-height: 1;
           }
 
           .stat-label {
             font-size: 12px;
-            color: #666;
+            color: var(--hunter-text-secondary);
             margin-top: 4px;
           }
         }
@@ -159,7 +159,7 @@
 
         li {
           padding: 4px 0;
-          color: #555;
+          color: var(--hunter-text-secondary);
           font-size: 14px;
         }
       }
@@ -180,7 +180,7 @@
 
   mat-card-actions {
     padding: 16px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--hunter-border);
 
     .sync-button {
       min-width: 200px;
@@ -217,7 +217,7 @@
     font-size: 20px;
 
     mat-icon {
-      color: #5f1f1f;
+      color: var(--hunter-brand);
     }
   }
 
@@ -242,11 +242,11 @@
         font-size: 32px;
         width: 32px;
         height: 32px;
-        color: #5f1f1f;
+        color: var(--hunter-brand);
       }
 
       &:hover {
-        background-color: #f5f5f5;
+        background-color: var(--hunter-surface-variant);
       }
     }
   }

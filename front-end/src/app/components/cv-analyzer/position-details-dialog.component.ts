@@ -115,16 +115,16 @@ import { JobPosition } from '../../models/job.model';
         display: flex;
         align-items: center;
         gap: 12px;
-        color: #5f1f1f;
+        color: var(--hunter-brand);
         margin: 0;
         padding: 24px 24px 16px;
-        border-bottom: 2px solid #e0e0e0;
+        border-bottom: 2px solid var(--hunter-border);
 
         .position-details-icon {
           font-size: 28px;
           width: 28px;
           height: 28px;
-          color: #5f1f1f;
+          color: var(--hunter-brand);
         }
 
         .position-details-header-text {
@@ -146,7 +146,7 @@ import { JobPosition } from '../../models/job.model';
         flex-wrap: wrap;
         gap: 20px;
         padding: 20px 24px;
-        background-color: #f8f8f8;
+        background-color: var(--hunter-surface-variant);
 
         .position-meta-item {
           display: flex;
@@ -157,12 +157,12 @@ import { JobPosition } from '../../models/job.model';
             font-size: 20px;
             width: 20px;
             height: 20px;
-            color: #999;
+            color: var(--hunter-text-hint);
           }
 
           .position-meta-text {
             font-size: 14px;
-            color: #666;
+            color: var(--hunter-text-secondary);
             font-weight: 500;
           }
         }
@@ -172,14 +172,14 @@ import { JobPosition } from '../../models/job.model';
           align-items: center;
           gap: 6px;
           text-decoration: none;
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           transition: all 0.2s ease;
 
           .position-meta-icon {
             font-size: 18px;
             width: 18px;
             height: 18px;
-            color: #5f1f1f;
+            color: var(--hunter-brand);
           }
 
           .position-meta-text {
@@ -188,7 +188,7 @@ import { JobPosition } from '../../models/job.model';
           }
 
           &:hover {
-            color: #8b2f2f;
+            color: var(--hunter-brand);
 
             .position-meta-text {
               text-decoration: underline;
@@ -210,20 +210,20 @@ import { JobPosition } from '../../models/job.model';
           gap: 10px;
           font-size: 16px;
           font-weight: 600;
-          color: #333;
+          color: var(--hunter-text-primary);
           margin: 0 0 16px;
 
           .position-section-icon {
             font-size: 22px;
             width: 22px;
             height: 22px;
-            color: #5f1f1f;
+            color: var(--hunter-brand);
           }
         }
 
         .position-section-text {
           margin: 0;
-          color: #666;
+          color: var(--hunter-text-secondary);
           line-height: 1.8;
           white-space: pre-wrap;
           font-size: 14px;
@@ -232,7 +232,7 @@ import { JobPosition } from '../../models/job.model';
 
       .position-details-actions {
         padding: 16px 24px;
-        border-top: 1px solid #e0e0e0;
+        border-top: 1px solid var(--hunter-border);
         margin: 0;
 
         .position-close-btn {

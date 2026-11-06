@@ -84,7 +84,7 @@ import { Candidate } from '../../models/candidate.model';
 
     mat-dialog-actions {
       padding: 16px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--hunter-border);
 
       button {
         mat-spinner {

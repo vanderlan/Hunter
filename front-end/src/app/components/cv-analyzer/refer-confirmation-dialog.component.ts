@@ -84,7 +84,7 @@ export interface ReferConfirmationData {
         margin: 0;
         font-size: 20px;
         font-weight: 600;
-        color: #333;
+        color: var(--hunter-text-primary);
       }
     }
 
@@ -97,11 +97,11 @@ export interface ReferConfirmationData {
       .main-message {
         font-size: 16px;
         line-height: 1.6;
-        color: #333;
+        color: var(--hunter-text-primary);
         margin: 0 0 16px;
 
         strong {
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           font-weight: 600;
         }
       }
@@ -111,13 +111,13 @@ export interface ReferConfirmationData {
         align-items: center;
         gap: 12px;
         padding: 16px;
-        background: #f5f5f5;
+        background: var(--hunter-surface-variant);
         border-radius: 8px;
-        border-left: 4px solid #5f1f1f;
+        border-left: 4px solid var(--hunter-brand);
         margin-bottom: 16px;
 
         mat-icon {
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           font-size: 28px;
           width: 28px;
           height: 28px;
@@ -131,22 +131,22 @@ export interface ReferConfirmationData {
 
           strong {
             font-size: 16px;
-            color: #333;
+            color: var(--hunter-text-primary);
           }
 
           .match-badge {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 12px;
-            background: #e0e0e0;
-            color: #666;
+            background: var(--hunter-surface-hover);
+            color: var(--hunter-text-secondary);
             font-size: 13px;
             font-weight: 600;
             width: fit-content;
 
             &.high-match {
-              background: #e8f5e9;
-              color: #2e7d32;
+              background: var(--hunter-success-bg);
+              color: var(--hunter-success-fg);
             }
           }
         }
@@ -157,18 +157,18 @@ export interface ReferConfirmationData {
         align-items: flex-start;
         gap: 8px;
         padding: 12px;
-        background: #e3f2fd;
+        background: var(--hunter-info-bg);
         border-radius: 6px;
         font-size: 14px;
         line-height: 1.5;
-        color: #0d47a1;
+        color: var(--hunter-info-fg);
         margin: 0;
 
         .info-icon {
           font-size: 20px;
           width: 20px;
           height: 20px;
-          color: #1976d2;
+          color: var(--hunter-info-fg);
           flex-shrink: 0;
           margin-top: 2px;
         }

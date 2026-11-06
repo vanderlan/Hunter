@@ -80,7 +80,7 @@
 
   .provider-card {
     margin-bottom: 24px;
-    background: white;
+    background: var(--hunter-surface);
     border-left: 4px solid #6d2932;
 
     mat-card-header {
@@ -89,18 +89,18 @@
         align-items: center;
         gap: 8px;
         font-size: 20px;
-        color: rgba(0, 0, 0, 0.87);
+        color: var(--hunter-text-primary);
 
         mat-icon {
           font-size: 24px;
           width: 24px;
           height: 24px;
-          color: #6d2932;
+          color: var(--hunter-brand);
         }
       }
 
       mat-card-subtitle {
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--hunter-text-secondary);
         margin-top: 4px;
       }
     }
@@ -117,8 +117,8 @@
     }
 
     .provider-radio-button {
-      background: #fafafa;
-      border: 2px solid rgba(0, 0, 0, 0.12);
+      background: var(--hunter-surface-variant);
+      border: 2px solid var(--hunter-border);
       padding: 20px;
       border-radius: 8px;
       transition: all 0.3s ease;
@@ -127,22 +127,22 @@
       align-items: center;
 
       &:hover {
-        background: white;
-        border-color: #6d2932;
+        background: var(--hunter-surface);
+        border-color: var(--hunter-brand);
         box-shadow: 0 2px 8px rgba(109, 41, 50, 0.15);
         transform: translateY(-2px);
       }
 
       ::ng-deep .mdc-radio {
-        --mdc-radio-disabled-selected-icon-color: #6d2932;
-        --mdc-radio-disabled-unselected-icon-color: rgba(0, 0, 0, 0.38);
-        --mdc-radio-unselected-hover-icon-color: #6d2932;
-        --mdc-radio-unselected-icon-color: rgba(0, 0, 0, 0.54);
-        --mdc-radio-unselected-pressed-icon-color: rgba(0, 0, 0, 0.54);
-        --mdc-radio-selected-focus-icon-color: #6d2932;
-        --mdc-radio-selected-hover-icon-color: #6d2932;
-        --mdc-radio-selected-icon-color: #6d2932;
-        --mdc-radio-selected-pressed-icon-color: #6d2932;
+        --mdc-radio-disabled-selected-icon-color: var(--hunter-brand);
+        --mdc-radio-disabled-unselected-icon-color: var(--hunter-text-hint);
+        --mdc-radio-unselected-hover-icon-color: var(--hunter-brand);
+        --mdc-radio-unselected-icon-color: var(--hunter-text-secondary);
+        --mdc-radio-unselected-pressed-icon-color: var(--hunter-text-secondary);
+        --mdc-radio-selected-focus-icon-color: var(--hunter-brand);
+        --mdc-radio-selected-hover-icon-color: var(--hunter-brand);
+        --mdc-radio-selected-icon-color: var(--hunter-brand);
+        --mdc-radio-selected-pressed-icon-color: var(--hunter-brand);
       }
 
       ::ng-deep .mdc-form-field {
@@ -154,7 +154,7 @@
         flex-direction: column;
         gap: 8px;
         width: 100%;
-        color: rgba(0, 0, 0, 0.87);
+        color: var(--hunter-text-primary);
 
         .provider-info {
           display: flex;
@@ -164,12 +164,12 @@
           .provider-name {
             font-size: 16px;
             font-weight: 500;
-            color: rgba(0, 0, 0, 0.87);
+            color: var(--hunter-text-primary);
           }
 
           .provider-description {
             font-size: 13px;
-            color: rgba(0, 0, 0, 0.6);
+            color: var(--hunter-text-secondary);
             line-height: 1.4;
           }
         }
@@ -186,7 +186,7 @@
   .parameters-table {
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--hunter-border);
     border-radius: 4px;
     overflow: hidden;
 
@@ -195,11 +195,11 @@
       grid-template-columns: 2fr 3fr 140px;
       gap: 16px;
       padding: 12px 16px;
-      background: #f5f5f5;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+      background: var(--hunter-surface-variant);
+      border-bottom: 2px solid var(--hunter-border);
       font-weight: 500;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.87);
+      color: var(--hunter-text-primary);
     }
 
     .table-row {
@@ -212,7 +212,7 @@
       transition: background-color 0.2s;
 
       &:hover {
-        background-color: #fafafa;
+        background-color: var(--hunter-surface-variant);
       }
 
       &:last-child {
@@ -223,7 +223,7 @@
         .param-key {
           font-family: 'SF Mono', Monaco, Menlo, Consolas, 'Roboto Mono', 'Liberation Mono', monospace;
           font-size: 13px;
-          color: #1976D2;
+          color: var(--hunter-info-fg);
           background: rgba(25, 118, 210, 0.08);
           padding: 4px 8px;
           border-radius: 4px;
@@ -235,7 +235,7 @@
         .param-value-input {
           width: 100%;
           padding: 8px 12px;
-          border: 1px solid rgba(0, 0, 0, 0.12);
+          border: 1px solid var(--hunter-border);
           border-radius: 4px;
           font-family: 'SF Mono', Monaco, Menlo, Consolas, 'Roboto Mono', 'Liberation Mono', monospace;
           font-size: 14px;
@@ -248,7 +248,7 @@
           }
 
           &::placeholder {
-            color: rgba(0, 0, 0, 0.38);
+            color: var(--hunter-text-hint);
           }
         }
       }
@@ -268,7 +268,7 @@
     justify-content: center;
     padding: 48px;
     text-align: center;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--hunter-text-secondary);
 
     mat-icon {
       font-size: 64px;
@@ -340,13 +340,13 @@
         .editor-label {
           font-size: 14px;
           font-weight: 500;
-          color: rgba(0, 0, 0, 0.87);
+          color: var(--hunter-text-primary);
         }
 
         .quill-editor {
-          border: 1px solid rgba(0, 0, 0, 0.12);
+          border: 1px solid var(--hunter-border);
           border-radius: 4px;
-          background: white;
+          background: var(--hunter-surface);
 
           ::ng-deep .ql-container {
             font-family: 'SF Mono', Monaco, Menlo, Consolas, 'Roboto Mono', 'Liberation Mono', monospace;
@@ -364,14 +364,14 @@
           ::ng-deep .ql-toolbar {
             border-top-left-radius: 4px;
             border-top-right-radius: 4px;
-            background: #f5f5f5;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            background: var(--hunter-surface-variant);
+            border-bottom: 1px solid var(--hunter-border);
           }
         }
 
         .editor-hint {
           font-size: 12px;
-          color: rgba(0, 0, 0, 0.6);
+          color: var(--hunter-text-secondary);
           margin-top: 4px;
         }
       }

@@ -3,7 +3,9 @@
 @include mat.elevation-classes();
 @include mat.app-background();
 
-// Custom color palettes
+// ============================================================================
+// Brand palette
+// ============================================================================
 $hunter-custom-primary: (
   50: #fce4e4,
   100: #f7bbbb,
@@ -37,34 +39,100 @@ $hunter-custom-primary: (
   )
 );
 
-$hunter-primary: mat.m2-define-palette($hunter-custom-primary, 900, 500, 700);
-$hunter-accent: mat.m2-define-palette($hunter-custom-primary, 500, 300, 700);
+// Dark surfaces need a lighter brand hue for contrast; light surfaces keep the deep red.
+$hunter-dark-primary: mat.m2-define-palette($hunter-custom-primary, 400, 300, 600);
+$hunter-dark-accent: mat.m2-define-palette($hunter-custom-primary, 300, 200, 500);
+$hunter-light-primary: mat.m2-define-palette($hunter-custom-primary, 900, 500, 700);
+$hunter-light-accent: mat.m2-define-palette($hunter-custom-primary, 500, 300, 700);
 $hunter-warn: mat.m2-define-palette(mat.$m2-red-palette);
 
-// Dark theme
+$hunter-typography: mat.m2-define-typography-config();
+
+// Dark theme (default)
 $hunter-dark-theme: mat.m2-define-dark-theme((
   color: (
-    primary: $hunter-primary,
-    accent: $hunter-accent,
+    primary: $hunter-dark-primary,
+    accent: $hunter-dark-accent,
     warn: $hunter-warn,
   ),
-  typography: mat.m2-define-typography-config(),
+  typography: $hunter-typography,
   density: 0,
 ));
 
-// Light theme (default)
+// Light theme (opt-in via body.light-theme)
 $hunter-light-theme: mat.m2-define-light-theme((
   color: (
-    primary: $hunter-primary,
-    accent: $hunter-accent,
+    primary: $hunter-light-primary,
+    accent: $hunter-light-accent,
     warn: $hunter-warn,
   ),
-  typography: mat.m2-define-typography-config(),
+  typography: $hunter-typography,
   density: 0,
 ));
 
-// Apply light theme by default
-@include mat.all-component-themes($hunter-light-theme);
+// Dark is the default: full theme (structure + typography + color) once, globally.
+@include mat.all-component-themes($hunter-dark-theme);
+
+// ============================================================================
+// Design tokens
+// Components reference these instead of hardcoded colors so they adapt to
+// both themes. Dark values live on <body>; body.light-theme overrides them.
+// ============================================================================
+body {
+  color-scheme: dark;
+
+  --hunter-bg: #121212;                       // app canvas
+  --hunter-surface: #1e1e1e;                  // cards, top bar, tables, dialogs
+  --hunter-surface-variant: #262626;          // table headers, panels, drop zones
+  --hunter-surface-hover: #2e2e2e;            // hover rows, neutral chips
+  --hunter-border: rgba(255, 255, 255, 0.12);
+
+  --hunter-text-primary: rgba(255, 255, 255, 0.92);
+  --hunter-text-secondary: rgba(255, 255, 255, 0.64);
+  --hunter-text-hint: rgba(255, 255, 255, 0.40);
+
+  --hunter-brand: #eb6161;                    // brand hue for text/icons/accents
+  --hunter-brand-tint: rgba(235, 97, 97, 0.12);
+
+  // Status tints: translucent fills + lifted foregrounds for dark surfaces
+  --hunter-info-bg: rgba(100, 181, 246, 0.16);    --hunter-info-fg: #64b5f6;
+  --hunter-purple-bg: rgba(206, 147, 216, 0.16);  --hunter-purple-fg: #ce93d8;
+  --hunter-indigo-bg: rgba(159, 168, 218, 0.16);  --hunter-indigo-fg: #9fa8da;
+  --hunter-warn-bg: rgba(255, 183, 77, 0.16);     --hunter-warn-fg: #ffb74d;
+  --hunter-teal-bg: rgba(77, 182, 172, 0.16);     --hunter-teal-fg: #4db6ac;
+  --hunter-yellow-bg: rgba(255, 213, 79, 0.16);   --hunter-yellow-fg: #ffd54f;
+  --hunter-success-bg: rgba(129, 199, 132, 0.16); --hunter-success-fg: #81c784;
+  --hunter-error-bg: rgba(239, 154, 154, 0.16);   --hunter-error-fg: #ef9a9a;
+}
+
+body.light-theme {
+  color-scheme: light;
+
+  --hunter-bg: #f5f5f5;
+  --hunter-surface: #ffffff;
+  --hunter-surface-variant: #f5f5f5;
+  --hunter-surface-hover: #e0e0e0;
+  --hunter-border: #e0e0e0;
+
+  --hunter-text-primary: #333333;
+  --hunter-text-secondary: #666666;
+  --hunter-text-hint: #999999;
+
+  --hunter-brand: #5f1f1f;
+  --hunter-brand-tint: rgba(95, 31, 31, 0.06);
+
+  --hunter-info-bg: #e3f2fd;    --hunter-info-fg: #1976d2;
+  --hunter-purple-bg: #f3e5f5;  --hunter-purple-fg: #7b1fa2;
+  --hunter-indigo-bg: #e8eaf6;  --hunter-indigo-fg: #3f51b5;
+  --hunter-warn-bg: #fff3e0;    --hunter-warn-fg: #f57c00;
+  --hunter-teal-bg: #e0f2f1;    --hunter-teal-fg: #00897b;
+  --hunter-yellow-bg: #fff9c4;  --hunter-yellow-fg: #f9a825;
+  --hunter-success-bg: #e8f5e9; --hunter-success-fg: #2e7d32;
+  --hunter-error-bg: #ffebee;   --hunter-error-fg: #c62828;
+
+  // Swap only the color layer for Material components
+  @include mat.all-component-colors($hunter-light-theme);
+}
 
 * {
   margin: 0;
@@ -79,58 +147,35 @@ html, body {
 
 body {
   margin: 0;
-  transition: background-color 0.3s ease;
-}
-
-// Light theme styles (default)
-body.light-theme, body {
-  background-color: #f5f5f5;
-  color: #000000;
+  background-color: var(--hunter-bg);
+  color: var(--hunter-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   .app-content {
-    background-color: #f5f5f5 !important;
-  }
-
-  .mat-mdc-card {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  .mat-mdc-form-field {
-    .mat-mdc-input-element {
-      color: #000000 !important;
-    }
-
-    .mat-mdc-form-field-label {
-      color: rgba(0, 0, 0, 0.6) !important;
-    }
+    background-color: var(--hunter-bg);
   }
 }
 
-// Dark theme styles
-body.dark-theme {
-  @include mat.all-component-colors($hunter-dark-theme);
-  background-color: #121212;
-  color: #ffffff;
+// Quill editor (quill.snow.css ships light-only)
+.ql-toolbar.ql-snow,
+.ql-container.ql-snow {
+  border-color: var(--hunter-border) !important;
+}
 
-  .app-content {
-    background-color: #121212 !important;
-  }
+.ql-toolbar.ql-snow {
+  background: var(--hunter-surface-variant);
 
-  .mat-mdc-card {
-    background-color: #1e1e1e !important;
-    color: #ffffff !important;
-  }
+  .ql-stroke { stroke: var(--hunter-text-secondary); }
+  .ql-fill { fill: var(--hunter-text-secondary); }
+  .ql-picker { color: var(--hunter-text-secondary); }
+  .ql-picker-options { background: var(--hunter-surface); border-color: var(--hunter-border); }
+}
 
-  .mat-mdc-form-field {
-    .mat-mdc-input-element {
-      color: #ffffff !important;
-    }
+.ql-container.ql-snow {
+  background: var(--hunter-surface);
+  color: var(--hunter-text-primary);
 
-    .mat-mdc-form-field-label {
-      color: rgba(255, 255, 255, 0.7) !important;
-    }
-  }
+  .ql-editor.ql-blank::before { color: var(--hunter-text-hint); }
 }
 
 .mat-mdc-card {

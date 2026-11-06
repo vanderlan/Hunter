@@ -118,6 +118,10 @@
               <mat-icon>settings</mat-icon>
               <span>Preferences</span>
             </button>
+            <button mat-menu-item (click)="toggleTheme()">
+              <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+              <span>{{ isDarkTheme() ? 'Light mode' : 'Dark mode' }}</span>
+            </button>
             <button mat-menu-item (click)="changePassword()">
               <mat-icon>lock</mat-icon>
               <span>Change Password</span>

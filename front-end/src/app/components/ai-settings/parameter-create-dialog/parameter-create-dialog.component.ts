@@ -81,7 +81,7 @@ import { ParameterCreateRequest } from '../../../services/parameter.service';
     mat-dialog-actions {
       padding: 16px;
       margin: 0;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--hunter-border);
       gap: 8px;
 
       button {

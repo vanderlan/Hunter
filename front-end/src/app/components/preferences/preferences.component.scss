@@ -22,13 +22,13 @@
       font-size: 28px;
       width: 28px;
       height: 28px;
-      color: #5f1f1f;
+      color: var(--hunter-brand);
     }
   }
 
   mat-card-content {
     p {
-      color: #666;
+      color: var(--hunter-text-secondary);
       margin-top: 8px;
     }
   }
@@ -53,7 +53,7 @@
 
 .preference-item {
   padding: 16px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--hunter-border);
   
   &:last-child {
     border-bottom: none;
@@ -73,7 +73,7 @@
   .preference-description {
     margin: 8px 0 0 32px;
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--hunter-text-secondary);
     line-height: 1.5;
   }
 }
@@ -82,7 +82,7 @@ mat-card-actions {
   padding: 16px;
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--hunter-border);
   margin-top: 16px;
   
   button {

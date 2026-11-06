@@ -72,8 +72,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     /* No Priority - Gray Theme */
     .priority-none {
-      background: #e0e0e0 !important;
-      color: #757575 !important;
+      background: var(--hunter-surface-hover) !important;
+      color: var(--hunter-text-secondary) !important;
     }
 
     /* Pulse animation for high priority */

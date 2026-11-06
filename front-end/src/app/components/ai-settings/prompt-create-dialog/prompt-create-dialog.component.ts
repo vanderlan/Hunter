@@ -126,13 +126,13 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
 
     mat-icon[matPrefix] {
       margin-right: 12px;
-      color: rgba(0, 0, 0, 0.54);
+      color: var(--hunter-text-secondary);
     }
 
     mat-dialog-actions {
       padding: 16px;
       margin: 0;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--hunter-border);
       gap: 8px;
 
       button {
@@ -155,13 +155,13 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
       .editor-label {
         font-size: 14px;
         font-weight: 500;
-        color: rgba(0, 0, 0, 0.87);
+        color: var(--hunter-text-primary);
       }
 
       .quill-editor {
-        border: 1px solid rgba(0, 0, 0, 0.12);
+        border: 1px solid var(--hunter-border);
         border-radius: 4px;
-        background: white;
+        background: var(--hunter-surface);
 
         ::ng-deep .ql-container {
           font-family: 'SF Mono', Monaco, Menlo, Consolas, 'Roboto Mono', 'Liberation Mono', monospace;
@@ -179,14 +179,14 @@ import { PromptCreateRequest } from '../../../services/prompt.service';
         ::ng-deep .ql-toolbar {
           border-top-left-radius: 4px;
           border-top-right-radius: 4px;
-          background: #f5f5f5;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+          background: var(--hunter-surface-variant);
+          border-bottom: 1px solid var(--hunter-border);
         }
       }
 
       .editor-hint {
         font-size: 12px;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--hunter-text-secondary);
       }
     }
 

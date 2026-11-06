@@ -48,7 +48,7 @@ export interface ConfirmDialogData {
       padding: 0 24px;
       font-size: 20px;
       font-weight: 500;
-      color: #d32f2f;
+      color: var(--hunter-error-fg);
     }
 
     mat-dialog-content {
@@ -60,14 +60,14 @@ export interface ConfirmDialogData {
       margin: 0;
       font-size: 16px;
       line-height: 1.5;
-      color: rgba(0, 0, 0, 0.87);
+      color: var(--hunter-text-primary);
     }
 
     mat-dialog-actions {
       padding: 16px 24px;
       margin: 0;
-      border-top: 1px solid #e0e0e0;
-      background-color: #fafafa;
+      border-top: 1px solid var(--hunter-border);
+      background-color: var(--hunter-surface-variant);
     }
 
     button {

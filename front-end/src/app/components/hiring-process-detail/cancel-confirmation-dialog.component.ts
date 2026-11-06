@@ -109,7 +109,7 @@ export interface CancelConfirmationResult {
         margin: 0;
         font-size: 20px;
         font-weight: 600;
-        color: #333;
+        color: var(--hunter-text-primary);
       }
     }
 
@@ -122,11 +122,11 @@ export interface CancelConfirmationResult {
       .main-message {
         font-size: 16px;
         line-height: 1.6;
-        color: #333;
+        color: var(--hunter-text-primary);
         margin: 0 0 16px;
 
         strong {
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           font-weight: 600;
         }
       }
@@ -136,13 +136,13 @@ export interface CancelConfirmationResult {
         align-items: center;
         gap: 12px;
         padding: 16px;
-        background: #f5f5f5;
+        background: var(--hunter-surface-variant);
         border-radius: 8px;
-        border-left: 4px solid #5f1f1f;
+        border-left: 4px solid var(--hunter-brand);
         margin-bottom: 16px;
 
         mat-icon {
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           font-size: 28px;
           width: 28px;
           height: 28px;
@@ -156,7 +156,7 @@ export interface CancelConfirmationResult {
 
           strong {
             font-size: 16px;
-            color: #333;
+            color: var(--hunter-text-primary);
           }
         }
       }
@@ -166,11 +166,11 @@ export interface CancelConfirmationResult {
         align-items: flex-start;
         gap: 8px;
         padding: 12px;
-        background: #fff3e0;
+        background: var(--hunter-warn-bg);
         border-radius: 6px;
         font-size: 14px;
         line-height: 1.5;
-        color: #e65100;
+        color: var(--hunter-warn-fg);
         margin: 0 0 20px;
         border-left: 3px solid #ff9800;
 

@@ -133,13 +133,13 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
         display: flex;
         align-items: center;
         gap: 12px;
-        color: #333;
+        color: var(--hunter-text-primary);
         margin: 0;
         font-size: 24px;
         font-weight: 500;
 
         mat-icon {
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           font-size: 28px;
           width: 28px;
           height: 28px;
@@ -158,19 +158,19 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
       padding: 24px;
       border-radius: 8px;
       margin-bottom: 32px;
-      border-left: 4px solid #5f1f1f;
+      border-left: 4px solid var(--hunter-brand);
 
       .header-info {
         h3 {
           margin: 0 0 8px 0;
-          color: #5f1f1f;
+          color: var(--hunter-brand);
           font-size: 24px;
           font-weight: 600;
         }
 
         .email {
           margin: 0 0 12px 0;
-          color: #666;
+          color: var(--hunter-text-secondary);
           font-size: 16px;
         }
 
@@ -180,14 +180,14 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
           align-items: center;
           gap: 8px;
           margin: 8px 0;
-          color: #555;
+          color: var(--hunter-text-secondary);
           font-size: 14px;
 
           mat-icon {
             font-size: 18px;
             width: 18px;
             height: 18px;
-            color: #5f1f1f;
+            color: var(--hunter-brand);
           }
         }
       }
@@ -195,7 +195,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
 
     .matches-section {
       .section-title {
-        color: #333;
+        color: var(--hunter-text-primary);
         font-size: 22px;
         font-weight: 600;
         margin: 0 0 24px 0;
@@ -251,7 +251,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
             font-size: 24px;
             font-weight: 600;
             margin: 0 0 12px 0;
-            color: #5f1f1f;
+            color: var(--hunter-brand);
           }
 
           mat-progress-bar {
@@ -262,36 +262,36 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
 
         .match-reason {
           padding: 16px;
-          background-color: #f5f5f5;
+          background-color: var(--hunter-surface-variant);
           border-radius: 8px;
-          border-left: 4px solid #5f1f1f;
+          border-left: 4px solid var(--hunter-brand);
           margin-bottom: 20px;
           line-height: 1.6;
-          color: #333;
+          color: var(--hunter-text-primary);
           font-size: 14px;
         }
 
         mat-expansion-panel {
           margin-bottom: 8px;
           box-shadow: none !important;
-          border: 1px solid #e0e0e0;
+          border: 1px solid var(--hunter-border);
 
           &::before {
             display: none;
           }
 
           mat-expansion-panel-header {
-            background-color: #fafafa;
+            background-color: var(--hunter-surface-variant);
             font-weight: 500;
 
             &:hover {
-              background-color: #f5f5f5;
+              background-color: var(--hunter-surface-variant);
             }
           }
 
           mat-panel-title {
             font-size: 14px;
-            color: #333;
+            color: var(--hunter-text-primary);
           }
 
           .skills-section {
@@ -305,7 +305,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
               font-size: 14px;
               font-weight: 600;
               margin: 0 0 12px 0;
-              color: #666;
+              color: var(--hunter-text-secondary);
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
@@ -317,13 +317,13 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
             }
 
             .skill-match {
-              background-color: #c8e6c9 !important;
-              color: #2e7d32 !important;
+              background-color: var(--hunter-success-bg) !important;
+              color: var(--hunter-success-fg) !important;
             }
 
             .skill-missing {
-              background-color: #ffcdd2 !important;
-              color: #c62828 !important;
+              background-color: var(--hunter-error-bg) !important;
+              color: var(--hunter-error-fg) !important;
             }
           }
 
@@ -331,7 +331,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
             padding: 16px 0;
             margin: 0;
             line-height: 1.6;
-            color: #666;
+            color: var(--hunter-text-secondary);
           }
         }
       }
@@ -339,7 +339,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
 
     mat-dialog-actions {
       padding: 16px 24px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid var(--hunter-border);
     }
   `]
 })

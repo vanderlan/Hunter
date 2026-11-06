@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from './services/auth.service';
+import { ThemeService } from './services/theme.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -32,7 +33,8 @@ export class AppComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) {
     // Track current route for page title
     this.router.events.pipe(
@@ -74,6 +76,14 @@ export class AppComponent {
 
   preferences(): void {
     this.router.navigate(['/preferences']);
+  }
+
+  isDarkTheme(): boolean {
+    return this.themeService.isDark;
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   getPageTitle(): string {

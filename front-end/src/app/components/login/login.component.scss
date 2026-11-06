@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #f7f4f4;
+  background: var(--hunter-bg);
   padding: 20px;
 }
 
@@ -93,8 +93,8 @@
         align-items: center;
         gap: 8px;
         padding: 12px 16px;
-        background-color: #ffebee;
-        color: #c62828;
+        background-color: var(--hunter-error-bg);
+        color: var(--hunter-error-fg);
         border-radius: 8px;
         font-size: 14px;
         margin: -8px 0 0 0;
@@ -125,14 +125,14 @@
 
   mat-card-footer {
     padding: 16px 24px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #e0e0e0;
+    background-color: var(--hunter-surface-variant);
+    border-top: 1px solid var(--hunter-border);
     margin: 0 -16px -16px;
 
     .footer-text {
       margin: 0;
       text-align: center;
-      color: #666;
+      color: var(--hunter-text-secondary);
       font-size: 14px;
     }
   }
