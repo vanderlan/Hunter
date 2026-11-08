@@ -11,14 +11,17 @@
   max-width: 500px;
   min-width: 450px;
   width: 100%;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  border-radius: 8px !important;
+  box-shadow: var(--hunter-shadow-lg);
+  border-radius: var(--hunter-radius-lg) !important;
   overflow: hidden;
 
   mat-card-header {
-    background: var(--hunter-brand-gradient);
-    color: white;
-    padding: 40px 40px;
+    // No slab: the login header sits on the card surface and lets the
+    // logotype carry the brand.
+    background: var(--hunter-surface);
+    color: var(--hunter-text-primary);
+    border-bottom: 1px solid var(--hunter-border);
+    padding: var(--hunter-space-8);
     margin: -16px -0px 0;
 
     .logo-container {
@@ -40,9 +43,9 @@
     }
 
     mat-card-subtitle {
-      color: rgba(255, 255, 255, 0.9);
-      margin-top: 8px;
-      font-size: 15px;
+      color: var(--hunter-text-secondary);
+      margin-top: var(--hunter-space-2);
+      font-size: 0.875rem;
     }
   }
 

@@ -131,54 +131,9 @@
       border: none;
     }
 
-    // Status color patterns
-    .status-new {
-      background-color: var(--hunter-info-bg) !important;
-      color: var(--hunter-info-fg) !important;
-      border: 1px solid var(--hunter-info-fg) !important;
-    }
-
-    .status-referred-partner {
-      background-color: var(--hunter-purple-bg) !important;
-      color: var(--hunter-purple-fg) !important;
-      border: 1px solid var(--hunter-purple-fg) !important;
-    }
-
-    .status-referred-internal {
-      background-color: var(--hunter-indigo-bg) !important;
-      color: var(--hunter-indigo-fg) !important;
-      border: 1px solid var(--hunter-indigo-fg) !important;
-    }
-
-    .status-screening {
-      background-color: var(--hunter-warn-bg) !important;
-      color: var(--hunter-warn-fg) !important;
-      border: 1px solid var(--hunter-warn-fg) !important;
-    }
-
-    .status-technical {
-      background-color: var(--hunter-teal-bg) !important;
-      color: var(--hunter-teal-fg) !important;
-      border: 1px solid var(--hunter-teal-fg) !important;
-    }
-
-    .status-client {
-      background-color: var(--hunter-yellow-bg) !important;
-      color: var(--hunter-yellow-fg) !important;
-      border: 1px solid var(--hunter-yellow-fg) !important;
-    }
-
-    .status-hired {
-      background-color: var(--hunter-success-bg) !important;
-      color: var(--hunter-success-fg) !important;
-      border: 1px solid var(--hunter-success-fg) !important;
-    }
-
-    .status-reproved {
-      background-color: var(--hunter-error-bg) !important;
-      color: var(--hunter-error-fg) !important;
-      border: 1px solid var(--hunter-error-fg) !important;
-    }
+    // Stage badge colours come from the pipeline scale in styles.scss,
+    // keyed off HIRING_PROCESS_STATUS_CONFIG.cssClass. Defining them here
+    // too would fork the single source of truth.
 
     button {
       margin-right: 8px;

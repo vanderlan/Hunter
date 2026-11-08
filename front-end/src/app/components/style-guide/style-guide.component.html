@@ -41,14 +41,15 @@
         </div>
       }
       <div class="swatch">
-        <div class="swatch__chip" style="background: var(--hunter-brand-gradient)"></div>
-        <span class="swatch__name">brand-gradient</span>
-        <code class="swatch__token">--hunter-brand-gradient</code>
+        <div class="swatch__chip" style="background: var(--hunter-brand-tint)"></div>
+        <span class="swatch__name">brand-tint</span>
+        <code class="swatch__token">--hunter-brand-tint</code>
       </div>
     </div>
     <p class="sg-note">
-      The gradient is the single brand ramp — sidebar, login and the email
-      header all reference it. Do not hand-roll another one.
+      The accent is spent sparingly — active nav item, primary action, focus
+      ring, selection. Chrome stays near-colourless so data carries the colour.
+      There are no gradients in this system.
     </p>
   </section>
 
@@ -77,6 +78,73 @@
         <span class="hunter-badge" [class]="'is-' + tone">{{ tone }}</span>
       }
       <span class="hunter-badge">neutral</span>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Hiring pipeline scale</h2>
+    <p class="sg-note">
+      The eight stages read as a cool&nbsp;&rarr;&nbsp;warm journey, so stage is
+      legible from colour alone. Red appears exactly once, at the terminal
+      <em>Reproved</em> state — which is why the brand is not red.
+    </p>
+    <div class="stage-flow">
+      @for (st of stages; track st.key) {
+        <span class="hunter-badge stage-chip" [class]="'hunter-badge ' + st.css">{{ st.label }}</span>
+      }
+    </div>
+    <p class="sg-note">
+      These classes come from <code>HIRING_PROCESS_STATUS_CONFIG.cssClass</code>,
+      so every screen rendering a stage picks them up automatically.
+    </p>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Data visualisation</h2>
+    <h3>Categorical series</h3>
+    <p class="sg-note">
+      Distinct in hue <em>and</em> luminance, so they survive greyscale and the
+      common colour-vision deficiencies.
+    </p>
+    <div class="row">
+      @for (n of vizSeries; track n) {
+        <div class="viz-chip" [style.background]="'var(--hunter-viz-' + n + ')'">
+          <code>viz-{{ n }}</code>
+        </div>
+      }
+    </div>
+
+    <h3>Match score scale</h3>
+    <p class="sg-note">
+      Sequential, 0&ndash;100%. Low scores are muted rather than red: a weak
+      match is not an error.
+    </p>
+    <div class="score-ramp">
+      @for (st of scoreStops; track st) {
+        <div class="score-step" [style.background]="'var(--hunter-score-' + st + ')'">
+          <span>{{ st }}%</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Density</h2>
+    <p class="sg-note">
+      Material runs at density&nbsp;-2 and the base size is 14px. This is a data
+      tool; rows should be scannable, not comfortable.
+    </p>
+    <div class="scale-list">
+      @for (d of density; track d.token) {
+        <div class="scale-row">
+          <code>{{ d.token }}</code>
+          <div class="scale-bar" [style.width]="'var(' + d.token + ')'"></div>
+          <span class="type-small">{{ d.label }}</span>
+        </div>
+      }
     </div>
   </section>
 

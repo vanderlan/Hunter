@@ -1,11 +1,22 @@
 // ============================================================================
-// Hunter Design Language — token sheet
+// Hunter Design Language — token sheet  ("Signal" identity)
 // ----------------------------------------------------------------------------
 // Single source of truth for colour, type, space, shape, elevation and motion.
 //
 // Layer 1: Angular Material 3 emits `--mat-sys-*` system variables.
 // Layer 2: we alias them to `--hunter-*` brand tokens.
 // Components consume ONLY `--hunter-*` — never raw hex, never `--mat-sys-*`.
+//
+// DESIGN PRINCIPLES
+//   1. Colour is information, not decoration. Chrome is near-colourless;
+//      the accent appears on roughly 5% of pixels (active nav, primary
+//      action, focus ring, selection).
+//   2. Red is reserved exclusively for destructive actions and the
+//      `Reproved` terminal state. It is never brand, never chrome.
+//   3. Separation by hairline border, not by shadow. Shadows mean "this
+//      floats above the page" — menus, dialogs, toasts, nothing else.
+//   4. No gradients.
+//   5. Light is the default. This app is for reading documents.
 //
 // Light/dark is handled by CSS `color-scheme` + `light-dark()`. There is no
 // second theme stylesheet: one set of rules resolves per scheme at paint time.
@@ -22,26 +33,27 @@ html {
     color: (
       primary: brand.$primary-palette,
       tertiary: brand.$tertiary-palette,
-      // `color-scheme` emits light-dark() pairs for every token, so the whole
-      // theme flips by changing the `color-scheme` property alone.
       theme-type: color-scheme,
     ),
     typography: (
       brand-family: ('Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif),
       plain-family: ('Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif),
-      bold-weight: 650,
-      medium-weight: 550,
+      bold-weight: 640,
+      medium-weight: 540,
       regular-weight: 400,
     ),
-    density: 0,
+    // Negative density tightens every Material control. This app is a
+    // data tool, not a marketing page — rows should be scannable.
+    density: -2,
   ));
 
-  // Softer, more contemporary shape scale than Material's default.
-  --mat-sys-corner-extra-small: 6px;
-  --mat-sys-corner-small: 10px;
-  --mat-sys-corner-medium: 14px;
-  --mat-sys-corner-large: 20px;
-  --mat-sys-corner-extra-large: 28px;
+  // Tighter shape scale. Large pill-like radii read as consumer app;
+  // restrained radii read as instrument.
+  --mat-sys-corner-extra-small: 4px;
+  --mat-sys-corner-small: 6px;
+  --mat-sys-corner-medium: 8px;
+  --mat-sys-corner-large: 12px;
+  --mat-sys-corner-extra-large: 16px;
 }
 
 // ----------------------------------------------------------------------------
@@ -49,82 +61,136 @@ html {
 // ----------------------------------------------------------------------------
 html {
   // --- Surfaces ---------------------------------------------------------
-  // A tonal ramp: each step is a distinct elevation plane, not a flat grey.
-  --hunter-bg: var(--mat-sys-surface);
-  --hunter-surface: var(--mat-sys-surface-container-low);
-  --hunter-surface-variant: var(--mat-sys-surface-container);
-  --hunter-surface-hover: var(--mat-sys-surface-container-high);
-  --hunter-surface-raised: var(--mat-sys-surface-container-highest);
-  --hunter-surface-sunken: var(--mat-sys-surface-container-lowest);
+  // Cool slate neutrals. The canvas is near-colourless by design so that
+  // data carries all of the colour.
+  --hunter-bg:               light-dark(#f8fafc, #0b0f14);
+  --hunter-surface:          light-dark(#ffffff, #11161d);
+  --hunter-surface-variant:  light-dark(#f1f5f9, #161c24);
+  --hunter-surface-hover:    light-dark(#e9eef4, #1c242e);
+  --hunter-surface-raised:   light-dark(#ffffff, #1c242e);
+  --hunter-surface-sunken:   light-dark(#f1f5f9, #080b0f);
 
   // --- Lines ------------------------------------------------------------
-  --hunter-border: var(--mat-sys-outline-variant);
-  --hunter-border-strong: var(--mat-sys-outline);
+  // Hairlines do the separating. These are deliberately low-contrast.
+  --hunter-border:           light-dark(#e2e8f0, #212a35);
+  --hunter-border-strong:    light-dark(#cbd5e1, #2e3a48);
 
   // --- Text -------------------------------------------------------------
-  --hunter-text-primary: var(--mat-sys-on-surface);
-  --hunter-text-secondary: var(--mat-sys-on-surface-variant);
-  --hunter-text-hint: color-mix(in srgb, var(--mat-sys-on-surface-variant) 62%, transparent);
-  --hunter-text-on-brand: var(--mat-sys-on-primary);
+  --hunter-text-primary:     light-dark(#0f172a, #e6edf5);
+  --hunter-text-secondary:   light-dark(#55657a, #92a2b6);
+  // Tuned to clear WCAG AA (4.5:1) on both surface and canvas: hint text
+  // carries sidebar section labels, which are small.
+  --hunter-text-hint:        light-dark(#64748b, #75839a);
+  --hunter-text-on-brand:    #ffffff;
 
-  // --- Brand ------------------------------------------------------------
-  --hunter-brand: var(--mat-sys-primary);
-  --hunter-brand-container: var(--mat-sys-primary-container);
-  --hunter-on-brand-container: var(--mat-sys-on-primary-container);
-  --hunter-brand-tint: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
-  --hunter-brand-tint-strong: color-mix(in srgb, var(--mat-sys-primary) 22%, transparent);
+  // --- Brand: precision teal --------------------------------------------
+  // Chosen because it collides with nothing in the hiring domain: red stays
+  // free for Reproved, green for Hired, and the warm half of the wheel
+  // stays free for the pipeline progression below.
+  --hunter-brand:            light-dark(#0d7d72, #2dd4bf);
+  --hunter-brand-hover:      light-dark(#0b6961, #5eead4);
+  --hunter-brand-container:  light-dark(#d6f5f0, #0d3b37);
+  --hunter-on-brand-container: light-dark(#064e46, #99f6e4);
+  --hunter-brand-tint:       light-dark(#{rgba(#0d9488, 0.08)}, #{rgba(#2dd4bf, 0.12)});
+  --hunter-brand-tint-strong:light-dark(#{rgba(#0d9488, 0.16)}, #{rgba(#2dd4bf, 0.22)});
 
-  // The ONE brand gradient. Previously three different ones were in use
-  // (sidebar, login, email header) — everything now refers to this.
-  // Tones 30 -> 10 of the primary palette, one step deeper in dark mode.
-  --hunter-brand-gradient: linear-gradient(
-    135deg,
-    light-dark(#82261e, #630f0a) 0%,
-    light-dark(#4f0d08, #2a0604) 100%
-  );
-  --hunter-accent: var(--mat-sys-tertiary);
-  --hunter-accent-container: var(--mat-sys-tertiary-container);
+  // Secondary accent, for charts and the occasional non-primary emphasis.
+  --hunter-accent:           light-dark(#4f46e5, #818cf8);
+  --hunter-accent-container: light-dark(#e6e6fb, #241f52);
 
   // --- Status palette ---------------------------------------------------
-  // Soft tinted containers (not saturated slabs). Each status carries a
-  // background, a readable foreground and a border for outlined treatments.
-  // These are the SAME values the toasts use — chips and notifications can no
-  // longer disagree about what "success" looks like.
-  --hunter-success-bg:    light-dark(#e6f4ea, #10291a);
-  --hunter-success-fg:    light-dark(#1b6b3a, #7fd99f);
-  --hunter-success-border:light-dark(#b7dfc4, #1f4d31);
+  // Soft tinted containers. Shared by chips, badges, callouts and toasts so
+  // one meaning always has one colour.
+  --hunter-success-bg:    light-dark(#e8f6ed, #0c2417);
+  --hunter-success-fg:    light-dark(#116a3a, #5fd18d);
+  --hunter-success-border:light-dark(#b9e3c8, #1b4730);
 
-  --hunter-error-bg:      light-dark(#fdeaea, #2f1414);
-  --hunter-error-fg:      light-dark(#b3261e, #f2b8b5);
-  --hunter-error-border:  light-dark(#f3c4c1, #5c2320);
+  --hunter-error-bg:      light-dark(#fdecec, #2a1113);
+  --hunter-error-fg:      light-dark(#c0271f, #fb9b95);
+  --hunter-error-border:  light-dark(#f4c7c4, #56201f);
 
-  --hunter-warn-bg:       light-dark(#fdf1dd, #2c2008);
-  --hunter-warn-fg:       light-dark(#8a5300, #f0c070);
-  --hunter-warn-border:   light-dark(#f0d7a8, #54400f);
+  --hunter-warn-bg:       light-dark(#fdf3e3, #2a1f09);
+  --hunter-warn-fg:       light-dark(#8f5a05, #f0ba63);
+  --hunter-warn-border:   light-dark(#f2dcb2, #513c10);
 
-  --hunter-info-bg:       light-dark(#e7f0fd, #11203a);
-  --hunter-info-fg:       light-dark(#1a5fb4, #9cc4fa);
-  --hunter-info-border:   light-dark(#c2d8f7, #23406e);
+  --hunter-info-bg:       light-dark(#e8f1fd, #0e1d33);
+  --hunter-info-fg:       light-dark(#1b5fb8, #90c2fb);
+  --hunter-info-border:   light-dark(#c5daf7, #1f3c69);
 
-  --hunter-teal-bg:       light-dark(#e0f2f1, #0c2927);
-  --hunter-teal-fg:       light-dark(#00695f, #78cfc6);
-  --hunter-teal-border:   light-dark(#b2ddd9, #1a4b47);
+  --hunter-teal-bg:       light-dark(#def5f1, #0a2a28);
+  --hunter-teal-fg:       light-dark(#0b6f66, #4fd6c6);
+  --hunter-teal-border:   light-dark(#b2e3dc, #144e49);
 
-  --hunter-purple-bg:     light-dark(#f3e8fb, #241433);
-  --hunter-purple-fg:     light-dark(#6b2fa0, #d3aaf0);
-  --hunter-purple-border: light-dark(#ddc5ef, #432561);
+  --hunter-purple-bg:     light-dark(#f2eafc, #1e1333);
+  --hunter-purple-fg:     light-dark(#6d33a8, #c4a5f3);
+  --hunter-purple-border: light-dark(#dcc9f2, #3b2563);
 
-  --hunter-indigo-bg:     light-dark(#e8eaf8, #171a36);
-  --hunter-indigo-fg:     light-dark(#3a43a4, #aeb5f0);
-  --hunter-indigo-border: light-dark(#c6cbee, #2c3268);
+  --hunter-indigo-bg:     light-dark(#e9eafd, #141734);
+  --hunter-indigo-fg:     light-dark(#4038c4, #a5abf5);
+  --hunter-indigo-border: light-dark(#c8ccf5, #292e66);
 
-  --hunter-yellow-bg:     light-dark(#fdf6d8, #2a2408);
-  --hunter-yellow-fg:     light-dark(#7a5c00, #e8ce62);
-  --hunter-yellow-border: light-dark(#eede9e, #4e430f);
+  --hunter-yellow-bg:     light-dark(#fdf7dd, #272209);
+  --hunter-yellow-fg:     light-dark(#7d5e05, #e3cb62);
+  --hunter-yellow-border: light-dark(#eede9e, #4a4110);
 
-  --hunter-neutral-bg:    var(--mat-sys-surface-container-high);
-  --hunter-neutral-fg:    var(--mat-sys-on-surface-variant);
-  --hunter-neutral-border:var(--mat-sys-outline-variant);
+  --hunter-neutral-bg:    light-dark(#f1f5f9, #1a222c);
+  --hunter-neutral-fg:    light-dark(#55657a, #92a2b6);
+  --hunter-neutral-border:light-dark(#e2e8f0, #2b3643);
+
+  // --- Hiring pipeline scale -------------------------------------------
+  // The eight stages read as a cool -> warm journey, so stage is legible
+  // from colour alone. Order matters: do not reassign these ad hoc.
+  //   New -> Analysis -> Internal -> Screening -> Tech -> Client -> Hired
+  //   (Reproved is the sole red.)
+  --hunter-stage-new-bg:        var(--hunter-neutral-bg);
+  --hunter-stage-new-fg:        var(--hunter-neutral-fg);
+  --hunter-stage-new-border:    var(--hunter-neutral-border);
+
+  --hunter-stage-analysis-bg:     var(--hunter-indigo-bg);
+  --hunter-stage-analysis-fg:     var(--hunter-indigo-fg);
+  --hunter-stage-analysis-border: var(--hunter-indigo-border);
+
+  --hunter-stage-internal-bg:     var(--hunter-purple-bg);
+  --hunter-stage-internal-fg:     var(--hunter-purple-fg);
+  --hunter-stage-internal-border: var(--hunter-purple-border);
+
+  --hunter-stage-screening-bg:     var(--hunter-info-bg);
+  --hunter-stage-screening-fg:     var(--hunter-info-fg);
+  --hunter-stage-screening-border: var(--hunter-info-border);
+
+  --hunter-stage-technical-bg:     var(--hunter-teal-bg);
+  --hunter-stage-technical-fg:     var(--hunter-teal-fg);
+  --hunter-stage-technical-border: var(--hunter-teal-border);
+
+  --hunter-stage-client-bg:     var(--hunter-warn-bg);
+  --hunter-stage-client-fg:     var(--hunter-warn-fg);
+  --hunter-stage-client-border: var(--hunter-warn-border);
+
+  --hunter-stage-hired-bg:     var(--hunter-success-bg);
+  --hunter-stage-hired-fg:     var(--hunter-success-fg);
+  --hunter-stage-hired-border: var(--hunter-success-border);
+
+  --hunter-stage-reproved-bg:     var(--hunter-error-bg);
+  --hunter-stage-reproved-fg:     var(--hunter-error-fg);
+  --hunter-stage-reproved-border: var(--hunter-error-border);
+
+  // --- Data visualisation ----------------------------------------------
+  // Categorical series for dashboards. Distinct in hue and in luminance, so
+  // they survive greyscale printing and the common colour-vision deficiencies.
+  --hunter-viz-1: light-dark(#0d9488, #2dd4bf);
+  --hunter-viz-2: light-dark(#4f46e5, #818cf8);
+  --hunter-viz-3: light-dark(#d97706, #fbbf24);
+  --hunter-viz-4: light-dark(#0369a1, #38bdf8);
+  --hunter-viz-5: light-dark(#9333ea, #c084fc);
+  --hunter-viz-6: light-dark(#15803d, #4ade80);
+
+  // Sequential scale for match scores (0 -> 100%). Low scores are muted
+  // rather than red: a weak match is not an error.
+  --hunter-score-0:   light-dark(#cbd5e1, #334155);
+  --hunter-score-25:  light-dark(#93c5c0, #2a6962);
+  --hunter-score-50:  light-dark(#5aada4, #1f8a7d);
+  --hunter-score-75:  light-dark(#2b9387, #27b3a0);
+  --hunter-score-100: light-dark(#0d7d72, #2dd4bf);
 
   // --- Space scale (4px base) -------------------------------------------
   --hunter-space-1: 4px;
@@ -139,22 +205,21 @@ html {
   --hunter-space-16: 64px;
 
   // --- Shape ------------------------------------------------------------
-  --hunter-radius-xs: 6px;
-  --hunter-radius-sm: 10px;
-  --hunter-radius-md: 14px;
-  --hunter-radius-lg: 20px;
-  --hunter-radius-xl: 28px;
+  --hunter-radius-xs: 4px;
+  --hunter-radius-sm: 6px;
+  --hunter-radius-md: 8px;
+  --hunter-radius-lg: 12px;
+  --hunter-radius-xl: 16px;
   --hunter-radius-pill: 999px;
 
   // --- Elevation --------------------------------------------------------
-  // `light-dark()` resolves to a <color>, so it is applied to the shadow
-  // colour rather than the whole shadow value. Dark surfaces need a deeper,
-  // more opaque shadow to read at all; light surfaces stay crisp.
-  --hunter-shadow-color: light-dark(rgba(16, 14, 13, 0.10), rgba(0, 0, 0, 0.44));
-  --hunter-shadow-color-ambient: light-dark(rgba(16, 14, 13, 0.06), rgba(0, 0, 0, 0.30));
+  // Deliberately sparse. Cards and panels use borders; only true overlays
+  // get a shadow. `light-dark()` resolves to a <color>, so it is applied to
+  // the shadow colour rather than the whole shadow value.
+  --hunter-shadow-color:         light-dark(#{rgba(#0f172a, 0.10)}, #{rgba(#000000, 0.50)});
+  --hunter-shadow-color-ambient: light-dark(#{rgba(#0f172a, 0.05)}, #{rgba(#000000, 0.34)});
 
-  --hunter-shadow-sm:
-    0 1px 2px var(--hunter-shadow-color);
+  --hunter-shadow-sm: 0 1px 2px var(--hunter-shadow-color);
   --hunter-shadow-md:
     0 2px 6px var(--hunter-shadow-color),
     0 1px 2px var(--hunter-shadow-color-ambient);
@@ -166,19 +231,20 @@ html {
     0 4px 12px var(--hunter-shadow-color-ambient);
 
   // --- Motion -----------------------------------------------------------
-  --hunter-ease: cubic-bezier(0.2, 0, 0, 1);         // standard
+  --hunter-ease: cubic-bezier(0.2, 0, 0, 1);
   --hunter-ease-emphasised: cubic-bezier(0.3, 0, 0, 1);
-  --hunter-duration-fast: 120ms;
-  --hunter-duration: 200ms;
-  --hunter-duration-slow: 320ms;
+  --hunter-duration-fast: 110ms;
+  --hunter-duration: 170ms;
+  --hunter-duration-slow: 260ms;
 
-  // --- Layout -----------------------------------------------------------
-  --hunter-sidenav-width: 248px;
-  --hunter-sidenav-width-collapsed: 72px;
-  --hunter-topbar-height: 64px;
+  // --- Layout & density -------------------------------------------------
+  --hunter-sidenav-width: 232px;
+  --hunter-sidenav-width-collapsed: 60px;
+  --hunter-topbar-height: 52px;
+  --hunter-row-height: 40px;        // compact table rows
+  --hunter-control-height: 34px;
 }
 
-// Honour the user's reduced-motion preference globally.
 @media (prefers-reduced-motion: reduce) {
   html {
     --hunter-duration-fast: 1ms;

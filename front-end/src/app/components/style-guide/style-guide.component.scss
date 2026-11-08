@@ -214,3 +214,49 @@ code {
   .style-guide { padding: var(--hunter-space-4); }
   .type-row { flex-direction: column; gap: var(--hunter-space-1); }
 }
+
+// --- Pipeline ---------------------------------------------------------------
+.stage-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--hunter-space-2);
+}
+
+// --- Data viz ---------------------------------------------------------------
+.viz-chip {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 52px;
+  border-radius: var(--hunter-radius-sm);
+
+  code {
+    background: rgba(255, 255, 255, 0.85);
+    color: #0f172a;
+    font-weight: 600;
+  }
+}
+
+.score-ramp {
+  display: flex;
+  border-radius: var(--hunter-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--hunter-border);
+  max-width: 520px;
+
+  .score-step {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    height: 48px;
+
+    span {
+      font-size: 0.6875rem;
+      font-weight: 650;
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}

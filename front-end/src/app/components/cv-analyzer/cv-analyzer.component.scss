@@ -266,10 +266,11 @@
   height: 100%;
 
   mat-card-header {
-    background: var(--hunter-brand-gradient);
-    color: white;
-    padding: 20px;
-    border-radius: 5px;
+    background: var(--hunter-surface-variant);
+    color: var(--hunter-text-primary);
+    border-bottom: 1px solid var(--hunter-border);
+    padding: var(--hunter-space-4);
+    border-radius: var(--hunter-radius-md) var(--hunter-radius-md) 0 0;
     display: flex;
     align-items: stretch;
 
@@ -293,15 +294,16 @@
     }
 
     mat-card-title {
-      color: white;
-      font-size: 18px;
-      font-weight: 500;
+      color: var(--hunter-text-primary);
+      font-size: 0.9375rem;
+      font-weight: 640;
+      letter-spacing: -0.01em;
       margin: 0;
     }
 
     mat-card-subtitle {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 14px;
+      color: var(--hunter-text-secondary);
+      font-size: 0.8125rem;
       margin: 0;
     }
 
@@ -316,7 +318,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: rgba(255, 255, 255, 0.78);
+      color: var(--hunter-text-secondary);
       text-decoration: none;
       font-size: 13px;
       font-weight: 500;
@@ -329,7 +331,7 @@
       }
 
       &:hover {
-        color: #ffffff;
+        color: var(--hunter-brand);
         text-decoration: underline;
       }
     }

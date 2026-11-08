@@ -63,8 +63,29 @@ export class StyleGuideComponent {
     'success', 'error', 'warn', 'info', 'teal', 'purple', 'indigo', 'yellow',
   ] as const;
 
+  /** The 8 pipeline stages, in journey order (cool -> warm). */
+  readonly stages = [
+    { key: 'new', label: 'New', css: 'status-new' },
+    { key: 'analysis', label: 'Pending Analysis', css: 'status-referred-partner' },
+    { key: 'internal', label: 'Referred Internally', css: 'status-referred-internal' },
+    { key: 'screening', label: 'Screening', css: 'status-screening' },
+    { key: 'technical', label: 'Tech Interview', css: 'status-technical' },
+    { key: 'client', label: 'Client Interview', css: 'status-client' },
+    { key: 'hired', label: 'Hired', css: 'status-hired' },
+    { key: 'reproved', label: 'Reproved', css: 'status-reproved' },
+  ];
+
+  readonly vizSeries = [1, 2, 3, 4, 5, 6];
+  readonly scoreStops = [0, 25, 50, 75, 100];
+
   readonly spacing = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16];
   readonly radii = ['xs', 'sm', 'md', 'lg', 'xl', 'pill'];
+  readonly density = [
+    { token: '--hunter-row-height', label: 'Table row' },
+    { token: '--hunter-control-height', label: 'Control' },
+    { token: '--hunter-topbar-height', label: 'Top bar' },
+    { token: '--hunter-sidenav-width', label: 'Sidebar' },
+  ];
   readonly shadows = ['sm', 'md', 'lg', 'xl'];
 
   readonly typeScale = [

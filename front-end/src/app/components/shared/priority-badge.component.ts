@@ -48,9 +48,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     /* High Priority - Red/Fire Theme */
     .priority-high {
-      background: linear-gradient(135deg, #e96161 0%, #e96161 100%) !important;
-      color: white !important;
-      box-shadow: 0 2px 4px rgba(255, 23, 68, 0.3);
+      background: var(--hunter-error-bg) !important;
+      color: var(--hunter-error-fg) !important;
+      border: 1px solid var(--hunter-error-border) !important;
       
       mat-icon {
         animation: pulse 2s ease-in-out infinite;
@@ -59,16 +59,16 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
     /* Medium Priority - Green Theme */
     .priority-medium {
-      background: linear-gradient(135deg, #77b47a 0%, #77b47a 100%) !important;
-      color: white !important;
-      box-shadow: 0 2px 4px rgba(67, 160, 71, 0.3);
+      background: var(--hunter-warn-bg) !important;
+      color: var(--hunter-warn-fg) !important;
+      border: 1px solid var(--hunter-warn-border) !important;
     }
 
     /* Low Priority - Light Blue Theme */
     .priority-low {
-      background: linear-gradient(135deg, #79a8ce 0%, #79a8ce 100%) !important;
-      color: white !important;
-      box-shadow: 0 2px 4px rgba(30, 136, 229, 0.3);
+      background: var(--hunter-info-bg) !important;
+      color: var(--hunter-info-fg) !important;
+      border: 1px solid var(--hunter-info-border) !important;
     }
 
     /* No Priority - Gray Theme */

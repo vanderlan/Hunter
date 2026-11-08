@@ -8,9 +8,10 @@ export type HunterTheme = 'dark' | 'light';
 })
 export class ThemeService {
   private readonly THEME_KEY = 'hunter_theme';
-  private readonly DEFAULT_THEME: HunterTheme = 'dark';
+  // Light is the default: Hunter is a document-reading tool.
+  private readonly DEFAULT_THEME: HunterTheme = 'light';
 
-  private isDarkTheme = new BehaviorSubject<boolean>(true);
+  private isDarkTheme = new BehaviorSubject<boolean>(false);
   public isDarkTheme$ = this.isDarkTheme.asObservable();
 
   constructor() {
@@ -41,7 +42,7 @@ export class ThemeService {
     // The whole theme resolves from the CSS `color-scheme` property: Material's
     // system tokens and our own are emitted as light-dark() pairs, so toggling
     // this one class repaints both without shipping a second stylesheet.
-    document.documentElement.classList.toggle('hunter-light', !isDark);
+    document.documentElement.classList.toggle('hunter-dark', isDark);
 
     // Kept in sync for any consumer that still keys off the body class.
     document.body.classList.toggle('dark-theme', isDark);
@@ -49,7 +50,7 @@ export class ThemeService {
 
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', isDark ? '#141110' : '#fff8f6');
+      ?.setAttribute('content', isDark ? '#0b0f14' : '#f8fafc');
   }
 
   private getStoredTheme(): HunterTheme {

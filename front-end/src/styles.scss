@@ -25,24 +25,24 @@ body {
 }
 
 html {
-  // Dark is the default scheme; ThemeService flips this to `light`.
-  color-scheme: dark;
+  // Light is the default: this app is for reading documents (CVs, notes,
+  // job descriptions). ThemeService flips this to `dark`.
+  color-scheme: light;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-size-adjust: 100%;
 }
 
-html.hunter-light {
-  color-scheme: light;
+html.hunter-dark {
+  color-scheme: dark;
 }
 
 body {
-  // One typeface across the whole product. Material's own components inherit
-  // this through the typography config in the token sheet, so button labels
-  // and body copy finally render in the same family.
+  // One typeface across the whole product.
   font-family: var(--mat-sys-body-medium-font, 'Inter', -apple-system,
     BlinkMacSystemFont, 'Segoe UI', sans-serif);
-  font-size: 0.9375rem;
+  // 14px base. This is a dense data tool, not a marketing page.
+  font-size: 0.875rem;
   line-height: 1.5;
   background-color: var(--hunter-bg);
   color: var(--hunter-text-primary);
@@ -54,10 +54,9 @@ body {
   background-color: var(--hunter-bg);
 }
 
-// Headings use the brand family with tighter tracking.
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 650;
-  letter-spacing: -0.012em;
+  font-weight: 640;
+  letter-spacing: -0.014em;
   line-height: 1.25;
   color: var(--hunter-text-primary);
 }
@@ -68,6 +67,7 @@ a {
   text-underline-offset: 2px;
 
   &:hover {
+    color: var(--hunter-brand-hover);
     text-decoration-color: currentColor;
   }
 }
@@ -76,10 +76,30 @@ a {
 :focus-visible {
   outline: 2px solid var(--hunter-brand);
   outline-offset: 2px;
+  border-radius: var(--hunter-radius-xs);
 }
 
 // ----------------------------------------------------------------------------
-// Scrollbars — themed rather than OS-default, which looked foreign in dark mode
+// Numerals
+// ----------------------------------------------------------------------------
+// Tabular figures everywhere numbers are compared vertically. Proportional
+// digits make match scores and dates jitter between rows; this is one of the
+// highest-value-per-line rules in the whole sheet.
+table,
+.mat-mdc-table,
+.mat-mdc-paginator,
+time,
+.hunter-num,
+[class*='score'],
+[class*='count'],
+[class*='date'],
+[class*='percent'] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+// ----------------------------------------------------------------------------
+// Scrollbars
 // ----------------------------------------------------------------------------
 * {
   scrollbar-width: thin;
@@ -110,10 +130,13 @@ a {
 // ----------------------------------------------------------------------------
 // Material component adjustments
 // ----------------------------------------------------------------------------
+// Cards separate by hairline, not by shadow. A page of drop-shadowed cards
+// reads as 2016; a page of bordered panels reads as an instrument.
 .mat-mdc-card {
-  border-radius: var(--hunter-radius-md);
+  border-radius: var(--hunter-radius-lg);
   border: 1px solid var(--hunter-border);
-  box-shadow: var(--hunter-shadow-sm);
+  box-shadow: none;
+  background: var(--hunter-surface);
 }
 
 .mat-mdc-button,
@@ -122,13 +145,24 @@ a {
 .mat-mdc-unelevated-button {
   text-transform: none;
   letter-spacing: 0;
-  font-weight: 550;
+  font-weight: 540;
   border-radius: var(--hunter-radius-sm);
 }
 
+// Raised buttons lose their shadow — flat fills only.
+.mat-mdc-raised-button:not(:disabled) {
+  box-shadow: none;
+
+  &:hover {
+    box-shadow: none;
+  }
+}
+
+// Overlays are the only things that float.
 .mat-mdc-dialog-surface {
   border-radius: var(--hunter-radius-lg);
   box-shadow: var(--hunter-shadow-xl);
+  border: 1px solid var(--hunter-border);
 }
 
 .mat-mdc-menu-panel,
@@ -145,19 +179,55 @@ a {
   font-weight: 500;
 }
 
+// --- Tables: compact, quiet, scannable --------------------------------------
+.mat-mdc-table {
+  background: transparent;
+
+  .mat-mdc-header-row {
+    height: auto;
+    min-height: 0;
+    background: var(--hunter-surface-variant);
+  }
+
+  .mat-mdc-header-cell {
+    padding: var(--hunter-space-2) var(--hunter-space-3);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.055em;
+    color: var(--hunter-text-secondary);
+    border-bottom: 1px solid var(--hunter-border);
+    white-space: nowrap;
+  }
+
+  .mat-mdc-row {
+    height: var(--hunter-row-height);
+    transition: background var(--hunter-duration-fast) var(--hunter-ease);
+
+    &:hover {
+      background: var(--hunter-surface-hover);
+    }
+  }
+
+  .mat-mdc-cell {
+    padding: var(--hunter-space-2) var(--hunter-space-3);
+    font-size: 0.8125rem;
+    color: var(--hunter-text-primary);
+    border-bottom: 1px solid var(--hunter-border);
+  }
+}
+
 // ----------------------------------------------------------------------------
 // Notifications
 // ----------------------------------------------------------------------------
-// The toast component owns its surface entirely. This strips the MDC
-// snackbar's background, padding and elevation so there is no slab behind it.
 .hunter-toast-panel {
   --mdc-snackbar-container-color: transparent;
   --mdc-snackbar-container-shape: 0;
   --mat-snack-bar-button-color: currentColor;
 
-  margin-top: var(--hunter-space-5);
-  min-width: min(420px, calc(100vw - 32px));
-  max-width: min(520px, calc(100vw - 32px));
+  margin-top: var(--hunter-space-4);
+  min-width: min(400px, calc(100vw - 32px));
+  max-width: min(500px, calc(100vw - 32px));
   box-shadow: none;
 
   .mdc-snackbar__surface {
@@ -216,30 +286,49 @@ a {
 }
 
 // ----------------------------------------------------------------------------
-// Status utility classes
+// Status & stage utilities
 // ----------------------------------------------------------------------------
-// Shared by chips, badges and pills so status colour is declared once.
 .hunter-badge {
   display: inline-flex;
   align-items: center;
   gap: var(--hunter-space-1);
-  padding: 3px var(--hunter-space-2);
-  border-radius: var(--hunter-radius-pill);
-  font-size: 0.75rem;
+  padding: 2px var(--hunter-space-2);
+  border-radius: var(--hunter-radius-xs);
+  font-size: 0.6875rem;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.5;
   white-space: nowrap;
   background: var(--hunter-neutral-bg);
   color: var(--hunter-neutral-fg);
   border: 1px solid var(--hunter-neutral-border);
 
-  // Quoted: `teal`/`purple`/`indigo`/`yellow` are CSS colour keywords, and
-  // Sass warns when those are interpolated as bare words.
   @each $tone in ('success', 'error', 'warn', 'info', 'teal', 'purple', 'indigo', 'yellow') {
     &.is-#{$tone} {
       background: var(--hunter-#{$tone}-bg);
       color: var(--hunter-#{$tone}-fg);
       border-color: var(--hunter-#{$tone}-border);
     }
+  }
+}
+
+// Pipeline stage badges. These classes come from
+// HIRING_PROCESS_STATUS_CONFIG.cssClass, so the mapping lives in one place
+// and every screen that renders a stage picks it up automatically.
+$hunter-stages: (
+  'new': 'new',
+  'referred-partner': 'analysis',
+  'referred-internal': 'internal',
+  'screening': 'screening',
+  'technical': 'technical',
+  'client': 'client',
+  'hired': 'hired',
+  'reproved': 'reproved',
+);
+
+@each $class, $stage in $hunter-stages {
+  .status-#{$class} {
+    background-color: var(--hunter-stage-#{$stage}-bg);
+    color: var(--hunter-stage-#{$stage}-fg);
+    border: 1px solid var(--hunter-stage-#{$stage}-border);
   }
 }

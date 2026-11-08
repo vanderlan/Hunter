@@ -155,7 +155,7 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
     }
 
     .analysis-header {
-      background: linear-gradient(135deg, #f5f7fa 0%, #e8f0fe 100%);
+      background: var(--hunter-info-bg);
       padding: 24px;
       border-radius: 8px;
       margin-bottom: 32px;
@@ -221,20 +221,21 @@ import { CvAnalysisDetail } from '../../services/cv-analysis.service';
         height: 100%;
 
         mat-card-header {
-          background: linear-gradient(135deg, #5f1f1f 0%, #81261d 100%);
-          color: white;
-          padding: 20px;
-          border-radius: 5px;
+          background: var(--hunter-surface-variant);
+          color: var(--hunter-text-primary);
+          border-bottom: 1px solid var(--hunter-border);
+          padding: var(--hunter-space-4);
+          border-radius: var(--hunter-radius-md) var(--hunter-radius-md) 0 0;
 
           mat-card-title {
-            color: white;
+            color: var(--hunter-text-primary);
             font-size: 18px;
             font-weight: 500;
             margin: 0;
           }
 
           mat-card-subtitle {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--hunter-text-secondary);
             font-size: 14px;
             margin: 8px 0 0 0;
           }

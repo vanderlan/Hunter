@@ -5,8 +5,8 @@
   <title>Hunter</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark light">
-  <meta name="theme-color" content="#141110">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f8fafc">
   <link rel="icon" type="image/x-icon" href="favicon.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,19 +17,19 @@
 
   <script>
     // Apply the stored theme before first paint to avoid a flash of the
-    // wrong scheme on load.
+    // wrong scheme on load. Light is the default, so only dark needs opting in.
     (function () {
       try {
         var stored = localStorage.getItem('hunter_theme');
-        if (stored === 'light') {
-          document.documentElement.classList.add('hunter-light');
-          document.documentElement.style.colorScheme = 'light';
+        if (stored === 'dark') {
+          document.documentElement.classList.add('hunter-dark');
+          document.documentElement.style.colorScheme = 'dark';
         }
-      } catch (e) { /* storage unavailable; fall back to the dark default */ }
+      } catch (e) { /* storage unavailable; fall back to the light default */ }
     })();
   </script>
 </head>
-<body class="dark-theme">
+<body class="light-theme">
   <app-root></app-root>
 </body>
 </html>

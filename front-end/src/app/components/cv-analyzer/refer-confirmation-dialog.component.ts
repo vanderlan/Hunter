@@ -78,7 +78,7 @@ export interface ReferConfirmationData {
         font-size: 32px;
         width: 32px;
         height: 32px;
-        color: #ff9800;
+        color: var(--hunter-warn-fg);
       }
 
       h2 {

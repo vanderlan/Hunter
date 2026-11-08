@@ -103,7 +103,7 @@ export interface CancelConfirmationResult {
         font-size: 32px;
         width: 32px;
         height: 32px;
-        color: #f44336;
+        color: var(--hunter-error-fg);
       }
 
       h2 {
@@ -173,13 +173,13 @@ export interface CancelConfirmationResult {
         line-height: 1.5;
         color: var(--hunter-warn-fg);
         margin: 0 0 20px;
-        border-left: 3px solid #ff9800;
+        border-left: 3px solid var(--hunter-warn-fg);
 
         .warning-icon-small {
           font-size: 20px;
           width: 20px;
           height: 20px;
-          color: #ff9800;
+          color: var(--hunter-warn-fg);
           flex-shrink: 0;
           margin-top: 2px;
         }

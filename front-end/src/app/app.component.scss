@@ -22,15 +22,17 @@
 // Sidebar Styles
 .app-sidenav {
   width: var(--hunter-sidenav-width);
-  background: var(--hunter-brand-gradient);
-  color: #ffffff;
+  // Navigation is chrome, so it is near-colourless. The accent appears only
+  // on the active item. Separation is a hairline, not a shadow.
+  background: var(--hunter-surface);
+  color: var(--hunter-text-primary);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  transition: width var(--hunter-duration-slow) var(--hunter-ease);
+  box-shadow: none;
 
   &.mat-drawer-side {
-    border-right: none;
+    border-right: 1px solid var(--hunter-border);
   }
 }
 
@@ -44,8 +46,11 @@
 
 // Sidebar Header (Brand)
 .sidenav-header {
-  padding: 20px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0 var(--hunter-space-3);
+  height: var(--hunter-topbar-height);
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--hunter-border);
 
   .brand-container {
     display: flex;
@@ -59,15 +64,16 @@
     }
 
     .brand-icon {
-      width: 32px;
-      height: 32px;
+      width: 24px;
+      height: 24px;
       object-fit: contain;
       flex-shrink: 0;
     }
 
     .brand-text {
-      font-size: 20px;
-      font-weight: 600;
+      font-size: 0.9375rem;
+      font-weight: 640;
+      letter-spacing: -0.01em;
       white-space: nowrap;
       animation: fadeIn 0.3s;
     }
@@ -86,44 +92,47 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--hunter-border-strong);
     border-radius: 3px;
   }
 
   .section-label {
-    padding: 16px 16px 8px 16px;
-    font-size: 11px;
+    padding: var(--hunter-space-5) var(--hunter-space-3) var(--hunter-space-1);
+    font-size: 0.6875rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.055em;
+    color: var(--hunter-text-hint);
     animation: fadeIn 0.3s;
     text-align: left;
   }
 
   .nav-item {
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 16px;
-    padding: 12px 16px;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
+    gap: var(--hunter-space-3);
+    padding: 0 var(--hunter-space-3);
+    height: var(--hunter-control-height);
+    margin: 1px var(--hunter-space-2);
+    width: auto;
+    color: var(--hunter-text-secondary);
+    font-size: 0.8125rem;
     font-weight: 500;
     text-align: left;
-    border-radius: 0;
-    transition: all 0.2s;
+    border-radius: var(--hunter-radius-sm);
+    transition: background var(--hunter-duration-fast) var(--hunter-ease),
+                color var(--hunter-duration-fast) var(--hunter-ease);
     position: relative;
 
     mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
       flex-shrink: 0;
     }
 
@@ -133,29 +142,23 @@
     }
 
     &:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: white;
+      background: var(--hunter-surface-hover);
+      color: var(--hunter-text-primary);
     }
 
+    // The accent earns its keep here and almost nowhere else in the chrome.
     &.active {
-      background: rgba(255, 255, 255, 0.12);
-      color: white;
+      background: var(--hunter-brand-tint);
+      color: var(--hunter-brand);
+      font-weight: 600;
 
-      &::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 3px;
-        background: var(--hunter-surface);
-      }
+      mat-icon { color: var(--hunter-brand); }
     }
   }
 
   mat-divider {
-    margin: 12px 0;
-    background: rgba(255, 255, 255, 0.12);
+    margin: var(--hunter-space-2) var(--hunter-space-3);
+    border-top-color: var(--hunter-border);
   }
 }
 
@@ -178,13 +181,13 @@
   border-bottom: 1px solid var(--hunter-border);
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 0 var(--hunter-space-4);
+  gap: var(--hunter-space-3);
+  box-shadow: none;
   z-index: 10;
 
   .toggle-button {
-    color: var(--hunter-brand);
+    color: var(--hunter-text-secondary);
 
     mat-icon {
       font-size: 24px;
@@ -194,8 +197,9 @@
   }
 
   .page-title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 0.9375rem;
+    font-weight: 640;
+    letter-spacing: -0.01em;
     color: var(--hunter-text-primary);
   }
 
@@ -274,7 +278,7 @@
 
   .top-bar {
     .page-title {
-      font-size: 18px;
+      font-size: 0.875rem;
     }
   }
 }

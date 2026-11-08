@@ -89,7 +89,7 @@ export interface CandidateDeleteDialogData {
       display: flex;
       align-items: center;
       gap: 12px;
-      color: #f44336;
+      color: var(--hunter-error-fg);
       margin: 0 0 20px 0;
       padding: 0;
       font-size: 20px;
@@ -97,7 +97,7 @@ export interface CandidateDeleteDialogData {
     }
 
     .warning-icon {
-      color: #f44336;
+      color: var(--hunter-error-fg);
       font-size: 28px;
       width: 28px;
       height: 28px;
@@ -129,20 +129,20 @@ export interface CandidateDeleteDialogData {
 
     .warning-box {
       background-color: var(--hunter-warn-bg);
-      border-left: 4px solid #ff9800;
+      border-left: 4px solid var(--hunter-warn-fg);
     }
 
     .warning-box mat-icon {
-      color: #ff9800;
+      color: var(--hunter-warn-fg);
     }
 
     .info-box {
       background-color: var(--hunter-info-bg);
-      border-left: 4px solid #2196f3;
+      border-left: 4px solid var(--hunter-info-fg);
     }
 
     .info-box mat-icon {
-      color: #2196f3;
+      color: var(--hunter-info-fg);
     }
 
     .warning-box mat-icon,
