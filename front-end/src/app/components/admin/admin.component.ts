@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -20,6 +20,7 @@ import { NotificationService } from '../../services/notification.service';
     MatSnackBarModule
 ],
     templateUrl: './admin.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './admin.component.scss'
 })
 export class AdminComponent {

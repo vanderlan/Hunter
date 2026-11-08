@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -39,6 +39,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
         MatCheckboxModule
     ],
     templateUrl: './user-management.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './user-management.component.scss'
 })
 export class UserManagementComponent implements OnInit {

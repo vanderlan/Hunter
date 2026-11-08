@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -37,6 +37,7 @@ import { HiringProcess, HiringProcessStatus, HiringProcessStatusHelper } from '.
         FormsModule
     ],
     templateUrl: './hiring-process-detail.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './hiring-process-detail.component.scss'
 })
 export class HiringProcessDetailComponent implements OnInit {

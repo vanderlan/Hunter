@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -22,6 +22,7 @@ import { NotificationService } from '../../services/notification.service';
     MatProgressSpinnerModule
 ],
     templateUrl: './preferences.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './preferences.component.scss'
 })
 export class PreferencesComponent implements OnInit {

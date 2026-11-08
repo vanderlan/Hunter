@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -25,6 +25,7 @@ import { NotificationService } from '../../services/notification.service';
     MatSnackBarModule
 ],
     templateUrl: './change-password.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './change-password.component.scss'
 })
 export class ChangePasswordComponent implements OnInit {

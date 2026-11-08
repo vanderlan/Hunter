@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -42,6 +42,7 @@ import { PriorityBadgeComponent } from '../shared/priority-badge.component';
     PriorityBadgeComponent
 ],
     templateUrl: './job-positions.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './job-positions.component.scss'
 })
 export class JobPositionsComponent implements OnInit {

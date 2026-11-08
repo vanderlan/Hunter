@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -30,6 +30,7 @@ import { PriorityBadgeComponent } from '../shared/priority-badge.component';
     PriorityBadgeComponent
 ],
     templateUrl: './open-positions.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './open-positions.component.scss'
 })
 export class OpenPositionsComponent implements OnInit, OnDestroy {

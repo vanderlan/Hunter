@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -46,6 +46,7 @@ import { PriorityBadgeComponent } from '../shared/priority-badge.component';
         PriorityBadgeComponent
     ],
     templateUrl: './cv-analyzer.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './cv-analyzer.component.scss'
 })
 export class CvAnalyzerComponent implements OnInit {

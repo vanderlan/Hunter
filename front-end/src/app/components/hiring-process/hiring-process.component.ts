@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -36,6 +36,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
         FormsModule
     ],
     templateUrl: './hiring-process.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './hiring-process.component.scss'
 })
 export class HiringProcessComponent implements OnInit {

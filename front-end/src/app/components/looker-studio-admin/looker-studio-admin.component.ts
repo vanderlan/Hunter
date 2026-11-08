@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -30,6 +30,7 @@ import { NotificationService } from '../../services/notification.service';
     MatDividerModule
   ],
   templateUrl: './looker-studio-admin.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './looker-studio-admin.component.scss'
 })
 export class LookerStudioAdminComponent implements OnInit {

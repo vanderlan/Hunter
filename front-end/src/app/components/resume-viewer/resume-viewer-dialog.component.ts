@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +21,7 @@ export interface ResumeViewerData {
     MatProgressSpinnerModule
 ],
     templateUrl: './resume-viewer-dialog.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './resume-viewer-dialog.component.scss'
 })
 export class ResumeViewerDialogComponent {

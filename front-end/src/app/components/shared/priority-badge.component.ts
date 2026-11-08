@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       </mat-chip>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     mat-chip {
       font-weight: 500;
