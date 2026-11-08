@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>{{EmailTitle}}</title>
+    <!--
+        Hunter email layout — the single source of truth for email styling.
+        Every template is a content fragment rendered into {{Content}} below.
+
+        Palette is kept in sync by hand with front-end/src/styles/_tokens.scss.
+        Email deliberately uses literal hex rather than CSS custom properties:
+        Outlook's Word rendering engine does not support var().
+    -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            background-color: #f7efed;
+            color: #1e1b1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        table { border-collapse: collapse; }
+        img { border: 0; line-height: 100%; vertical-align: middle; }
+        a { color: #a23d33; }
+
+        .email-outer {
+            width: 100%;
+            background-color: #f7efed;
+            padding: 24px 12px;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #e9e1df;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        /* --- Header: the one brand gradient, shared with app sidebar/login --- */
+        .header {
+            background: #82261e;
+            background: linear-gradient(135deg, #82261e 0%, #4f0d08 100%);
+            color: #ffffff;
+            padding: 36px 32px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 650;
+            letter-spacing: -0.3px;
+            color: #ffffff;
+        }
+        .header p {
+            margin: 8px 0 0 0;
+            font-size: 14px;
+            color: #ffffff;
+            opacity: 0.82;
+        }
+
+        .content { padding: 32px; }
+
+        /* --- Sections --- */
+        .section { margin-bottom: 28px; }
+        .section-title {
+            color: #1e1b1a;
+            font-size: 16px;
+            font-weight: 650;
+            letter-spacing: -0.2px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9e1df;
+        }
+        .section-subtitle {
+            color: #625d5c;
+            font-size: 13px;
+            margin: 0 0 12px 0;
+        }
+        .section-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        /* --- Detail rows --- */
+        .detail-row {
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            background-color: #faf2f0;
+            border: 1px solid #e9e1df;
+            border-left: 3px solid #a23d33;
+            border-radius: 10px;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #1e1b1a;
+            display: inline-block;
+            min-width: 110px;
+        }
+        .detail-value { color: #625d5c; }
+
+        /* --- Callouts: one shape, four tones, matching the app's status tokens --- */
+        .info-box, .notes-box, .warning-box, .summary-box,
+        .highlight-box, .credentials-box, .empty-state,
+        .status-change-box, .referral-reason, .cancel-reason, .note-content {
+            padding: 18px;
+            margin: 0 0 20px 0;
+            border-radius: 12px;
+            border: 1px solid #c2d8f7;
+            border-left: 4px solid #1a5fb4;
+            background-color: #e7f0fd;
+            color: #1e1b1a;
+        }
+        .info-box h3, .info-box h4,
+        .status-change-box h3,
+        .note-content h4 { margin: 0 0 10px 0; font-size: 15px; font-weight: 650; color: #1a5fb4; }
+
+        .notes-box, .highlight-box {
+            background-color: #fdf1dd;
+            border-color: #f0d7a8;
+            border-left-color: #8a5300;
+        }
+        .notes-box h4, .highlight-box h4 { margin: 0 0 10px 0; font-size: 15px; font-weight: 650; color: #8a5300; }
+
+        .warning-box, .cancel-reason {
+            background-color: #fdeaea;
+            border-color: #f3c4c1;
+            border-left-color: #b3261e;
+        }
+        .warning-box h3, .warning-box h4,
+        .cancel-reason h4 { margin: 0 0 10px 0; font-size: 15px; font-weight: 650; color: #b3261e; }
+
+        .summary-box, .referral-reason {
+            background-color: #e6f4ea;
+            border-color: #b7dfc4;
+            border-left-color: #1b6b3a;
+        }
+        .summary-box h3, .referral-reason h4 { margin: 0 0 10px 0; font-size: 15px; font-weight: 650; color: #1b6b3a; }
+
+        .credentials-box, .empty-state {
+            background-color: #faf2f0;
+            border-color: #e9e1df;
+            border-left-color: #a23d33;
+        }
+        .empty-state { text-align: center; color: #625d5c; }
+
+        .info-box p, .notes-box p, .warning-box p, .summary-box p,
+        .highlight-box p, .credentials-box p, .referral-reason p,
+        .cancel-reason p, .note-content p { margin: 0; font-size: 14px; line-height: 1.6; }
+
+        /* --- Status flow --- */
+        .status-change-box { text-align: center; }
+        .status-flow { margin: 14px 0 0 0; }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #ffffff;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 13px;
+            margin: 0 4px;
+        }
+        .status-badge.old { color: #625d5c; border: 1px solid #ccc5c3; }
+        .status-badge.new { color: #1a5fb4; border: 1px solid #1a5fb4; }
+        .status-arrow { font-size: 18px; color: #1a5fb4; font-weight: 700; margin: 0 6px; }
+
+        /* --- Notes --- */
+        .note-header { margin-bottom: 8px; }
+        .note-icon { margin-right: 6px; }
+        .note-author { font-weight: 600; color: #1e1b1a; font-size: 14px; }
+        .note-text { color: #1e1b1a; font-size: 14px; line-height: 1.6; margin: 0; }
+
+        /* --- Job + candidate lists --- */
+        .job-list { margin: 0; padding: 0; list-style: none; }
+        .job-item {
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background-color: #ffffff;
+            border: 1px solid #e9e1df;
+            border-left: 4px solid #a23d33;
+            border-radius: 12px;
+        }
+        .job-item.new { border-left-color: #1b6b3a; }
+        .job-item.closed { border-left-color: #b3261e; }
+        .job-item-icon { margin-right: 8px; }
+        .job-item-title-link { color: #1e1b1a; font-weight: 600; text-decoration: none; }
+        .job-item-title-link:hover { text-decoration: underline; }
+
+        .position-section { margin-bottom: 28px; }
+        .position-header {
+            font-size: 16px;
+            font-weight: 650;
+            color: #1e1b1a;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid #e9e1df;
+        }
+        .candidates-container { margin: 0; }
+        .candidate-card {
+            padding: 16px;
+            margin-bottom: 10px;
+            background-color: #ffffff;
+            border: 1px solid #e9e1df;
+            border-radius: 12px;
+        }
+        .candidate-header { margin-bottom: 8px; }
+        .candidate-name { font-weight: 650; color: #1e1b1a; font-size: 15px; }
+        .candidate-info { color: #625d5c; font-size: 13px; }
+        .match-reason { color: #625d5c; font-size: 13px; line-height: 1.6; margin: 8px 0 0 0; }
+        .more-candidates { color: #625d5c; font-size: 13px; text-align: center; margin-top: 12px; }
+
+        /* Match badges reuse the status palette */
+        .match-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: #eee6e4;
+            color: #625d5c;
+            border: 1px solid #e0d8d6;
+        }
+        .match-badge.high, .match-badge.excellent {
+            background-color: #e6f4ea; color: #1b6b3a; border-color: #b7dfc4;
+        }
+        .match-badge.medium, .match-badge.good {
+            background-color: #fdf1dd; color: #8a5300; border-color: #f0d7a8;
+        }
+        .match-badge.low {
+            background-color: #fdeaea; color: #b3261e; border-color: #f3c4c1;
+        }
+
+        /* --- Welcome features --- */
+        .welcome-message { font-size: 15px; color: #1e1b1a; margin-bottom: 20px; }
+        .features-section { margin: 20px 0; }
+        .feature-item {
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            background-color: #faf2f0;
+            border: 1px solid #e9e1df;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .emoji-icon { margin-right: 8px; }
+
+        /* --- CTA --- */
+        .cta-section { text-align: center; margin-top: 28px; }
+        .cta-button {
+            display: inline-block;
+            padding: 13px 28px;
+            background-color: #82261e;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background-color: #faf2f0;
+            border-top: 1px solid #e9e1df;
+            color: #625d5c;
+            padding: 24px 32px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer p { margin: 4px 0; }
+        .footer .footer-brand { color: #1e1b1a; font-weight: 650; font-size: 14px; }
+
+        /* ------------------------------------------------------------------
+           Dark mode — same tokens, dark surfaces. Honoured by Apple Mail,
+           iOS Mail and Outlook.com; other clients keep the light treatment.
+           ------------------------------------------------------------------ */
+        @media (prefers-color-scheme: dark) {
+            body, .email-outer { background-color: #100e0d !important; color: #e9e1df !important; }
+            .email-container { background-color: #1e1b1a !important; border-color: #3f3b39 !important; }
+            .header { background: #630f0a !important; background: linear-gradient(135deg, #630f0a 0%, #2a0604 100%) !important; }
+
+            .section-title, .position-header { color: #e9e1df !important; border-bottom-color: #3f3b39 !important; }
+            .section-subtitle, .detail-value, .candidate-info, .match-reason,
+            .more-candidates, .empty-state, .footer { color: #b0aaa8 !important; }
+            .detail-label, .note-author, .note-text, .candidate-name,
+            .welcome-message, .footer .footer-brand { color: #e9e1df !important; }
+
+            .detail-row, .feature-item, .credentials-box, .empty-state {
+                background-color: #221f1e !important; border-color: #3f3b39 !important;
+            }
+            .job-item, .candidate-card, .status-badge {
+                background-color: #221f1e !important; border-color: #3f3b39 !important;
+            }
+            .footer { background-color: #161312 !important; border-top-color: #3f3b39 !important; }
+
+            .info-box, .status-change-box, .note-content {
+                background-color: #11203a !important; border-color: #23406e !important; color: #e9e1df !important;
+            }
+            .info-box h3, .info-box h4, .status-change-box h3, .note-content h4,
+            .status-badge.new, .status-arrow { color: #9cc4fa !important; }
+            .status-badge.new { border-color: #9cc4fa !important; }
+
+            .notes-box, .highlight-box {
+                background-color: #2c2008 !important; border-color: #54400f !important; color: #e9e1df !important;
+            }
+            .notes-box h4, .highlight-box h4 { color: #f0c070 !important; }
+
+            .warning-box, .cancel-reason {
+                background-color: #2f1414 !important; border-color: #5c2320 !important; color: #e9e1df !important;
+            }
+            .warning-box h3, .warning-box h4, .cancel-reason h4 { color: #f2b8b5 !important; }
+
+            .summary-box, .referral-reason {
+                background-color: #10291a !important; border-color: #1f4d31 !important; color: #e9e1df !important;
+            }
+            .summary-box h3, .referral-reason h4 { color: #7fd99f !important; }
+
+            .job-item-title-link { color: #e9e1df !important; }
+            .status-badge.old { color: #b0aaa8 !important; border-color: #565150 !important; }
+            a { color: #ff8a7b !important; }
+            .cta-button { background-color: #a23d33 !important; color: #ffffff !important; }
+
+            .match-badge { background-color: #33302e !important; color: #b0aaa8 !important; border-color: #4a4644 !important; }
+            .match-badge.high, .match-badge.excellent { background-color: #10291a !important; color: #7fd99f !important; border-color: #1f4d31 !important; }
+            .match-badge.medium, .match-badge.good { background-color: #2c2008 !important; color: #f0c070 !important; border-color: #54400f !important; }
+            .match-badge.low { background-color: #2f1414 !important; color: #f2b8b5 !important; border-color: #5c2320 !important; }
+        }
+
+        @media only screen and (max-width: 600px) {
+            .content { padding: 24px 20px; }
+            .header { padding: 28px 20px; }
+            .footer { padding: 20px; }
+            .detail-label { min-width: 0; display: block; margin-bottom: 2px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-outer">
+        <div class="email-container">
+            <div class="header">
+                <h1>{{EmailTitle}}</h1>
+                <p>{{EmailSubtitle}}</p>
+            </div>
+
+            <div class="content">
+{{Content}}
+            </div>
+
+            <div class="footer">
+                <p class="footer-brand">Hunter</p>
+                <p>AI-Powered Candidate Matching Platform</p>
+                <p>This is an automated email. Please do not reply.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

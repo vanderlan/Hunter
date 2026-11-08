@@ -38,9 +38,18 @@ export class ThemeService {
     if (typeof document === 'undefined') {
       return;
     }
-    // Dark is the baseline (tokens live on <body>); light-theme is the opt-in override.
+    // The whole theme resolves from the CSS `color-scheme` property: Material's
+    // system tokens and our own are emitted as light-dark() pairs, so toggling
+    // this one class repaints both without shipping a second stylesheet.
+    document.documentElement.classList.toggle('hunter-light', !isDark);
+
+    // Kept in sync for any consumer that still keys off the body class.
     document.body.classList.toggle('dark-theme', isDark);
     document.body.classList.toggle('light-theme', !isDark);
+
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', isDark ? '#141110' : '#fff8f6');
   }
 
   private getStoredTheme(): HunterTheme {

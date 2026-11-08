@@ -1,0 +1,201 @@
+<div class="style-guide">
+
+  <header class="sg-header">
+    <div>
+      <h1>Hunter Design Language</h1>
+      <p>
+        Every value below is read live from <code>styles/_tokens.scss</code>.
+        Build new screens from these tokens — never from raw hex.
+      </p>
+    </div>
+    <button mat-stroked-button (click)="toggleTheme()">
+      <mat-icon>{{ theme.isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      {{ theme.isDark ? 'Light' : 'Dark' }} scheme
+    </button>
+  </header>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Surfaces</h2>
+    <p class="sg-note">A tonal ramp. Each step is an elevation plane, not a flat grey.</p>
+    <div class="swatch-grid">
+      @for (s of surfaces; track s.token) {
+        <div class="swatch">
+          <div class="swatch__chip" [style.background]="'var(' + s.token + ')'"></div>
+          <span class="swatch__name">{{ s.name }}</span>
+          <code class="swatch__token">{{ s.token }}</code>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Brand</h2>
+    <div class="swatch-grid">
+      @for (s of brand; track s.token) {
+        <div class="swatch">
+          <div class="swatch__chip" [style.background]="'var(' + s.token + ')'"></div>
+          <span class="swatch__name">{{ s.name }}</span>
+          <code class="swatch__token">{{ s.token }}</code>
+        </div>
+      }
+      <div class="swatch">
+        <div class="swatch__chip" style="background: var(--hunter-brand-gradient)"></div>
+        <span class="swatch__name">brand-gradient</span>
+        <code class="swatch__token">--hunter-brand-gradient</code>
+      </div>
+    </div>
+    <p class="sg-note">
+      The gradient is the single brand ramp — sidebar, login and the email
+      header all reference it. Do not hand-roll another one.
+    </p>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Status palette</h2>
+    <p class="sg-note">
+      Chips, badges, callouts and toasts all draw from these. One meaning,
+      one colour, everywhere.
+    </p>
+    <div class="status-grid">
+      @for (tone of statuses; track tone) {
+        <div class="status-demo"
+             [style.background]="'var(--hunter-' + tone + '-bg)'"
+             [style.color]="'var(--hunter-' + tone + '-fg)'"
+             [style.border-color]="'var(--hunter-' + tone + '-border)'">
+          <strong>{{ tone }}</strong>
+          <code>--hunter-{{ tone }}-*</code>
+        </div>
+      }
+    </div>
+
+    <h3>Badges</h3>
+    <div class="row">
+      @for (tone of statuses; track tone) {
+        <span class="hunter-badge" [class]="'is-' + tone">{{ tone }}</span>
+      }
+      <span class="hunter-badge">neutral</span>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Typography</h2>
+    <p class="sg-note">Inter across the whole product — UI chrome and body copy alike.</p>
+    <div class="type-list">
+      @for (t of typeScale; track t.cls) {
+        <div class="type-row">
+          <span class="type-row__label">{{ t.label }}</span>
+          <span [class]="t.cls">{{ t.sample }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Space scale</h2>
+    <p class="sg-note">4px base. Use the token, not a magic number.</p>
+    <div class="scale-list">
+      @for (n of spacing; track n) {
+        <div class="scale-row">
+          <code>--hunter-space-{{ n }}</code>
+          <div class="scale-bar" [style.width]="'var(--hunter-space-' + n + ')'"></div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Shape &amp; elevation</h2>
+    <div class="row">
+      @for (r of radii; track r) {
+        <div class="shape-demo" [style.border-radius]="'var(--hunter-radius-' + r + ')'">
+          <code>{{ r }}</code>
+        </div>
+      }
+    </div>
+    <div class="row row--roomy">
+      @for (s of shadows; track s) {
+        <div class="shadow-demo" [style.box-shadow]="'var(--hunter-shadow-' + s + ')'">
+          <code>shadow-{{ s }}</code>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Notifications</h2>
+    <p class="sg-note">
+      Soft tinted surfaces built from the status tokens above, with real
+      Material icons and a dismiss affordance.
+    </p>
+    <div class="row">
+      <button mat-flat-button (click)="toast('success')">Success</button>
+      <button mat-flat-button (click)="toast('error')">Error</button>
+      <button mat-flat-button (click)="toast('warning')">Warning</button>
+      <button mat-flat-button (click)="toast('info')">Info</button>
+    </div>
+    <p class="sg-note">Last fired: <code>{{ lastToast() }}</code></p>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Controls</h2>
+    <div class="row row--roomy">
+      <button mat-flat-button>Primary</button>
+      <button mat-stroked-button>Secondary</button>
+      <button mat-button>Tertiary</button>
+      <button mat-icon-button matTooltip="Icon button"><mat-icon>more_vert</mat-icon></button>
+      <button mat-flat-button disabled>Disabled</button>
+    </div>
+
+    <div class="row row--roomy">
+      <mat-form-field appearance="outline">
+        <mat-label>Candidate name</mat-label>
+        <input matInput placeholder="Ana Ribeiro">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Stage</mat-label>
+        <mat-select>
+          <mat-option value="screening">Screening</mat-option>
+          <mat-option value="interview">Interview</mat-option>
+          <mat-option value="offer">Offer</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="row row--roomy">
+      <mat-checkbox checked>Include archived</mat-checkbox>
+      <mat-slide-toggle checked>Email alerts</mat-slide-toggle>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- -->
+  <section class="sg-section">
+    <h2>Cards</h2>
+    <div class="row row--roomy">
+      <mat-card class="demo-card">
+        <mat-card-header>
+          <mat-card-title>Senior Backend Engineer</mat-card-title>
+          <mat-card-subtitle>Remote · 14 candidates</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Cards sit on <code>--hunter-surface</code> with a hairline border
+             and <code>--hunter-shadow-sm</code>.</p>
+          <span class="hunter-badge is-success">Open</span>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button>Dismiss</button>
+          <button mat-flat-button>Review</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </section>
+
+</div>

@@ -81,7 +81,7 @@
   .provider-card {
     margin-bottom: 24px;
     background: var(--hunter-surface);
-    border-left: 4px solid #6d2932;
+    border-left: 4px solid var(--hunter-brand);
 
     mat-card-header {
       mat-card-title {
@@ -243,7 +243,7 @@
 
           &:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--hunter-brand);
             box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
           }
 

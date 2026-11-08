@@ -74,25 +74,25 @@
 
     &.status-active {
       background-color: var(--hunter-success-bg);
-      border-color: #4caf50;
+      border-color: var(--hunter-success-fg);
       color: var(--hunter-success-fg);
     }
 
     &.status-warning {
       background-color: var(--hunter-warn-bg);
-      border-color: #ff9800;
+      border-color: var(--hunter-warn-fg);
       color: var(--hunter-warn-fg);
     }
 
     &.status-expired {
       background-color: var(--hunter-error-bg);
-      border-color: #f44336;
+      border-color: var(--hunter-error-fg);
       color: var(--hunter-error-fg);
     }
 
     &.status-none {
       background-color: var(--hunter-surface-variant);
-      border-color: #9e9e9e;
+      border-color: var(--hunter-neutral-border);
       color: var(--hunter-text-secondary);
     }
   }
@@ -146,18 +146,18 @@
         margin-top: 1rem;
         padding: 1rem;
         background-color: var(--hunter-info-bg);
-        border-left: 4px solid #2196f3;
+        border-left: 4px solid var(--hunter-info-fg);
         border-radius: 4px;
 
         mat-icon {
-          color: #2196f3;
+          color: var(--hunter-info-fg);
           flex-shrink: 0;
         }
 
         div {
           flex: 1;
           font-size: 0.9rem;
-          color: #1565c0;
+          color: var(--hunter-info-fg);
 
           strong {
             display: block;
@@ -240,7 +240,7 @@
     padding: 1rem;
     background-color: var(--hunter-warn-bg);
     border-radius: 8px;
-    border-left: 4px solid #ff9800;
+    border-left: 4px solid var(--hunter-warn-fg);
   }
 }
 

@@ -1,370 +1,245 @@
-@use '@angular/material' as mat;
-
-@include mat.elevation-classes();
-@include mat.app-background();
-
 // ============================================================================
-// Brand palette
+// Hunter — global stylesheet
+// ----------------------------------------------------------------------------
+// Keep this file thin. It wires up the design language, applies resets and
+// themes third-party widgets. Everything colour-related lives in
+// `styles/_tokens.scss`; component styles consume `--hunter-*` tokens only.
 // ============================================================================
-$hunter-custom-primary: (
-  50: #fce4e4,
-  100: #f7bbbb,
-  200: #f18e8e,
-  300: #eb6161,
-  400: #e73f3f,
-  500: #b13a2f,
-  600: #a03329,
-  700: #8a2c23,
-  800: #74251d,
-  900: #5f1f1f,
-  A100: #ff8a80,
-  A200: #ff5252,
-  A400: #ff1744,
-  A700: #d50000,
-  contrast: (
-    50: rgba(black, 0.87),
-    100: rgba(black, 0.87),
-    200: rgba(black, 0.87),
-    300: white,
-    400: white,
-    500: white,
-    600: white,
-    700: white,
-    800: white,
-    900: white,
-    A100: rgba(black, 0.87),
-    A200: white,
-    A400: white,
-    A700: white,
-  )
-);
 
-// Dark surfaces need a lighter brand hue for contrast; light surfaces keep the deep red.
-$hunter-dark-primary: mat.m2-define-palette($hunter-custom-primary, 400, 300, 600);
-$hunter-dark-accent: mat.m2-define-palette($hunter-custom-primary, 300, 200, 500);
-$hunter-light-primary: mat.m2-define-palette($hunter-custom-primary, 900, 500, 700);
-$hunter-light-accent: mat.m2-define-palette($hunter-custom-primary, 500, 300, 700);
-$hunter-warn: mat.m2-define-palette(mat.$m2-red-palette);
+@use './styles/tokens';
 
-$hunter-typography: mat.m2-define-typography-config();
-
-// Dark theme (default)
-$hunter-dark-theme: mat.m2-define-dark-theme((
-  color: (
-    primary: $hunter-dark-primary,
-    accent: $hunter-dark-accent,
-    warn: $hunter-warn,
-  ),
-  typography: $hunter-typography,
-  density: 0,
-));
-
-// Light theme (opt-in via body.light-theme)
-$hunter-light-theme: mat.m2-define-light-theme((
-  color: (
-    primary: $hunter-light-primary,
-    accent: $hunter-light-accent,
-    warn: $hunter-warn,
-  ),
-  typography: $hunter-typography,
-  density: 0,
-));
-
-// Dark is the default: full theme (structure + typography + color) once, globally.
-@include mat.all-component-themes($hunter-dark-theme);
-
-// ============================================================================
-// Design tokens
-// Components reference these instead of hardcoded colors so they adapt to
-// both themes. Dark values live on <body>; body.light-theme overrides them.
-// ============================================================================
-body {
-  color-scheme: dark;
-
-  --hunter-bg: #121212;                       // app canvas
-  --hunter-surface: #1e1e1e;                  // cards, top bar, tables, dialogs
-  --hunter-surface-variant: #262626;          // table headers, panels, drop zones
-  --hunter-surface-hover: #2e2e2e;            // hover rows, neutral chips
-  --hunter-border: rgba(255, 255, 255, 0.12);
-
-  --hunter-text-primary: rgba(255, 255, 255, 0.92);
-  --hunter-text-secondary: rgba(255, 255, 255, 0.64);
-  --hunter-text-hint: rgba(255, 255, 255, 0.40);
-
-  --hunter-brand: #eb6161;                    // brand hue for text/icons/accents
-  --hunter-brand-tint: rgba(235, 97, 97, 0.12);
-
-  // Status tints: translucent fills + lifted foregrounds for dark surfaces
-  --hunter-info-bg: rgba(100, 181, 246, 0.16);    --hunter-info-fg: #64b5f6;
-  --hunter-purple-bg: rgba(206, 147, 216, 0.16);  --hunter-purple-fg: #ce93d8;
-  --hunter-indigo-bg: rgba(159, 168, 218, 0.16);  --hunter-indigo-fg: #9fa8da;
-  --hunter-warn-bg: rgba(255, 183, 77, 0.16);     --hunter-warn-fg: #ffb74d;
-  --hunter-teal-bg: rgba(77, 182, 172, 0.16);     --hunter-teal-fg: #4db6ac;
-  --hunter-yellow-bg: rgba(255, 213, 79, 0.16);   --hunter-yellow-fg: #ffd54f;
-  --hunter-success-bg: rgba(129, 199, 132, 0.16); --hunter-success-fg: #81c784;
-  --hunter-error-bg: rgba(239, 154, 154, 0.16);   --hunter-error-fg: #ef9a9a;
-}
-
-body.light-theme {
-  color-scheme: light;
-
-  --hunter-bg: #f5f5f5;
-  --hunter-surface: #ffffff;
-  --hunter-surface-variant: #f5f5f5;
-  --hunter-surface-hover: #e0e0e0;
-  --hunter-border: #e0e0e0;
-
-  --hunter-text-primary: #333333;
-  --hunter-text-secondary: #666666;
-  --hunter-text-hint: #999999;
-
-  --hunter-brand: #5f1f1f;
-  --hunter-brand-tint: rgba(95, 31, 31, 0.06);
-
-  --hunter-info-bg: #e3f2fd;    --hunter-info-fg: #1976d2;
-  --hunter-purple-bg: #f3e5f5;  --hunter-purple-fg: #7b1fa2;
-  --hunter-indigo-bg: #e8eaf6;  --hunter-indigo-fg: #3f51b5;
-  --hunter-warn-bg: #fff3e0;    --hunter-warn-fg: #f57c00;
-  --hunter-teal-bg: #e0f2f1;    --hunter-teal-fg: #00897b;
-  --hunter-yellow-bg: #fff9c4;  --hunter-yellow-fg: #f9a825;
-  --hunter-success-bg: #e8f5e9; --hunter-success-fg: #2e7d32;
-  --hunter-error-bg: #ffebee;   --hunter-error-fg: #c62828;
-
-  // Swap only the color layer for Material components
-  @include mat.all-component-colors($hunter-light-theme);
-}
-
-* {
+// ----------------------------------------------------------------------------
+// Reset
+// ----------------------------------------------------------------------------
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+html {
+  // Dark is the default scheme; ThemeService flips this to `light`.
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+html.hunter-light {
+  color-scheme: light;
 }
 
 body {
-  margin: 0;
+  // One typeface across the whole product. Material's own components inherit
+  // this through the typography config in the token sheet, so button labels
+  // and body copy finally render in the same family.
+  font-family: var(--mat-sys-body-medium-font, 'Inter', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  font-size: 0.9375rem;
+  line-height: 1.5;
   background-color: var(--hunter-bg);
   color: var(--hunter-text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color var(--hunter-duration-slow) var(--hunter-ease),
+              color var(--hunter-duration-slow) var(--hunter-ease);
+}
 
-  .app-content {
-    background-color: var(--hunter-bg);
+.app-content {
+  background-color: var(--hunter-bg);
+}
+
+// Headings use the brand family with tighter tracking.
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  line-height: 1.25;
+  color: var(--hunter-text-primary);
+}
+
+a {
+  color: var(--hunter-brand);
+  text-decoration-color: color-mix(in srgb, var(--hunter-brand) 40%, transparent);
+  text-underline-offset: 2px;
+
+  &:hover {
+    text-decoration-color: currentColor;
   }
 }
 
-// Quill editor (quill.snow.css ships light-only)
+// Consistent, visible keyboard focus across the whole app.
+:focus-visible {
+  outline: 2px solid var(--hunter-brand);
+  outline-offset: 2px;
+}
+
+// ----------------------------------------------------------------------------
+// Scrollbars — themed rather than OS-default, which looked foreign in dark mode
+// ----------------------------------------------------------------------------
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hunter-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hunter-border-strong);
+  border-radius: var(--hunter-radius-pill);
+  border: 2px solid transparent;
+  background-clip: content-box;
+
+  &:hover {
+    background: var(--hunter-text-hint);
+    background-clip: content-box;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Material component adjustments
+// ----------------------------------------------------------------------------
+.mat-mdc-card {
+  border-radius: var(--hunter-radius-md);
+  border: 1px solid var(--hunter-border);
+  box-shadow: var(--hunter-shadow-sm);
+}
+
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 550;
+  border-radius: var(--hunter-radius-sm);
+}
+
+.mat-mdc-dialog-surface {
+  border-radius: var(--hunter-radius-lg);
+  box-shadow: var(--hunter-shadow-xl);
+}
+
+.mat-mdc-menu-panel,
+.mat-mdc-autocomplete-panel,
+.mat-mdc-select-panel {
+  border-radius: var(--hunter-radius-md);
+  border: 1px solid var(--hunter-border);
+  box-shadow: var(--hunter-shadow-lg);
+}
+
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  border-radius: var(--hunter-radius-xs);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+// ----------------------------------------------------------------------------
+// Notifications
+// ----------------------------------------------------------------------------
+// The toast component owns its surface entirely. This strips the MDC
+// snackbar's background, padding and elevation so there is no slab behind it.
+.hunter-toast-panel {
+  --mdc-snackbar-container-color: transparent;
+  --mdc-snackbar-container-shape: 0;
+  --mat-snack-bar-button-color: currentColor;
+
+  margin-top: var(--hunter-space-5);
+  min-width: min(420px, calc(100vw - 32px));
+  max-width: min(520px, calc(100vw - 32px));
+  box-shadow: none;
+
+  .mdc-snackbar__surface {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    min-width: 0;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .mat-mdc-snack-bar-label {
+    padding: 0;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Quill editor — ships light-only, so it needs token wiring for dark mode
+// ----------------------------------------------------------------------------
 .ql-toolbar.ql-snow,
 .ql-container.ql-snow {
-  border-color: var(--hunter-border) !important;
+  border-color: var(--hunter-border);
 }
 
 .ql-toolbar.ql-snow {
   background: var(--hunter-surface-variant);
+  border-radius: var(--hunter-radius-sm) var(--hunter-radius-sm) 0 0;
 
   .ql-stroke { stroke: var(--hunter-text-secondary); }
   .ql-fill { fill: var(--hunter-text-secondary); }
   .ql-picker { color: var(--hunter-text-secondary); }
-  .ql-picker-options { background: var(--hunter-surface); border-color: var(--hunter-border); }
+
+  .ql-picker-options {
+    background: var(--hunter-surface-raised);
+    border-color: var(--hunter-border);
+    border-radius: var(--hunter-radius-xs);
+    box-shadow: var(--hunter-shadow-md);
+  }
+
+  button:hover,
+  button.ql-active {
+    .ql-stroke { stroke: var(--hunter-brand); }
+    .ql-fill { fill: var(--hunter-brand); }
+  }
 }
 
 .ql-container.ql-snow {
   background: var(--hunter-surface);
   color: var(--hunter-text-primary);
+  border-radius: 0 0 var(--hunter-radius-sm) var(--hunter-radius-sm);
 
-  .ql-editor.ql-blank::before { color: var(--hunter-text-hint); }
-}
-
-.mat-mdc-card {
-  border-radius: 8px !important;
-}
-
-.mat-mdc-raised-button {
-  text-transform: none !important;
-}
-
-// Custom notification styles
-.custom-notification {
-  margin-top: 20px !important;
-  
-  .mdc-snackbar__surface {
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    min-width: 344px !important;
-    max-width: 568px !important;
-    padding: 0 !important;
-    position: relative;
-  }
-
-  .mat-mdc-snack-bar-label {
-    font-size: 15px !important;
-    font-weight: 500 !important;
-    padding: 16px 16px 16px 52px !important;
-    position: relative;
-  }
-
-  // Hide the action button completely
-  .mat-mdc-button.mat-mdc-snack-bar-action,
-  .mat-mdc-snack-bar-action,
-  button[matsnackbaraction] {
-    display: none !important;
+  .ql-editor.ql-blank::before {
+    color: var(--hunter-text-hint);
+    font-style: normal;
   }
 }
 
-// Success notification
-.success-notification {
-  .mdc-snackbar__surface {
-    background-color: #4caf50 !important;
-    
-    // Add icon using ::before on the surface to avoid duplication
-    &::before {
-      content: '✓';
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 24px;
-      font-weight: bold;
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
-      text-align: center;
-      z-index: 1;
+// ----------------------------------------------------------------------------
+// Status utility classes
+// ----------------------------------------------------------------------------
+// Shared by chips, badges and pills so status colour is declared once.
+.hunter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hunter-space-1);
+  padding: 3px var(--hunter-space-2);
+  border-radius: var(--hunter-radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: var(--hunter-neutral-bg);
+  color: var(--hunter-neutral-fg);
+  border: 1px solid var(--hunter-neutral-border);
+
+  // Quoted: `teal`/`purple`/`indigo`/`yellow` are CSS colour keywords, and
+  // Sass warns when those are interpolated as bare words.
+  @each $tone in ('success', 'error', 'warn', 'info', 'teal', 'purple', 'indigo', 'yellow') {
+    &.is-#{$tone} {
+      background: var(--hunter-#{$tone}-bg);
+      color: var(--hunter-#{$tone}-fg);
+      border-color: var(--hunter-#{$tone}-border);
     }
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
-  }
-
-  .mat-mdc-button.mat-mdc-snack-bar-action {
-    color: #ffffff !important;
-  }
-}
-
-// Error notification
-.error-notification {
-  .mdc-snackbar__surface {
-    background-color: #f44336 !important;
-    
-    // Add icon using ::before on the surface to avoid duplication
-    &::before {
-      content: '✕';
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 24px;
-      font-weight: bold;
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
-      text-align: center;
-      z-index: 1;
-    }
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
-  }
-
-  .mat-mdc-button.mat-mdc-snack-bar-action {
-    color: #ffffff !important;
-  }
-}
-
-// Warning notification
-.warning-notification {
-  .mdc-snackbar__surface {
-    background-color: #ff9800 !important;
-    
-    // Add icon using ::before on the surface to avoid duplication
-    &::before {
-      content: '⚠';
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 24px;
-      font-weight: bold;
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
-      text-align: center;
-      z-index: 1;
-    }
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
-  }
-
-  .mat-mdc-button.mat-mdc-snack-bar-action {
-    color: #ffffff !important;
-  }
-}
-
-// Info notification
-.info-notification {
-  .mdc-snackbar__surface {
-    background-color: #2196f3 !important;
-    
-    // Add icon using ::before on the surface to avoid duplication
-    &::before {
-      content: 'ℹ';
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 24px;
-      font-weight: bold;
-      color: #ffffff;
-      background-color: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
-      text-align: center;
-      z-index: 1;
-    }
-  }
-
-  .mat-mdc-snack-bar-label {
-    color: #ffffff !important;
-  }
-
-  .mat-mdc-button.mat-mdc-snack-bar-action {
-    color: #ffffff !important;
-  }
-}
-
-// Dark theme adjustments for notifications
-body.dark-theme {
-  .success-notification .mdc-snackbar__surface {
-    background-color: #388e3c !important;
-  }
-  
-  .error-notification .mdc-snackbar__surface {
-    background-color: #d32f2f !important;
-  }
-  
-  .warning-notification .mdc-snackbar__surface {
-    background-color: #f57c00 !important;
-  }
-  
-  .info-notification .mdc-snackbar__surface {
-    background-color: #1976d2 !important;
   }
 }

@@ -43,12 +43,12 @@
 
       &.accent {
         background-color: var(--hunter-brand-tint);
-        border-left: 4px solid #b13a2f;
+        border-left: 4px solid var(--hunter-brand);
       }
 
       &.warn {
         background-color: rgba(244, 67, 54, 0.1);
-        border-left: 4px solid #f44336;
+        border-left: 4px solid var(--hunter-error-fg);
       }
 
       .stat-value {

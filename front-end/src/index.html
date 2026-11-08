@@ -6,9 +6,28 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
-  <meta name="theme-color" content="#121212">
+  <meta name="theme-color" content="#141110">
   <link rel="icon" type="image/x-icon" href="favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Inter: the single product typeface, variable weight 400-700. -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <script>
+    // Apply the stored theme before first paint to avoid a flash of the
+    // wrong scheme on load.
+    (function () {
+      try {
+        var stored = localStorage.getItem('hunter_theme');
+        if (stored === 'light') {
+          document.documentElement.classList.add('hunter-light');
+          document.documentElement.style.colorScheme = 'light';
+        }
+      } catch (e) { /* storage unavailable; fall back to the dark default */ }
+    })();
+  </script>
 </head>
 <body class="dark-theme">
   <app-root></app-root>

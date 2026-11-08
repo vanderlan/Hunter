@@ -68,6 +68,13 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    // Living style guide for the Hunter design language. Admin-only: it is a
+    // development reference, not a product surface.
+    path: 'style-guide',
+    loadComponent: () => import('./components/style-guide/style-guide.component').then(m => m.StyleGuideComponent),
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
     path: '**',
     redirectTo: ''
   }

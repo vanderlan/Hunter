@@ -266,7 +266,7 @@
   height: 100%;
 
   mat-card-header {
-    background: linear-gradient(135deg, #5f1f1f 0%, #81261d 100%);
+    background: var(--hunter-brand-gradient);
     color: white;
     padding: 20px;
     border-radius: 5px;
@@ -316,7 +316,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      color: #d5e7e8;
+      color: rgba(255, 255, 255, 0.78);
       text-decoration: none;
       font-size: 13px;
       font-weight: 500;
@@ -329,7 +329,7 @@
       }
 
       &:hover {
-        color: #66bb6a;
+        color: #ffffff;
         text-decoration: underline;
       }
     }

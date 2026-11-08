@@ -21,10 +21,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         logger.LogInformation("ClosedJobs count: {Count}", 
             (data.GetValueOrDefault("ClosedJobs") as IEnumerable<object>)?.Count() ?? 0);
         
-        var template = LoadTemplate("JobChangesTemplate.html");
-        logger.LogInformation("Template loaded, length: {Length}", template.Length);
-        
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("JobChangesTemplate.html", "Hunter Job Alert", "Job Changes Detected", data);
         logger.LogInformation("Template rendered, result length: {Length}", result.Length);
 
         return result;
@@ -33,8 +30,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     public string RenderCandidateMatchesTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering candidate matches template");
-        var template = LoadTemplate("CandidateMatchesTemplate.html");
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("CandidateMatchesTemplate.html", "Hunter Candidate Matches", "New Position Candidate Recommendations", data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
     }
@@ -42,8 +38,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     public string RenderWelcomeEmailTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering welcome email template");
-        var template = LoadTemplate("WelcomeEmailTemplate.html");
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("WelcomeEmailTemplate.html", "&#127919; Welcome to Hunter!", "Your AI-Powered CV Analysis Platform", data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
     }
@@ -51,8 +46,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     public string RenderCandidateReferralTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering candidate referral template");
-        var template = LoadTemplate("CandidateReferralTemplate.html");
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("CandidateReferralTemplate.html", "&#127919; New Candidate Referral", "A new candidate has been referred for review", data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
     }
@@ -60,8 +54,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     public string RenderStatusChangeTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering status change template");
-        var template = LoadTemplate("StatusChangeTemplate.html");
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("StatusChangeTemplate.html", "&#128260; Status Update", "Your candidate&#39;s hiring process has been updated", data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
     }
@@ -69,8 +62,7 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     public string RenderNoteAddedTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering note added template");
-        var template = LoadTemplate("NoteAddedTemplate.html");
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("NoteAddedTemplate.html", "&#128221; New Note Added", "A new note has been added to your candidate&#39;s hiring process", data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
     }
@@ -78,10 +70,38 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
     public string RenderHiringProcessCancelledTemplate(Dictionary<string, object> data)
     {
         logger.LogInformation("Rendering hiring process cancelled template");
-        var template = LoadTemplate("HiringProcessCancelledTemplate.html");
-        var result = RenderTemplate(template, data);
+        var result = RenderWithLayout("HiringProcessCancelledTemplate.html", "&#128683; Hiring Process Cancelled", "A referral has been cancelled in the Hunter system", data);
         logger.LogInformation("Template rendered, length: {Length}", result.Length);
         return result;
+    }
+
+    private const string LayoutTemplate = "_Layout.html";
+
+    /// <summary>
+    /// Renders a content fragment into the shared email layout.
+    /// Templates hold content only; all chrome (header, footer, palette,
+    /// dark-mode rules) lives once in <c>_Layout.html</c>.
+    /// </summary>
+    private string RenderWithLayout(
+        string templateName,
+        string emailTitle,
+        string emailSubtitle,
+        Dictionary<string, object> data)
+    {
+        var fragment = LoadTemplate(templateName);
+        var content = RenderTemplate(fragment, data);
+
+        var layoutData = new Dictionary<string, object>(data)
+        {
+            ["EmailTitle"] = emailTitle,
+            ["EmailSubtitle"] = emailSubtitle,
+        };
+
+        // Render the shell first, then splice in the already-rendered content.
+        // Doing it in this order means user-supplied text can never be
+        // re-interpreted as template syntax.
+        var shell = RenderTemplate(LoadTemplate(LayoutTemplate), layoutData);
+        return shell.Replace("{{Content}}", content);
     }
 
     private string LoadTemplate(string templateName)

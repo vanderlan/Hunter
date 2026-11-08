@@ -21,9 +21,9 @@
 
 // Sidebar Styles
 .app-sidenav {
-  width: 240px;
-  background: linear-gradient(180deg, #5f1f1f 0%, #4a1818 100%);
-  color: white;
+  width: var(--hunter-sidenav-width);
+  background: var(--hunter-brand-gradient);
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -35,11 +35,11 @@
 }
 
 .app-container.sidenav-expanded .app-sidenav {
-  width: 240px;
+  width: var(--hunter-sidenav-width);
 }
 
 .app-container:not(.sidenav-expanded) .app-sidenav {
-  width: 64px;
+  width: var(--hunter-sidenav-width-collapsed);
 }
 
 // Sidebar Header (Brand)
@@ -173,7 +173,7 @@
 }
 
 .top-bar {
-  height: 64px;
+  height: var(--hunter-topbar-height);
   background: var(--hunter-surface);
   border-bottom: 1px solid var(--hunter-border);
   display: flex;
@@ -265,7 +265,7 @@
 // Responsive
 @media (max-width: 768px) {
   .app-sidenav {
-    width: 240px !important;
+    width: var(--hunter-sidenav-width) !important;
   }
 
   .app-container:not(.sidenav-expanded) .app-sidenav {

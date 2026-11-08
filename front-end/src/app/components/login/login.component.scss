@@ -16,7 +16,7 @@
   overflow: hidden;
 
   mat-card-header {
-    background: linear-gradient(135deg, #5f1f1f, #81261d);
+    background: var(--hunter-brand-gradient);
     color: white;
     padding: 40px 40px;
     margin: -16px -0px 0;

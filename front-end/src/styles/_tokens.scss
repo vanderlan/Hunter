@@ -1,0 +1,188 @@
+// ============================================================================
+// Hunter Design Language — token sheet
+// ----------------------------------------------------------------------------
+// Single source of truth for colour, type, space, shape, elevation and motion.
+//
+// Layer 1: Angular Material 3 emits `--mat-sys-*` system variables.
+// Layer 2: we alias them to `--hunter-*` brand tokens.
+// Components consume ONLY `--hunter-*` — never raw hex, never `--mat-sys-*`.
+//
+// Light/dark is handled by CSS `color-scheme` + `light-dark()`. There is no
+// second theme stylesheet: one set of rules resolves per scheme at paint time.
+// ============================================================================
+
+@use '@angular/material' as mat;
+@use './theme-colors' as brand;
+
+// ----------------------------------------------------------------------------
+// Material 3 theme
+// ----------------------------------------------------------------------------
+html {
+  @include mat.theme((
+    color: (
+      primary: brand.$primary-palette,
+      tertiary: brand.$tertiary-palette,
+      // `color-scheme` emits light-dark() pairs for every token, so the whole
+      // theme flips by changing the `color-scheme` property alone.
+      theme-type: color-scheme,
+    ),
+    typography: (
+      brand-family: ('Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif),
+      plain-family: ('Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif),
+      bold-weight: 650,
+      medium-weight: 550,
+      regular-weight: 400,
+    ),
+    density: 0,
+  ));
+
+  // Softer, more contemporary shape scale than Material's default.
+  --mat-sys-corner-extra-small: 6px;
+  --mat-sys-corner-small: 10px;
+  --mat-sys-corner-medium: 14px;
+  --mat-sys-corner-large: 20px;
+  --mat-sys-corner-extra-large: 28px;
+}
+
+// ----------------------------------------------------------------------------
+// Brand tokens
+// ----------------------------------------------------------------------------
+html {
+  // --- Surfaces ---------------------------------------------------------
+  // A tonal ramp: each step is a distinct elevation plane, not a flat grey.
+  --hunter-bg: var(--mat-sys-surface);
+  --hunter-surface: var(--mat-sys-surface-container-low);
+  --hunter-surface-variant: var(--mat-sys-surface-container);
+  --hunter-surface-hover: var(--mat-sys-surface-container-high);
+  --hunter-surface-raised: var(--mat-sys-surface-container-highest);
+  --hunter-surface-sunken: var(--mat-sys-surface-container-lowest);
+
+  // --- Lines ------------------------------------------------------------
+  --hunter-border: var(--mat-sys-outline-variant);
+  --hunter-border-strong: var(--mat-sys-outline);
+
+  // --- Text -------------------------------------------------------------
+  --hunter-text-primary: var(--mat-sys-on-surface);
+  --hunter-text-secondary: var(--mat-sys-on-surface-variant);
+  --hunter-text-hint: color-mix(in srgb, var(--mat-sys-on-surface-variant) 62%, transparent);
+  --hunter-text-on-brand: var(--mat-sys-on-primary);
+
+  // --- Brand ------------------------------------------------------------
+  --hunter-brand: var(--mat-sys-primary);
+  --hunter-brand-container: var(--mat-sys-primary-container);
+  --hunter-on-brand-container: var(--mat-sys-on-primary-container);
+  --hunter-brand-tint: color-mix(in srgb, var(--mat-sys-primary) 12%, transparent);
+  --hunter-brand-tint-strong: color-mix(in srgb, var(--mat-sys-primary) 22%, transparent);
+
+  // The ONE brand gradient. Previously three different ones were in use
+  // (sidebar, login, email header) — everything now refers to this.
+  // Tones 30 -> 10 of the primary palette, one step deeper in dark mode.
+  --hunter-brand-gradient: linear-gradient(
+    135deg,
+    light-dark(#82261e, #630f0a) 0%,
+    light-dark(#4f0d08, #2a0604) 100%
+  );
+  --hunter-accent: var(--mat-sys-tertiary);
+  --hunter-accent-container: var(--mat-sys-tertiary-container);
+
+  // --- Status palette ---------------------------------------------------
+  // Soft tinted containers (not saturated slabs). Each status carries a
+  // background, a readable foreground and a border for outlined treatments.
+  // These are the SAME values the toasts use — chips and notifications can no
+  // longer disagree about what "success" looks like.
+  --hunter-success-bg:    light-dark(#e6f4ea, #10291a);
+  --hunter-success-fg:    light-dark(#1b6b3a, #7fd99f);
+  --hunter-success-border:light-dark(#b7dfc4, #1f4d31);
+
+  --hunter-error-bg:      light-dark(#fdeaea, #2f1414);
+  --hunter-error-fg:      light-dark(#b3261e, #f2b8b5);
+  --hunter-error-border:  light-dark(#f3c4c1, #5c2320);
+
+  --hunter-warn-bg:       light-dark(#fdf1dd, #2c2008);
+  --hunter-warn-fg:       light-dark(#8a5300, #f0c070);
+  --hunter-warn-border:   light-dark(#f0d7a8, #54400f);
+
+  --hunter-info-bg:       light-dark(#e7f0fd, #11203a);
+  --hunter-info-fg:       light-dark(#1a5fb4, #9cc4fa);
+  --hunter-info-border:   light-dark(#c2d8f7, #23406e);
+
+  --hunter-teal-bg:       light-dark(#e0f2f1, #0c2927);
+  --hunter-teal-fg:       light-dark(#00695f, #78cfc6);
+  --hunter-teal-border:   light-dark(#b2ddd9, #1a4b47);
+
+  --hunter-purple-bg:     light-dark(#f3e8fb, #241433);
+  --hunter-purple-fg:     light-dark(#6b2fa0, #d3aaf0);
+  --hunter-purple-border: light-dark(#ddc5ef, #432561);
+
+  --hunter-indigo-bg:     light-dark(#e8eaf8, #171a36);
+  --hunter-indigo-fg:     light-dark(#3a43a4, #aeb5f0);
+  --hunter-indigo-border: light-dark(#c6cbee, #2c3268);
+
+  --hunter-yellow-bg:     light-dark(#fdf6d8, #2a2408);
+  --hunter-yellow-fg:     light-dark(#7a5c00, #e8ce62);
+  --hunter-yellow-border: light-dark(#eede9e, #4e430f);
+
+  --hunter-neutral-bg:    var(--mat-sys-surface-container-high);
+  --hunter-neutral-fg:    var(--mat-sys-on-surface-variant);
+  --hunter-neutral-border:var(--mat-sys-outline-variant);
+
+  // --- Space scale (4px base) -------------------------------------------
+  --hunter-space-1: 4px;
+  --hunter-space-2: 8px;
+  --hunter-space-3: 12px;
+  --hunter-space-4: 16px;
+  --hunter-space-5: 20px;
+  --hunter-space-6: 24px;
+  --hunter-space-8: 32px;
+  --hunter-space-10: 40px;
+  --hunter-space-12: 48px;
+  --hunter-space-16: 64px;
+
+  // --- Shape ------------------------------------------------------------
+  --hunter-radius-xs: 6px;
+  --hunter-radius-sm: 10px;
+  --hunter-radius-md: 14px;
+  --hunter-radius-lg: 20px;
+  --hunter-radius-xl: 28px;
+  --hunter-radius-pill: 999px;
+
+  // --- Elevation --------------------------------------------------------
+  // `light-dark()` resolves to a <color>, so it is applied to the shadow
+  // colour rather than the whole shadow value. Dark surfaces need a deeper,
+  // more opaque shadow to read at all; light surfaces stay crisp.
+  --hunter-shadow-color: light-dark(rgba(16, 14, 13, 0.10), rgba(0, 0, 0, 0.44));
+  --hunter-shadow-color-ambient: light-dark(rgba(16, 14, 13, 0.06), rgba(0, 0, 0, 0.30));
+
+  --hunter-shadow-sm:
+    0 1px 2px var(--hunter-shadow-color);
+  --hunter-shadow-md:
+    0 2px 6px var(--hunter-shadow-color),
+    0 1px 2px var(--hunter-shadow-color-ambient);
+  --hunter-shadow-lg:
+    0 8px 24px var(--hunter-shadow-color),
+    0 2px 6px var(--hunter-shadow-color-ambient);
+  --hunter-shadow-xl:
+    0 20px 48px var(--hunter-shadow-color),
+    0 4px 12px var(--hunter-shadow-color-ambient);
+
+  // --- Motion -----------------------------------------------------------
+  --hunter-ease: cubic-bezier(0.2, 0, 0, 1);         // standard
+  --hunter-ease-emphasised: cubic-bezier(0.3, 0, 0, 1);
+  --hunter-duration-fast: 120ms;
+  --hunter-duration: 200ms;
+  --hunter-duration-slow: 320ms;
+
+  // --- Layout -----------------------------------------------------------
+  --hunter-sidenav-width: 248px;
+  --hunter-sidenav-width-collapsed: 72px;
+  --hunter-topbar-height: 64px;
+}
+
+// Honour the user's reduced-motion preference globally.
+@media (prefers-reduced-motion: reduce) {
+  html {
+    --hunter-duration-fast: 1ms;
+    --hunter-duration: 1ms;
+    --hunter-duration-slow: 1ms;
+  }
+}

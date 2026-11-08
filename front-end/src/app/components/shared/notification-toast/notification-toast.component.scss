@@ -1,0 +1,118 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--hunter-space-3);
+  padding: var(--hunter-space-3) var(--hunter-space-3) var(--hunter-space-3) var(--hunter-space-4);
+  border-radius: var(--hunter-radius-md);
+  border: 1px solid var(--toast-border);
+  background: var(--toast-bg);
+  color: var(--hunter-text-primary);
+  box-shadow: var(--hunter-shadow-lg);
+
+  // Accent rail reinforces the tone without shouting.
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    background: var(--toast-fg);
+  }
+}
+
+.toast__icon {
+  flex: none;
+  color: var(--toast-fg);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+
+.toast__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.toast__title {
+  margin: 0 0 2px;
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--hunter-text-primary);
+}
+
+.toast__message {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 450;
+  line-height: 1.45;
+  color: var(--hunter-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.toast__close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--hunter-radius-xs);
+  background: transparent;
+  color: var(--hunter-text-hint);
+  cursor: pointer;
+  transition: background var(--hunter-duration-fast) var(--hunter-ease),
+              color var(--hunter-duration-fast) var(--hunter-ease);
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--toast-fg) 14%, transparent);
+    color: var(--hunter-text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--toast-fg);
+    outline-offset: 1px;
+  }
+}
+
+// --- Tones ------------------------------------------------------------------
+.toast--success {
+  --toast-bg: var(--hunter-success-bg);
+  --toast-fg: var(--hunter-success-fg);
+  --toast-border: var(--hunter-success-border);
+}
+
+.toast--error {
+  --toast-bg: var(--hunter-error-bg);
+  --toast-fg: var(--hunter-error-fg);
+  --toast-border: var(--hunter-error-border);
+}
+
+.toast--warning {
+  --toast-bg: var(--hunter-warn-bg);
+  --toast-fg: var(--hunter-warn-fg);
+  --toast-border: var(--hunter-warn-border);
+}
+
+.toast--info {
+  --toast-bg: var(--hunter-info-bg);
+  --toast-fg: var(--hunter-info-fg);
+  --toast-border: var(--hunter-info-border);
+}
