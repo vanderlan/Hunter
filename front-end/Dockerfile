@@ -12,8 +12,9 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build Angular app for production environment
-RUN npm run build -- --configuration=production
+# Build Angular app (override with --build-arg FRONTEND_CONFIGURATION=beta for local)
+ARG FRONTEND_CONFIGURATION=production
+RUN npm run build -- --configuration=${FRONTEND_CONFIGURATION}
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine

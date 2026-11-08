@@ -288,3 +288,4 @@ front-end/.env
 opencover.xml
 coverage.opencover.xml
 tests/**/coverage/
+.vscode/launch.json

@@ -17,4 +17,6 @@
 **/*.jfm
 **/secrets.dev.yaml
 **/values.dev.yaml
-**/.toolstarget
+**/.toolstarget**/node_modules
+front-end
+docs
