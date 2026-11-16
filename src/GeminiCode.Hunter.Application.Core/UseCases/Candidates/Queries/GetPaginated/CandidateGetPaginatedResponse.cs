@@ -1,4 +1,5 @@
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Extensions;
 
 namespace GeminiCode.Hunter.Application.Core.UseCases.Candidates.Queries.GetPaginated;
@@ -13,6 +14,8 @@ public class CandidateGetPaginatedResponse
     public string AnalyzedByUserName { get; set; }
     public DateTime CreatedAt { get; set; }
     public bool HasHiringProcess { get; set; }
+    public string Source { get; set; } = string.Empty;
+    public bool IsEmailConfirmed { get; set; }
 
     public static CandidateGetPaginatedResponse From(Candidate candidate, bool hasHiringProcess)
     {
@@ -23,9 +26,11 @@ public class CandidateGetPaginatedResponse
             Email = candidate.Email,
             PhoneNumber = candidate.PhoneNumber,
             AnalyzedAt = candidate.AnalyzedAt.ToApplicationTime(),
-            AnalyzedByUserName = candidate.User?.Name ?? "Unknown",
+            AnalyzedByUserName = candidate.User?.Name ?? (candidate.Source == CandidateSource.Public ? "Public page" : "Unknown"),
             CreatedAt = candidate.CreatedAt.ToApplicationTime(),
-            HasHiringProcess = hasHiringProcess
+            HasHiringProcess = hasHiringProcess,
+            Source = candidate.Source.ToString(),
+            IsEmailConfirmed = candidate.IsEmailConfirmed
         };
     }
 
@@ -41,9 +46,11 @@ public class CandidateGetPaginatedResponse
             Email = candidate.Email,
             PhoneNumber = candidate.PhoneNumber,
             AnalyzedAt = candidate.AnalyzedAt.ToApplicationTime(),
-            AnalyzedByUserName = candidate.User?.Name ?? "Unknown",
+            AnalyzedByUserName = candidate.User?.Name ?? (candidate.Source == CandidateSource.Public ? "Public page" : "Unknown"),
             CreatedAt = candidate.CreatedAt.ToApplicationTime(),
-            HasHiringProcess = false
+            HasHiringProcess = false,
+            Source = candidate.Source.ToString(),
+            IsEmailConfirmed = candidate.IsEmailConfirmed
         };
     }
 }

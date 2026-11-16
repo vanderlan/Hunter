@@ -1,0 +1,221 @@
+<div class="public-page public-match">
+
+  <!-- ============ Upload ============ -->
+  @if (state === 'idle') {
+    <section class="match-intro">
+      <h1>See which open positions fit your CV.</h1>
+      <p>
+        Upload your CV as a PDF. Our AI compares it with every open position and shows you
+        the match, the skills you have and the ones you are missing. No account needed.
+      </p>
+    </section>
+
+    <section
+      class="match-dropzone"
+      [class.drag-over]="dragOver"
+      [class.has-file]="selectedFile"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave()"
+      (drop)="onDrop($event)">
+
+      @if (!selectedFile) {
+        <mat-icon class="match-dropzone-icon">upload_file</mat-icon>
+        <p class="match-dropzone-title">Drag your CV here</p>
+        <p class="match-dropzone-hint">PDF, up to 10MB</p>
+        <label mat-stroked-button class="match-file-button">
+          Choose a file
+          <input type="file" accept="application/pdf,.pdf" hidden (change)="onFileInput($event)">
+        </label>
+      } @else {
+        <mat-icon class="match-dropzone-icon">picture_as_pdf</mat-icon>
+        <p class="match-dropzone-title">{{ selectedFile.name }}</p>
+        <p class="match-dropzone-hint">{{ (selectedFile.size / 1024 / 1024) | number:'1.1-1' }} MB</p>
+        <div class="match-dropzone-actions">
+          <button mat-button (click)="clearFile()">
+            <mat-icon>close</mat-icon>
+            Remove
+          </button>
+          <button mat-flat-button color="primary" (click)="analyze()">
+            <mat-icon>analytics</mat-icon>
+            Match my CV
+          </button>
+        </div>
+      }
+    </section>
+
+    @if (errorMessage) {
+      <div class="match-error">
+        <mat-icon>error_outline</mat-icon>
+        {{ errorMessage }}
+      </div>
+    }
+
+    <section class="match-steps">
+      <div class="match-step">
+        <span class="match-step-number">1</span>
+        <div>
+          <strong>Upload</strong>
+          <span>Your CV is read by the AI, not by people.</span>
+        </div>
+      </div>
+      <div class="match-step">
+        <span class="match-step-number">2</span>
+        <div>
+          <strong>See your matches</strong>
+          <span>Match score, matching skills and gaps for every open position.</span>
+        </div>
+      </div>
+      <div class="match-step">
+        <span class="match-step-number">3</span>
+        <div>
+          <strong>Ask for a referral</strong>
+          <span>Save your contact and someone inside can refer you directly.</span>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ============ Analyzing ============ -->
+  @if (state === 'analyzing') {
+    <section class="match-analyzing">
+      <mat-spinner diameter="56"></mat-spinner>
+      <h2>Reading your CV...</h2>
+      <p>Comparing it with every open position. This usually takes under a minute.</p>
+    </section>
+  }
+
+  <!-- ============ Results ============ -->
+  @if (state === 'results' && session) {
+    <section class="match-results-header">
+      <div>
+        <h1>
+          @if (session.result.matchesFound > 0) {
+            {{ session.result.matchesFound }} position{{ session.result.matchesFound !== 1 ? 's' : '' }} match your CV
+          } @else {
+            No strong match right now
+          }
+        </h1>
+        <p>
+          We compared your CV with {{ session.result.totalPositionsAnalyzed }} open position{{ session.result.totalPositionsAnalyzed !== 1 ? 's' : '' }}.
+        </p>
+      </div>
+      <button mat-stroked-button (click)="startOver()">
+        <mat-icon>restart_alt</mat-icon>
+        Try another CV
+      </button>
+    </section>
+
+    <!-- profile banner -->
+    @if (session.result.candidateToken) {
+      <section class="match-profile" [class.confirmed]="session.isEmailConfirmed">
+        @if (!hasProfile) {
+          <mat-icon>notifications_active</mat-icon>
+          <div>
+            <strong>Want to hear about new positions that fit you?</strong>
+            <span>Save your profile and we will email you when a new match appears. You also need it to ask for a referral.</span>
+          </div>
+          <button mat-flat-button color="primary" (click)="openRegister('save')">Save my profile</button>
+        } @else if (!session.isEmailConfirmed) {
+          <mat-icon>mark_email_unread</mat-icon>
+          <div>
+            <strong>Check your inbox</strong>
+            <span>We sent a confirmation link to {{ session.profile?.email }}. Referral requests are delivered after you confirm.</span>
+          </div>
+          <div class="match-profile-actions">
+            <button mat-button (click)="openRegister('save')">Edit</button>
+            <button mat-stroked-button (click)="resendConfirmation()" [disabled]="resendingConfirmation">
+              {{ resendingConfirmation ? 'Sending...' : 'Resend' }}
+            </button>
+          </div>
+        } @else {
+          <mat-icon>verified</mat-icon>
+          <div>
+            <strong>Profile confirmed</strong>
+            <span>{{ session.profile?.name }} · {{ session.profile?.email }}</span>
+          </div>
+          <button mat-button (click)="openRegister('save')">Edit</button>
+        }
+      </section>
+    }
+
+    @if (session.result.matches.length === 0) {
+      <div class="public-state">
+        <mat-icon class="public-state-icon">search_off</mat-icon>
+        <p>None of the open positions reached the minimum match for your CV. New positions open often, so saving your profile is the best way to be notified.</p>
+        <a mat-stroked-button routerLink="/">Browse open positions</a>
+      </div>
+    }
+
+    <section class="match-grid">
+      @for (match of session.result.matches; track match.jobCode) {
+        <article class="match-card" [class.highlighted]="isHighlighted(match)">
+          <header class="match-card-header">
+            <div>
+              <a class="match-card-title" [routerLink]="['/jobs', match.jobCode]">{{ match.jobTitle }}</a>
+              @if (isHighlighted(match)) {
+                <span class="match-card-flag">The position you came from</span>
+              }
+            </div>
+            <span class="match-score" [class]="'match-score ' + matchClass(match.matchPercentage)">
+              {{ match.matchPercentage | number:'1.0-0' }}%
+            </span>
+          </header>
+
+          <mat-progress-bar mode="determinate" [value]="match.matchPercentage" [class]="matchClass(match.matchPercentage)"></mat-progress-bar>
+
+          <p class="match-reason">{{ match.matchReason }}</p>
+
+          <mat-expansion-panel class="match-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Skills breakdown</mat-panel-title>
+            </mat-expansion-panel-header>
+            @if (match.matchingSkills.length > 0) {
+              <div class="match-skills">
+                <h4>You have</h4>
+                <div class="match-skill-list">
+                  @for (skill of match.matchingSkills; track skill) {
+                    <span class="public-skill skill-have">{{ skill }}</span>
+                  }
+                </div>
+              </div>
+            }
+            @if (match.missingSkills.length > 0) {
+              <div class="match-skills">
+                <h4>Missing</h4>
+                <div class="match-skill-list">
+                  @for (skill of match.missingSkills; track skill) {
+                    <span class="public-skill skill-missing">{{ skill }}</span>
+                  }
+                </div>
+              </div>
+            }
+            @if (match.whatIsMissingForPerfectMatch) {
+              <div class="match-skills">
+                <h4>To be a perfect match</h4>
+                <p>{{ match.whatIsMissingForPerfectMatch }}</p>
+              </div>
+            }
+          </mat-expansion-panel>
+
+          <footer class="match-card-actions">
+            @if (isRequested(match)) {
+              <span class="match-requested">
+                <mat-icon>check_circle</mat-icon>
+                Referral requested
+              </span>
+            } @else {
+              <span [matTooltip]="referralTooltip(match)">
+                <button mat-flat-button color="primary"
+                  [disabled]="!match.canRequestReferral || !session.result.candidateToken"
+                  (click)="askForReferral(match)">
+                  <mat-icon>waving_hand</mat-icon>
+                  Ask for a referral
+                </button>
+              </span>
+            }
+          </footer>
+        </article>
+      }
+    </section>
+  }
+</div>

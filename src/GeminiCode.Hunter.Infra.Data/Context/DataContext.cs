@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Helpers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
     public DbSet<Parameter> Parameters { get; set; }
     public DbSet<Prompt> Prompts { get; set; }
     public DbSet<LookerStudioCredential> LookerStudioCredentials { get; set; }
+    public DbSet<ReferralRequest> ReferralRequests { get; set; }
     #endregion
 
     private static DbContextOptions GetDbContextOptions(IConfiguration configuration)
@@ -52,6 +54,7 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
         modelBuilder.ApplyConfiguration(new ParameterMapping());
         modelBuilder.ApplyConfiguration(new PromptMapping());
         modelBuilder.ApplyConfiguration(new LookerStudioCredentialMapping());
+        modelBuilder.ApplyConfiguration(new ReferralRequestMapping());
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
@@ -82,6 +85,13 @@ public class DataContext(IConfiguration configuration) : DbContext(GetDbContextO
             {
                 ((BaseEntity)entity.Entity).CreatedAt = now;
                 ((BaseEntity)entity.Entity).PublicId = Guid.NewGuid().ToString();
+
+                // Every position needs a unique public code (unique index); callers may
+                // set a verified-unique one, otherwise fall back to a random one here.
+                if (entity.Entity is JobPosition { PublicCode: null or "" } jobPosition)
+                {
+                    jobPosition.PublicCode = SecureTokenGenerator.NewPublicCode();
+                }
             }
 
             ((BaseEntity)entity.Entity).LastUpdated = now;

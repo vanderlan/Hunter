@@ -194,6 +194,77 @@ public class AIService : IAIService
         }
     }
 
+    public async Task<PublicJobContentResult> GeneratePublicJobContentAsync(string jobTitle, JobPositionSummary internalContent)
+    {
+        try
+        {
+            _provider = await _parameterService.GetValueAsync(ParameterConstants.ActiveAIService, _configuration["AI:Provider"] ?? AIProviders.OpenAI);
+            SetupProvider(_configuration, _logger);
+
+            _logger.LogInformation("Generating public (company-neutral) content for: {JobTitle} using {Provider}", jobTitle, _provider);
+
+            var prompt = await BuildPublicJobContentPromptAsync(jobTitle, internalContent);
+
+            var messages = new List<ChatMessage>
+            {
+                new SystemChatMessage(
+                    "You are a recruitment copywriter preparing job descriptions for a public, anonymous job board. " +
+                    "Remove every detail that could identify the hiring company: company names, brands, product names, " +
+                    "clients, office addresses, internal codes, URLs and people's names. Keep the role, responsibilities, " +
+                    "requirements and skills intact and professional. Never invent information."
+                ),
+                new UserChatMessage(prompt)
+            };
+
+            ChatCompletionOptions options;
+
+            if (_provider.Equals(AIProviders.DeepSeek, StringComparison.OrdinalIgnoreCase))
+            {
+                options = new ChatCompletionOptions
+                {
+                    Temperature = 0.2f,
+                    ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()
+                };
+            }
+            else
+            {
+                options = new ChatCompletionOptions
+                {
+                    Temperature = 0.2f,
+                    ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                        jsonSchemaFormatName: "public_job_content",
+                        jsonSchema: BinaryData.FromString(GetJobEnrichmentSchema()),
+                        jsonSchemaIsStrict: true
+                    )
+                };
+            }
+
+            var chatCompletion = await _chatClient.CompleteChatAsync(messages, options);
+            var responseContent = chatCompletion.Value.Content[0].Text;
+
+            var result = JsonSerializer.Deserialize<OpenAIJobEnrichmentResponse>(responseContent, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (result == null)
+                throw new InvalidOperationException($"Failed to deserialize {_provider} public job content response");
+
+            return new PublicJobContentResult(
+                Summary: result.Summary ?? string.Empty,
+                Responsibilities: result.Responsibilities ?? string.Empty,
+                Requirements: result.Requirements ?? string.Empty,
+                MustHaveSkills: result.MustHaveSkills ?? string.Empty,
+                NiceToHaveSkills: result.NiceToHaveSkills ?? string.Empty
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating public job content for: {JobTitle} using {Provider}", jobTitle, _provider);
+            throw;
+        }
+    }
+
     public async Task<string> GetCompletionAsync(string prompt, int maxTokens = 100)
     {
         try
@@ -230,6 +301,56 @@ public class AIService : IAIService
 
         return prompt;
     }
+
+    private async Task<string> BuildPublicJobContentPromptAsync(string jobTitle, JobPositionSummary content)
+    {
+        var promptTemplate = await _promptService.GetPromptTextAsync(PromptConstants.PublicJobContent);
+
+        if (string.IsNullOrWhiteSpace(promptTemplate))
+        {
+            promptTemplate = DefaultPublicJobContentPrompt;
+        }
+
+        return promptTemplate
+            .Replace("{VAR_jobTitle}", jobTitle)
+            .Replace("{VAR_summary}", content.Summary ?? string.Empty)
+            .Replace("{VAR_responsibilities}", content.Responsibilities ?? string.Empty)
+            .Replace("{VAR_requirements}", content.Requirements ?? string.Empty)
+            .Replace("{VAR_mustHaveSkills}", content.MustHaveSkills ?? string.Empty)
+            .Replace("{VAR_niceToHaveSkills}", content.NiceToHaveSkills ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Used when no PUBLIC_JOB_CONTENT prompt is configured in the database.
+    /// Admins can override it from the AI Settings screen by creating a prompt with that key.
+    /// </summary>
+    private const string DefaultPublicJobContentPrompt = """
+        Rewrite the job description below for a public, anonymous job board.
+
+        Rules:
+        - Remove any company name, brand, product name, client name, person name, address, URL or internal code.
+        - Replace them with neutral wording such as "the company", "our client" or "the team".
+        - Keep the meaning, seniority, responsibilities, requirements and skills. Do not add anything new.
+        - Keep each field roughly the same length as the original. Skills fields stay as comma-separated lists.
+        - Answer only with JSON using the keys: summary, responsibilities, requirements, mustHaveSkills, niceToHaveSkills.
+
+        Job title: {VAR_jobTitle}
+
+        Summary:
+        {VAR_summary}
+
+        Responsibilities:
+        {VAR_responsibilities}
+
+        Requirements:
+        {VAR_requirements}
+
+        Must-have skills:
+        {VAR_mustHaveSkills}
+
+        Nice-to-have skills:
+        {VAR_niceToHaveSkills}
+        """;
 
     private async Task<string> BuildAnalysisPromptAsync(string cvText, List<JobPositionSummary> jobPositions)
     {

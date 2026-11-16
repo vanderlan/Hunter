@@ -74,7 +74,7 @@ export class ChangePasswordComponent implements OnInit {
         this.loading = false;
         this.notificationService.success('Password changed successfully!');
         this.passwordForm.reset();
-        this.router.navigate(['/']);
+        this.router.navigate(['/analyze']);
       },
       error: (error) => {
         this.loading = false;
@@ -85,6 +85,6 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/analyze']);
   }
 }

@@ -7,13 +7,15 @@ public class CvAnalysis : BaseEntity
 {
     public long CvAnalysisId { get; set; }
     public long CandidateId { get; set; }
-    public long UserId { get; set; }
+
+    /// <summary>Null when the analysis was triggered from the public page.</summary>
+    public long? UserId { get; set; }
     
     public DateTime AnalyzedAt { get; set; }
     public int TotalPositionsAnalyzed { get; set; }
     public int MatchesFound { get; set; }
     
     public virtual Candidate Candidate { get; set; } = null!;
-    public virtual User User { get; set; } = null!;
+    public virtual User? User { get; set; }
     public virtual ICollection<CvAnalysisMatch> Matches { get; set; } = [];
 }

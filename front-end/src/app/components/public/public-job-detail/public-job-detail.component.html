@@ -1,0 +1,86 @@
+<div class="public-page public-detail">
+  <a mat-button routerLink="/" class="public-back">
+    <mat-icon>arrow_back</mat-icon>
+    All positions
+  </a>
+
+  @if (loading) {
+    <div class="public-state">
+      <mat-spinner diameter="44"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading && notFound) {
+    <div class="public-state">
+      <mat-icon class="public-state-icon">work_off</mat-icon>
+      <p>This position is no longer open.</p>
+      <a mat-stroked-button routerLink="/">See open positions</a>
+    </div>
+  }
+
+  @if (!loading && position) {
+    <article class="public-detail-card">
+      <header class="public-detail-header">
+        <h1>{{ position.title }}</h1>
+        <a mat-flat-button color="primary" routerLink="/match" [queryParams]="{ job: position.code }">
+          <mat-icon>analytics</mat-icon>
+          Match my CV
+        </a>
+      </header>
+
+      @if (position.summary) {
+        <section class="public-section">
+          <h2>About the role</h2>
+          <p>{{ position.summary }}</p>
+        </section>
+      }
+
+      @if (position.responsibilities) {
+        <section class="public-section">
+          <h2>What you will do</h2>
+          <p>{{ position.responsibilities }}</p>
+        </section>
+      }
+
+      @if (position.requirements) {
+        <section class="public-section">
+          <h2>What we are looking for</h2>
+          <p>{{ position.requirements }}</p>
+        </section>
+      }
+
+      @if (splitList(position.mustHaveSkills).length > 0) {
+        <section class="public-section">
+          <h2>Must-have skills</h2>
+          <div class="public-skill-list">
+            @for (skill of splitList(position.mustHaveSkills); track skill) {
+              <span class="public-skill public-skill-must">{{ skill }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      @if (splitList(position.niceToHaveSkills).length > 0) {
+        <section class="public-section">
+          <h2>Nice to have</h2>
+          <div class="public-skill-list">
+            @for (skill of splitList(position.niceToHaveSkills); track skill) {
+              <span class="public-skill">{{ skill }}</span>
+            }
+          </div>
+        </section>
+      }
+
+      <footer class="public-detail-footer">
+        <div>
+          <strong>Think this is you?</strong>
+          <span>Upload your CV, see your match score and ask someone inside to refer you.</span>
+        </div>
+        <a mat-flat-button color="primary" routerLink="/match" [queryParams]="{ job: position.code }">
+          <mat-icon>upload_file</mat-icon>
+          Match my CV
+        </a>
+      </footer>
+    </article>
+  }
+</div>

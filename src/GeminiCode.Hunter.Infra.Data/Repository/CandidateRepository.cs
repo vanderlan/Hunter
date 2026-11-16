@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Repositories;
 using GeminiCode.Hunter.Domain.Core.Filters;
 using GeminiCode.Hunter.Domain.Core.ValueObjects.Pagination;
@@ -26,8 +28,37 @@ public sealed class CandidateRepository(DataContext dataContext) : BaseEntityRep
         if (string.IsNullOrWhiteSpace(email))
             return null;
 
+        // Public candidates are kept separate from the internal records
         return await DataContext.Candidates
-            .FirstOrDefaultAsync(x => x.Email == email);
+            .FirstOrDefaultAsync(x => x.Email == email && x.Source == CandidateSource.Internal);
+    }
+
+    public async Task<Candidate?> GetByPublicTokenAsync(string publicToken)
+    {
+        if (string.IsNullOrWhiteSpace(publicToken))
+            return null;
+
+        return await DataContext.Candidates
+            .FirstOrDefaultAsync(x => x.PublicToken == publicToken);
+    }
+
+    public async Task<Candidate?> GetByEmailConfirmationTokenAsync(string confirmationToken)
+    {
+        if (string.IsNullOrWhiteSpace(confirmationToken))
+            return null;
+
+        return await DataContext.Candidates
+            .FirstOrDefaultAsync(x => x.EmailConfirmationToken == confirmationToken);
+    }
+
+    public async Task<List<Candidate>> GetStalePublicCandidatesAsync(DateTime unsavedBefore, DateTime unconfirmedBefore)
+    {
+        return await DataContext.Candidates
+            .Where(x => x.Source == CandidateSource.Public && !x.IsEmailConfirmed)
+            .Where(x => (!x.HasAcceptedTerms && x.CreatedAt < unsavedBefore)
+                     || (x.HasAcceptedTerms && x.CreatedAt < unconfirmedBefore))
+            .AsNoTracking()
+            .ToListAsync();
     }
 
     public async Task<List<Candidate>> GetRecentCandidatesAsync(int count)
@@ -49,8 +80,10 @@ public sealed class CandidateRepository(DataContext dataContext) : BaseEntityRep
 
     public async Task<PagedList<Candidate>> ListPaginateAsync(CandidateFilter filter)
     {
+        // Public candidates only become visible internally after confirming their email
         IQueryable<Candidate> query = DataContext.Set<Candidate>()
-            .Include(x => x.User);
+            .Include(x => x.User)
+            .Where(x => x.Source == CandidateSource.Internal || x.IsEmailConfirmed);
 
         query = ApplyFilters(filter, query);
 

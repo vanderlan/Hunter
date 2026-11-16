@@ -1,5 +1,9 @@
 <div class="app-container" [class.sidenav-expanded]="sidenavExpanded">
-  @if (isAuthenticated$ | async) {
+  @if (isPublicRoute) {
+    <!-- Anonymous pages bring their own shell -->
+    <router-outlet></router-outlet>
+  }
+  @else if (isAuthenticated$ | async) {
     <!-- Left Sidebar -->
     <mat-sidenav-container class="sidenav-container">
       <mat-sidenav
@@ -21,9 +25,8 @@
         <!-- Navigation Menu -->
         <nav class="sidenav-nav">
           <button mat-button
-            routerLink="/"
+            routerLink="/analyze"
             routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
             class="nav-item">
             <mat-icon>analytics</mat-icon>
             @if (sidenavExpanded) {
@@ -51,6 +54,25 @@
               <span>{{ getReferralsLabel() }}</span>
             }
           </button>
+
+          <button mat-button routerLink="/referral-requests" routerLinkActive="active" class="nav-item">
+            <mat-icon
+              [matBadge]="pendingReferralRequests"
+              [matBadgeHidden]="pendingReferralRequests === 0"
+              matBadgeSize="small"
+              matBadgeColor="warn"
+              aria-hidden="false">waving_hand</mat-icon>
+            @if (sidenavExpanded) {
+              <span>Referral Requests</span>
+            }
+          </button>
+
+          <a mat-button routerLink="/" class="nav-item nav-item-external">
+            <mat-icon>public</mat-icon>
+            @if (sidenavExpanded) {
+              <span>Public job board</span>
+            }
+          </a>
 
           @if (isAdmin()) {
             @if (sidenavExpanded) {

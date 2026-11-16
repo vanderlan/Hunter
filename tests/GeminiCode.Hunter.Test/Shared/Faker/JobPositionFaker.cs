@@ -3,6 +3,7 @@ using Bogus;
 using GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Commands.Create;
 using GeminiCode.Hunter.Application.Core.UseCases.JobPositions.Commands.Update;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Helpers;
 
 namespace GeminiCode.Hunter.Test.Shared.Faker;
 
@@ -22,6 +23,21 @@ public static class JobPositionFaker
              .RuleFor(o => o.PublicId, f => Guid.NewGuid().ToString())
              .RuleFor(o => o.LastCheckedAt, f => DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified))
              .Generate();
+    }
+
+    /// <summary>An active position that already has company-neutral public content.</summary>
+    public static JobPosition GetPublic()
+    {
+        var position = Get();
+        position.JobPositionId = new Bogus.Randomizer().Long(1, 1000);
+        position.PublicCode = SecureTokenGenerator.NewPublicCode();
+        position.PublicSummary = "Public summary";
+        position.PublicResponsibilities = "Public responsibilities";
+        position.PublicRequirements = "Public requirements";
+        position.PublicMustHaveSkills = "C#, SQL";
+        position.PublicNiceToHaveSkills = "Docker";
+        position.PublicContentGeneratedAt = DateTime.UtcNow;
+        return position;
     }
 
     public static JobPositionCreateRequest GetJobPositionCreateRequest()

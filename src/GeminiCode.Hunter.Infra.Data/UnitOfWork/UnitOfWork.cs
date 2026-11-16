@@ -55,6 +55,9 @@ public sealed class UnitOfWork(IConfiguration configuration, ILogger<UserReposit
     private ILookerStudioCredentialRepository _lookerStudioCredentialRepository;
     public ILookerStudioCredentialRepository LookerStudioCredentialRepository => _lookerStudioCredentialRepository ??= new LookerStudioCredentialRepository(DbContext);
 
+    private IReferralRequestRepository _referralRequestRepository;
+    public IReferralRequestRepository ReferralRequestRepository => _referralRequestRepository ??= new ReferralRequestRepository(DbContext);
+
     public async Task CommitAsync()
     {
         try

@@ -43,6 +43,30 @@ public sealed class JobPositionRepository(DataContext dataContext) : BaseEntityR
         await MarkAsInactiveAsync(jobPositionId);
     }
 
+    public async Task<JobPosition?> GetByPublicCodeAsync(string publicCode)
+    {
+        if (string.IsNullOrWhiteSpace(publicCode))
+            return null;
+
+        return await DataContext.JobPositions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.PublicCode == publicCode);
+    }
+
+    public async Task<bool> ExistsByPublicCodeAsync(string publicCode)
+    {
+        return await DataContext.JobPositions.AnyAsync(x => x.PublicCode == publicCode);
+    }
+
+    public async Task<List<JobPosition>> GetPublicPositionsAsync()
+    {
+        return await DataContext.JobPositions
+            .Where(x => x.IsActive && x.PublicSummary != null && x.PublicSummary != "")
+            .OrderByDescending(x => x.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<PagedList<JobPosition>> ListPaginateAsync(JobPositionFilter filter)
     {
         IQueryable<JobPosition> query = DataContext.Set<JobPosition>();

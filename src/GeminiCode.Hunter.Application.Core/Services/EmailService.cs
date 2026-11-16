@@ -588,5 +588,98 @@ public class EmailService : IEmailService
                 ex.Message, ex.InnerException?.Message ?? "None");
         }
     }
-}
 
+    public async Task SendPublicCandidateConfirmationAsync(string toEmail, string candidateName, string confirmationUrl)
+    {
+        try
+        {
+            var templateData = new Dictionary<string, object>
+            {
+                ["CandidateName"] = string.IsNullOrWhiteSpace(candidateName) ? "there" : candidateName,
+                ["ConfirmationUrl"] = confirmationUrl,
+                ["ApplicationUrl"] = _applicationUrl
+            };
+
+            var htmlBody = _templateService.RenderPublicCandidateConfirmationTemplate(templateData);
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Hunter", _fromEmail));
+            message.To.Add(new MailboxAddress(candidateName ?? "", toEmail));
+            message.Subject = "Confirm your email to complete your Hunter profile";
+            message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
+
+            await SendMessageAsync(message);
+
+            _logger.LogInformation("Public candidate confirmation email sent to {Email}", toEmail);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send public candidate confirmation email to {Email}", toEmail);
+            throw;
+        }
+    }
+
+    public async Task SendReferralRequestNotificationAsync(
+        List<string> toEmails,
+        string candidateName,
+        string candidateEmail,
+        string jobTitle,
+        decimal? matchPercentage,
+        string? message)
+    {
+        try
+        {
+            if (!toEmails.Any())
+            {
+                _logger.LogInformation("No internal users to notify about referral request");
+                return;
+            }
+
+            var templateData = new Dictionary<string, object>
+            {
+                ["CandidateName"] = candidateName,
+                ["CandidateEmail"] = candidateEmail,
+                ["JobTitle"] = jobTitle,
+                ["HasMatchPercentage"] = matchPercentage.HasValue,
+                ["MatchPercentage"] = matchPercentage.HasValue ? Math.Round(matchPercentage.Value).ToString("0") : "",
+                ["HasMessage"] = !string.IsNullOrWhiteSpace(message),
+                ["Message"] = message ?? "",
+                ["ApplicationUrl"] = _applicationUrl
+            };
+
+            var htmlBody = _templateService.RenderReferralRequestTemplate(templateData);
+
+            // One email per recipient so addresses are never shared
+            foreach (var email in toEmails)
+            {
+                try
+                {
+                    var mime = new MimeMessage();
+                    mime.From.Add(new MailboxAddress("Hunter", _fromEmail));
+                    mime.To.Add(new MailboxAddress("", email));
+                    mime.Subject = $"Referral request - {candidateName} for {jobTitle}";
+                    mime.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
+
+                    await SendMessageAsync(mime);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send referral request notification to {Email}", email);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send referral request notifications");
+        }
+    }
+
+    private async Task SendMessageAsync(MimeMessage message)
+    {
+        using var smtp = new SmtpClient();
+        await smtp.ConnectAsync(_smtpHost, _smtpPort, SecureSocketOptions.StartTls);
+        await smtp.AuthenticateAsync(_smtpLogin, _password);
+        await smtp.SendAsync(message);
+        await smtp.DisconnectAsync(true);
+    }
+}

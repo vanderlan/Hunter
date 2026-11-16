@@ -10,6 +10,7 @@ using GeminiCode.Hunter.Crosscutting.Ioc.Dependencies;
 using GeminiCode.Hunter.Domain.Core.Authentication;
 using GeminiCode.Hunter.Domain.Core.Configuration;
 using GeminiCode.Hunter.Domain.Core.Extensions;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.FeatureManagement;
 
 namespace GeminiCode.Hunter.Api;
@@ -18,6 +19,10 @@ public static class Bootstrapper
 {
     public static void ConfigureApp(this IApplicationBuilder app)
     {
+        // The API runs behind nginx (and possibly a TLS terminator). Without this the
+        // per-IP rate limits on the public endpoints would all share the proxy's address.
+        app.UseForwardedHeaders();
+
         app.UseSwagger();
         
         app.UseSwaggerUI(options =>
@@ -96,6 +101,15 @@ public static class Bootstrapper
 
         services.AddHostedService<JobSyncBackgroundService>();
         services.AddHostedService<LookerStudioTokenRefreshBackgroundService>();
+        services.AddHostedService<PublicCandidateCleanupBackgroundService>();
+
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            // Trust whatever proxy sits in front of the container; the API is never exposed directly.
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
 
         services.ConfigureRateLimit(configuration);
     }

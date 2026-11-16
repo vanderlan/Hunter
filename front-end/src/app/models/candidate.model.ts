@@ -9,6 +9,8 @@ export interface Candidate {
   hasResume?: boolean;
   resumeFileName?: string;
   hasHiringProcess?: boolean;
+  source?: 'Internal' | 'Public';
+  isEmailConfirmed?: boolean;
 }
 
 export interface PagedCandidates {

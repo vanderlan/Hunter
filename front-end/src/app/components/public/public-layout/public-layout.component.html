@@ -1,0 +1,44 @@
+<div class="public-shell">
+  <header class="public-header">
+    <a routerLink="/" class="public-brand" aria-label="Hunter home">
+      <img src="assets/hunter-logo-small.png" alt="" class="public-brand-icon">
+      <span class="public-brand-text">Hunter</span>
+    </a>
+
+    <nav class="public-nav" aria-label="Public navigation">
+      <a mat-button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon>work_outline</mat-icon>
+        <span>Open positions</span>
+      </a>
+      <a mat-button routerLink="/match" routerLinkActive="active">
+        <mat-icon>analytics</mat-icon>
+        <span>Match my CV</span>
+      </a>
+    </nav>
+
+    <div class="public-actions">
+      <button mat-icon-button (click)="toggleTheme()" [matTooltip]="isDarkTheme() ? 'Light mode' : 'Dark mode'">
+        <mat-icon>{{ isDarkTheme() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+      @if (isAuthenticated()) {
+        <a mat-flat-button color="primary" routerLink="/analyze">
+          <mat-icon>dashboard</mat-icon>
+          Go to app
+        </a>
+      } @else {
+        <a mat-stroked-button routerLink="/login">
+          <mat-icon>login</mat-icon>
+          Sign in
+        </a>
+      }
+    </div>
+  </header>
+
+  <main class="public-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="public-footer">
+    <span>© {{ year }} Hunter. Positions are published anonymously; your CV is only shared after you ask for a referral.</span>
+  </footer>
+</div>

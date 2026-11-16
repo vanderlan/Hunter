@@ -1,0 +1,86 @@
+<div class="public-page">
+  <section class="public-hero">
+    <div class="public-hero-text">
+      <h1>Open positions, open to everyone.</h1>
+      <p>
+        Browse the roles our network is hiring for right now. Upload your CV and our AI
+        tells you which ones fit you, then someone inside can refer you directly.
+      </p>
+      <div class="public-hero-actions">
+        <a mat-flat-button color="primary" routerLink="/match">
+          <mat-icon>upload_file</mat-icon>
+          Match my CV
+        </a>
+        <span class="public-hero-hint">PDF only · takes about a minute · no account needed</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="public-search">
+    <mat-form-field appearance="outline" class="public-search-field">
+      <mat-label>Search positions</mat-label>
+      <input matInput
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Title, skill or keyword">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    @if (!loading && !loadError) {
+      <span class="public-count">
+        {{ filteredPositions.length }} open position{{ filteredPositions.length !== 1 ? 's' : '' }}
+        @if (searchQuery && filteredPositions.length !== positions.length) {
+          <span> (of {{ positions.length }})</span>
+        }
+      </span>
+    }
+  </section>
+
+  @if (loading) {
+    <div class="public-state">
+      <mat-spinner diameter="44"></mat-spinner>
+      <p>Loading open positions...</p>
+    </div>
+  }
+
+  @if (!loading && loadError) {
+    <div class="public-state">
+      <mat-icon class="public-state-icon">cloud_off</mat-icon>
+      <p>We could not load the positions right now.</p>
+      <button mat-stroked-button (click)="loadPositions()">Try again</button>
+    </div>
+  }
+
+  @if (!loading && !loadError && filteredPositions.length === 0) {
+    <div class="public-state">
+      <mat-icon class="public-state-icon">search_off</mat-icon>
+      @if (searchQuery) {
+        <p>No positions match "{{ searchQuery }}".</p>
+      } @else {
+        <p>No open positions at the moment. Check back soon.</p>
+      }
+    </div>
+  }
+
+  @if (!loading && filteredPositions.length > 0) {
+    <section class="public-grid">
+      @for (position of filteredPositions; track trackByCode($index, position)) {
+        <a class="public-job-card" [routerLink]="['/jobs', position.code]">
+          <div class="public-job-card-header">
+            <h2>{{ position.title }}</h2>
+            <mat-icon>chevron_right</mat-icon>
+          </div>
+          @if (position.summary) {
+            <p class="public-job-card-summary">{{ position.summary }}</p>
+          }
+          @if (skills(position).length > 0) {
+            <div class="public-job-card-skills">
+              @for (skill of skills(position); track skill) {
+                <span class="public-skill">{{ skill }}</span>
+              }
+            </div>
+          }
+        </a>
+      }
+    </section>
+  }
+</div>

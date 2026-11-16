@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
   hidePassword = true;
   loading = false;
   errorMessage = '';
-  returnUrl = '/';
+  returnUrl = '/analyze';
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
       password: ['', Validators.required]
     });
 
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/analyze';
     
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);

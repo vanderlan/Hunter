@@ -21,10 +21,20 @@ public class JobPositionMapping : IEntityTypeConfiguration<JobPosition>
         builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
         builder.Property(x => x.Priority).HasMaxLength(20);
         builder.Property(x => x.CountryRestrictions).HasMaxLength(500);
+        builder.Property(x => x.PublicCode).HasMaxLength(20).IsRequired();
+        builder.Property(x => x.PublicSummary).HasColumnType("text");
+        builder.Property(x => x.PublicResponsibilities).HasColumnType("text");
+        builder.Property(x => x.PublicRequirements).HasColumnType("text");
+        builder.Property(x => x.PublicMustHaveSkills).HasColumnType("text");
+        builder.Property(x => x.PublicNiceToHaveSkills).HasColumnType("text");
+        builder.Property(x => x.PublicContentGeneratedAt).HasColumnType("timestamp without time zone");
+
+        builder.Ignore(x => x.IsPubliclyVisible);
 
         builder.HasIndex(x => x.PublicId).IsUnique();
         builder.HasIndex(x => x.ExternalUrl).IsUnique();
         builder.HasIndex(x => x.IsActive);
+        builder.HasIndex(x => x.PublicCode).IsUnique();
 
         builder.Property(x => x.CreatedAt)
             .HasColumnType("timestamp without time zone")

@@ -71,6 +71,9 @@ public class CandidateDeleteRequestHandler(
             logger.LogInformation("Hiring processes deleted successfully for candidate {CandidateId}", candidate.CandidateId);
         }
 
+        // 2a. Delete referral requests made from the public page
+        await unitOfWork.ReferralRequestRepository.DeleteByCandidateIdAsync(candidate.CandidateId);
+
         // 2. Delete CV Analysis data (CvAnalysisMatch has cascade delete from CvAnalysis)
         logger.LogInformation("Deleting CV analysis records for candidate {CandidateId}", candidate.CandidateId);
         await unitOfWork.CvAnalysisRepository.DeleteByCandidateIdAsync(candidate.CandidateId);

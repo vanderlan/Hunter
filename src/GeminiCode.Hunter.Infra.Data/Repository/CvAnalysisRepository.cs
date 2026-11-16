@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -171,5 +172,11 @@ public sealed class CvAnalysisRepository(DataContext dataContext)
             await DataContext.SaveChangesAsync();
         }
     }
-}
 
+    public async Task<int> CountPublicAnalysesSinceAsync(DateTime since)
+    {
+        return await DataContext.CvAnalyses
+            .Where(x => x.UserId == null && x.AnalyzedAt >= since)
+            .CountAsync();
+    }
+}

@@ -234,7 +234,8 @@ public class ApplicationArchitectureTests
         foreach (var request in requests)
         {
             var requestNamespace = request.Namespace;
-            var actionName = request.Name.Replace("Request", "");
+            // Strip only the suffix: names such as "ReferralRequestAcceptRequest" contain the word twice.
+            var actionName = request.Name[..^"Request".Length];
 
             // Check if Response exists in same namespace
             var response = Types.InCurrentDomain()

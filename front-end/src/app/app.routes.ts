@@ -8,8 +8,38 @@ export const routes: Routes = [
     loadComponent: () => import('./components/login/login.component').then(m => m.LoginComponent)
   },
   {
+    // Anonymous surface: job board, CV match, email confirmation. Rendered in
+    // its own shell (see AppComponent.isPublicRoute) with no sidenav.
     path: '',
+    loadComponent: () => import('./components/public/public-layout/public-layout.component').then(m => m.PublicLayoutComponent),
+    data: { layout: 'public' },
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./components/public/public-jobs/public-jobs.component').then(m => m.PublicJobsComponent)
+      },
+      {
+        path: 'jobs/:code',
+        loadComponent: () => import('./components/public/public-job-detail/public-job-detail.component').then(m => m.PublicJobDetailComponent)
+      },
+      {
+        path: 'match',
+        loadComponent: () => import('./components/public/public-cv-match/public-cv-match.component').then(m => m.PublicCvMatchComponent)
+      },
+      {
+        path: 'confirm',
+        loadComponent: () => import('./components/public/public-confirm-email/public-confirm-email.component').then(m => m.PublicConfirmEmailComponent)
+      }
+    ]
+  },
+  {
+    path: 'analyze',
     loadComponent: () => import('./components/cv-analyzer/cv-analyzer.component').then(m => m.CvAnalyzerComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'referral-requests',
+    loadComponent: () => import('./components/referral-requests/referral-requests.component').then(m => m.ReferralRequestsComponent),
     canActivate: [AuthGuard]
   },
   {

@@ -75,6 +75,18 @@ public class EmailTemplateService(ILogger<EmailTemplateService> logger) : IEmail
         return result;
     }
 
+    public string RenderPublicCandidateConfirmationTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering public candidate confirmation template");
+        return RenderWithLayout("PublicCandidateConfirmationTemplate.html", "&#9993; Confirm your email", "One click and you are in", data);
+    }
+
+    public string RenderReferralRequestTemplate(Dictionary<string, object> data)
+    {
+        logger.LogInformation("Rendering referral request template");
+        return RenderWithLayout("ReferralRequestTemplate.html", "&#128075; Referral Request", "A candidate is asking to be referred", data);
+    }
+
     private const string LayoutTemplate = "_Layout.html";
 
     /// <summary>

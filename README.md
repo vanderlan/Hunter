@@ -33,6 +33,13 @@
 	+ Job position tracking and history
 	+ Smart sync logic (one-time AI enrichment per job)
 
++ **Public Job Board & Self-Service CV Match** ([details](docs/public-job-board.md))
+	+ Open positions visible without login, with AI-generated company-neutral descriptions
+	+ Anonymous CV match against all open positions
+	+ Visitors can save a profile (email confirmation) and ask for a referral
+	+ Referral requests screen where Partners/Admins accept (starts a hiring process) or decline
+	+ Per-IP rate limits, daily analysis cap and automatic cleanup of unsaved CVs
+
 + **User Management & Security**
 	+ Role-based access control (Admin/Partner)
 	+ JWT authentication with refresh tokens

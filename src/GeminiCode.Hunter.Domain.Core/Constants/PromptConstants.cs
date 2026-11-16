@@ -14,4 +14,9 @@ public static class PromptConstants
     /// Key for the CV analysis prompt used to match candidates against job positions
     /// </summary>
     public const string CvAnalysis = "CV_ANALYSIS";
+
+    /// <summary>
+    /// Key for the prompt that rewrites a job description into a company-neutral public version
+    /// </summary>
+    public const string PublicJobContent = "PUBLIC_JOB_CONTENT";
 }

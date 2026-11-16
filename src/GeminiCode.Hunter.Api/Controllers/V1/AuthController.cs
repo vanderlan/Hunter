@@ -20,7 +20,7 @@ namespace GeminiCode.Hunter.Api.Controllers.V1;
 public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ApiController(mediator)
 {
     [HttpPost("Login")]
-    [EnableRateLimiting("login")]
+    [EnableRateLimiting(RateLimitPolicies.Login)]
     [SwaggerResponse((int)HttpStatusCode.OK, "A success reponse with a Token, Refresh Token and expiration date", typeof(LoginWithCredentialsResponse))]
     [SwaggerResponse((int)HttpStatusCode.BadRequest, "A error response with the error description", typeof(ExceptionResponse))]
     [SwaggerResponse((int)HttpStatusCode.Unauthorized)]

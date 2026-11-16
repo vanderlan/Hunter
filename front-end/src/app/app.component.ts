@@ -6,8 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatBadgeModule } from '@angular/material/badge';
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
+import { ReferralRequestService } from './services/referral-request.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -21,7 +23,8 @@ import { filter } from 'rxjs/operators';
         MatButtonModule,
         MatIconModule,
         MatMenuModule,
-        MatDividerModule
+        MatDividerModule,
+        MatBadgeModule
     ],
     templateUrl: './app.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -31,17 +34,47 @@ export class AppComponent {
   isAuthenticated$ = this.authService.isAuthenticated$;
   sidenavExpanded = true;
   currentRoute = '';
+  /** True while on the anonymous pages (job board, CV match): no sidenav, no top bar. */
+  isPublicRoute = false;
+  pendingReferralRequests = 0;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private referralRequestService: ReferralRequestService
   ) {
-    // Track current route for page title
+    // Track current route for page title and shell selection
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
       this.currentRoute = event.url;
+      this.isPublicRoute = this.resolveIsPublicRoute();
+      this.refreshPendingReferralRequests();
+    });
+  }
+
+  private resolveIsPublicRoute(): boolean {
+    let route = this.router.routerState.snapshot.root;
+    while (route) {
+      if (route.data?.['layout'] === 'public') {
+        return true;
+      }
+      if (!route.firstChild) {
+        break;
+      }
+      route = route.firstChild;
+    }
+    return false;
+  }
+
+  private refreshPendingReferralRequests(): void {
+    if (this.isPublicRoute || !this.authService.isAuthenticated()) {
+      return;
+    }
+    this.referralRequestService.getPendingCount().subscribe({
+      next: (response) => this.pendingReferralRequests = response.count,
+      error: () => { /* badge is a convenience; never block navigation on it */ }
     });
   }
 
@@ -89,7 +122,8 @@ export class AppComponent {
 
   getPageTitle(): string {
     const route = this.currentRoute;
-    if (route === '/' || route === '') return 'Analyze CV';
+    if (route === '/analyze' || route.startsWith('/analyze?')) return 'Analyze CV';
+    if (route.includes('/referral-requests')) return 'Referral Requests';
     if (route.includes('/open-positions')) return 'Open Positions';
     if (route.includes('/hiring-process')) return this.getReferralsLabel();
     if (route.includes('/candidates')) return 'Candidates';

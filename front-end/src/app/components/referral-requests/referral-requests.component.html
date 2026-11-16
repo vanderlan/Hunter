@@ -1,0 +1,146 @@
+<div class="referral-requests-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>waving_hand</mat-icon>
+        Referral Requests
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Candidates who matched their CV on the public page and asked to be referred. Accepting one starts a hiring process in your name.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="filters-row">
+    <mat-button-toggle-group [value]="statusFilter" (change)="onStatusFilterChange($event.value)" aria-label="Status filter">
+      <mat-button-toggle value="pending">Pending</mat-button-toggle>
+      <mat-button-toggle value="accepted">Accepted</mat-button-toggle>
+      <mat-button-toggle value="declined">Declined</mat-button-toggle>
+      <mat-button-toggle value="all">All</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)" placeholder="Candidate name, email or position">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <mat-card class="table-card">
+    <mat-card-content>
+      @if (loading) {
+        <div class="spinner-container">
+          <mat-spinner></mat-spinner>
+        </div>
+      }
+
+      @if (!loading) {
+        <table mat-table [dataSource]="dataSource" class="referral-table">
+
+          <ng-container matColumnDef="candidate">
+            <th mat-header-cell *matHeaderCellDef>Candidate</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="cell-stack">
+                <span class="cell-primary">{{ element.candidateName || 'Unknown' }}</span>
+                <span class="cell-secondary">{{ element.candidateEmail }}</span>
+                @if (element.message) {
+                  <span class="cell-message" [matTooltip]="element.message">
+                    <mat-icon>chat_bubble_outline</mat-icon>
+                    {{ element.message }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="job">
+            <th mat-header-cell *matHeaderCellDef>Position</th>
+            <td mat-cell *matCellDef="let element">
+              <a [routerLink]="['/open-positions']" [queryParams]="{ jobId: element.jobPositionId }" class="job-link">{{ element.jobTitle }}</a>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="match">
+            <th mat-header-cell *matHeaderCellDef>AI match</th>
+            <td mat-cell *matCellDef="let element">
+              @if (element.matchPercentage != null) {
+                <span class="match-pill" [class.high]="element.matchPercentage >= 80" [class.medium]="element.matchPercentage >= 60 && element.matchPercentage < 80">
+                  {{ element.matchPercentage | number:'1.0-0' }}%
+                </span>
+              } @else {
+                <span class="cell-secondary">—</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>Requested</th>
+            <td mat-cell *matCellDef="let element">{{ element.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="cell-stack">
+                <span [class]="statusClass(element.status)">{{ element.status }}</span>
+                @if (element.resolvedByUserName) {
+                  <span class="cell-secondary" [matTooltip]="element.resolutionNote || ''">
+                    by {{ element.resolvedByUserName }} · {{ element.resolvedAt | date:'dd/MM/yyyy' }}
+                  </span>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+            <td mat-cell *matCellDef="let element" class="actions-cell">
+              @if (resolvingId === element.publicId) {
+                <mat-spinner diameter="24" class="inline-spinner"></mat-spinner>
+              } @else {
+                <button mat-icon-button (click)="viewResume(element)" matTooltip="View CV">
+                  <mat-icon>description</mat-icon>
+                </button>
+                @if (element.status === 'Pending') {
+                  <button mat-flat-button color="primary" (click)="resolve(element, 'accept')">
+                    <mat-icon>how_to_reg</mat-icon>
+                    Refer
+                  </button>
+                  <button mat-icon-button color="warn" (click)="resolve(element, 'decline')" matTooltip="Decline">
+                    <mat-icon>person_off</mat-icon>
+                  </button>
+                }
+                @if (element.status === 'Accepted' && element.hiringProcessId) {
+                  <a mat-stroked-button [routerLink]="['/hiring-process', element.hiringProcessId]">
+                    <mat-icon>track_changes</mat-icon>
+                    Process
+                  </a>
+                }
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell empty-cell" [attr.colspan]="displayedColumns.length">
+              @if (statusFilter === 'pending') {
+                No pending referral requests. When a candidate asks for a referral on the public page it shows up here.
+              } @else {
+                No referral requests found.
+              }
+            </td>
+          </tr>
+        </table>
+
+        <mat-paginator
+          [length]="totalCount"
+          [pageSize]="pageSize"
+          [pageIndex]="pageIndex"
+          [pageSizeOptions]="[5, 10, 25, 50]"
+          (page)="onPageChange($event)">
+        </mat-paginator>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,45 @@
+                    <div class="info-box">
+                        <h3>Someone is asking for a referral</h3>
+                        <p>A candidate matched their CV on the public Hunter page and asked to be referred for the position below. Review the request and accept it to start a hiring process, or decline it.</p>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">
+                            <span class="section-icon">&#128100;</span>Candidate
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">{{CandidateName}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">{{CandidateEmail}}</span>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">
+                            <span class="section-icon">&#128188;</span>Position
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Job Title:</span>
+                            <span class="detail-value">{{JobTitle}}</span>
+                        </div>
+                        {{#if HasMatchPercentage}}
+                        <div class="detail-row">
+                            <span class="detail-label">AI Match:</span>
+                            <span class="detail-value">{{MatchPercentage}}%</span>
+                        </div>
+                        {{/if}}
+                    </div>
+
+                    {{#if HasMessage}}
+                    <div class="referral-reason">
+                        <h4>&#128221; Message from the candidate</h4>
+                        <p>{{Message}}</p>
+                    </div>
+                    {{/if}}
+
+                    <div class="cta-section">
+                        <a href="{{ApplicationUrl}}/referral-requests" class="cta-button">Review in Hunter</a>
+                    </div>

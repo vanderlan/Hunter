@@ -39,6 +39,9 @@
             <th mat-header-cell *matHeaderCellDef>Name</th>
             <td mat-cell *matCellDef="let element">
               {{ element.name || 'N/A' }}
+              @if (element.source === 'Public') {
+                <span class="source-badge" matTooltip="Uploaded by the candidate on the public page">Public</span>
+              }
             </td>
           </ng-container>
           <!-- Email Column -->

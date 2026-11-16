@@ -40,6 +40,26 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<DateTime?>("EmailConfirmationSentAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("EmailConfirmationToken")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTime?>("EmailConfirmedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("HasAcceptedTerms")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsEmailConfirmed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp without time zone");
 
@@ -56,7 +76,24 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<long>("UserId")
+                    b.Property<string>("PublicToken")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<bool>("ReceiveJobMatchNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("Source")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1);
+
+                    b.Property<DateTime?>("TermsAcceptedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("CandidateId");
@@ -65,8 +102,15 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
 
                     b.HasIndex("Email");
 
+                    b.HasIndex("EmailConfirmationToken");
+
                     b.HasIndex("PublicId")
                         .IsUnique();
+
+                    b.HasIndex("PublicToken")
+                        .IsUnique();
+
+                    b.HasIndex("Source");
 
                     b.HasIndex("UserId");
 
@@ -146,7 +190,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Property<int>("TotalPositionsAnalyzed")
                         .HasColumnType("integer");
 
-                    b.Property<long>("UserId")
+                    b.Property<long?>("UserId")
                         .HasColumnType("bigint");
 
                     b.HasKey("CvAnalysisId");
@@ -487,10 +531,33 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Property<DateTime?>("PriorityLastSyncedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("PublicCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime?>("PublicContentGeneratedAt")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("PublicId")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PublicMustHaveSkills")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicNiceToHaveSkills")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicRequirements")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicResponsibilities")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicSummary")
+                        .HasColumnType("text");
 
                     b.Property<string>("Requirements")
                         .HasColumnType("text");
@@ -512,6 +579,9 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                         .IsUnique();
 
                     b.HasIndex("IsActive");
+
+                    b.HasIndex("PublicCode")
+                        .IsUnique();
 
                     b.HasIndex("PublicId")
                         .IsUnique();
@@ -668,6 +738,74 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.ToTable("Prompt", (string)null);
                 });
 
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.ReferralRequest", b =>
+                {
+                    b.Property<long>("ReferralRequestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ReferralRequestId"));
+
+                    b.Property<long>("CandidateId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("HiringProcessId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("JobPositionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal?>("MatchPercentage")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("ResolutionNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long?>("ResolvedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ReferralRequestId");
+
+                    b.HasIndex("HiringProcessId");
+
+                    b.HasIndex("JobPositionId");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
+
+                    b.HasIndex("ResolvedByUserId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("CandidateId", "JobPositionId")
+                        .IsUnique();
+
+                    b.ToTable("ReferralRequest", (string)null);
+                });
+
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.RefreshToken", b =>
                 {
                     b.Property<string>("Refreshtoken")
@@ -776,8 +914,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("User");
                 });
@@ -812,8 +949,7 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Candidate");
 
@@ -909,6 +1045,39 @@ namespace GeminiCode.Hunter.Infra.Data.Migrations
                     b.Navigation("ChangedByUser");
 
                     b.Navigation("HiringProcess");
+                });
+
+            modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.ReferralRequest", b =>
+                {
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.HiringProcess", "HiringProcess")
+                        .WithMany()
+                        .HasForeignKey("HiringProcessId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.JobPosition", "JobPosition")
+                        .WithMany()
+                        .HasForeignKey("JobPositionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GeminiCode.Hunter.Domain.Core.Entities.User", "ResolvedByUser")
+                        .WithMany()
+                        .HasForeignKey("ResolvedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("HiringProcess");
+
+                    b.Navigation("JobPosition");
+
+                    b.Navigation("ResolvedByUser");
                 });
 
             modelBuilder.Entity("GeminiCode.Hunter.Domain.Core.Entities.CvAnalysis", b =>

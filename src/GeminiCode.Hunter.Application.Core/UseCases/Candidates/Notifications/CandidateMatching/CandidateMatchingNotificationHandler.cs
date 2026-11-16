@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.FeatureManagement;
+using GeminiCode.Hunter.Domain.Core.Entities.Enuns;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
@@ -49,8 +50,8 @@ ILogger<CandidateMatchingNotificationHandler> logger)
 
         try
         {
-            // Get all candidates from database
-            var candidates = await unitOfWork.CandidateRepository.SearchByAsync(c => true);
+            // All candidates visible internally (public ones only after confirming their email)
+            var candidates = await unitOfWork.CandidateRepository.SearchByAsync(c => c.Source == CandidateSource.Internal || c.IsEmailConfirmed);
             var candidatesList = candidates.ToList();
 
             if (!candidatesList.Any())

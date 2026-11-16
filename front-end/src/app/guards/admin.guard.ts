@@ -12,7 +12,7 @@ export const AdminGuard: CanActivateFn = (route, state) => {
 
   // User is authenticated but not admin, redirect to home
   if (authService.isAuthenticated()) {
-    router.navigate(['/']);
+    router.navigate(['/analyze']);
     return false;
   }
 

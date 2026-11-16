@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using GeminiCode.Hunter.Api.Configuration;
 using GeminiCode.Hunter.Api.Attributes;
 using GeminiCode.Hunter.Api.Controllers.Base;
 using GeminiCode.Hunter.Application.Core.UseCases.Candidates.Commands.AnalyzeCv;
@@ -73,7 +74,7 @@ public sealed class CandidatesController(IMediator mediator) : ApiController(med
     /// <returns>List of matching job positions with match percentages and analysis</returns>
     [HttpPost("Analyze")]
     [RequestTimeout(300000)] // 5 minutes timeout for long-running AI analysis
-    [EnableRateLimiting("cvanalysis")]
+    [EnableRateLimiting(RateLimitPolicies.CvAnalysis)]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(AnalyzeCvResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -58,4 +58,19 @@ public interface IEmailService
         string cancelReason);
     
     Task SendEmailAsync(string subject, string htmlBody);
+
+    /// <summary>Asks a public candidate to confirm their email address.</summary>
+    Task SendPublicCandidateConfirmationAsync(
+        string toEmail,
+        string candidateName,
+        string confirmationUrl);
+
+    /// <summary>Tells internal users that a public candidate asked to be referred.</summary>
+    Task SendReferralRequestNotificationAsync(
+        List<string> toEmails,
+        string candidateName,
+        string candidateEmail,
+        string jobTitle,
+        decimal? matchPercentage,
+        string? message);
 }

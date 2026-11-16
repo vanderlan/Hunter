@@ -18,6 +18,7 @@ public interface IUnitOfWork: IDisposable
     IParameterRepository ParameterRepository { get; }
     IPromptRepository PromptRepository { get; }
     ILookerStudioCredentialRepository LookerStudioCredentialRepository { get; }
+    IReferralRequestRepository ReferralRequestRepository { get; }
     Task CommitAsync();
     void DiscardChanges();
 }

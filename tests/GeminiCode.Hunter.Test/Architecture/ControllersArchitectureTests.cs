@@ -134,6 +134,8 @@ public class ControllersArchitectureTests
             .DoNotHaveName("AuthController")
             .And()
             .DoNotHaveName("UsersController")
+            .And()
+            .DoNotHaveName("PublicController") // anonymous by design: public job board and CV match
             .Should()
             .HaveCustomAttribute(typeof(AuthorizeForAttribute))
             .Or()

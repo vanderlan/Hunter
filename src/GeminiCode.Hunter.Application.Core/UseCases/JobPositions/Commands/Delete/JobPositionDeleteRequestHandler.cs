@@ -28,6 +28,9 @@ public class JobPositionDeleteRequestHandler(
                 "Please cancel or complete all hiring processes before deleting this job position.");
         }
 
+        // Delete public referral requests pointing at this position
+        await unitOfWork.ReferralRequestRepository.DeleteByJobPositionIdAsync(jobPosition.JobPositionId);
+
         // Delete related CvAnalysisMatches
         logger.LogInformation("Deleting CvAnalysisMatches for JobPosition {JobPositionId}", request.PublicId);
         await unitOfWork.CvAnalysisRepository.DeleteMatchesByJobPositionIdAsync(jobPosition.JobPositionId);

@@ -14,4 +14,10 @@ public interface IJobPositionRepository : IBaseEntityRepository<JobPosition>
     Task MarkAsInactiveAsync(long jobPositionId);
     Task MarkAsClosedAsync(long jobPositionId);
     Task<PagedList<JobPosition>> ListPaginateAsync(JobPositionFilter filter);
+
+    Task<JobPosition?> GetByPublicCodeAsync(string publicCode);
+    Task<bool> ExistsByPublicCodeAsync(string publicCode);
+
+    /// <summary>Active positions that already have company-neutral public content.</summary>
+    Task<List<JobPosition>> GetPublicPositionsAsync();
 }

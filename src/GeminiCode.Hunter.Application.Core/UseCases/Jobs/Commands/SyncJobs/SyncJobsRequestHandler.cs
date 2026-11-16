@@ -1,7 +1,9 @@
 using GeminiCode.Hunter.Application.Core.UseCases.Jobs.Notifications.JobChangesDetected;
 using GeminiCode.Hunter.Application.Core.UseCases.LookerStudio.Commands.SyncJobPriorities;
 using GeminiCode.Hunter.Domain.Core.Entities;
+using GeminiCode.Hunter.Domain.Core.Helpers;
 using GeminiCode.Hunter.Domain.Core.Models;
+using GeminiCode.Hunter.Domain.Core.Models.External.OpenAI;
 using GeminiCode.Hunter.Domain.Core.Repositories.UnitOfWork;
 using GeminiCode.Hunter.Domain.Core.Services;
 using MediatR;
@@ -79,8 +81,11 @@ public class SyncJobsRequestHandler(
                         NiceToHaveSkills = enrichedDetails.NiceToHaveSkills,
                         Priority = DefaultPriority,
                         IsActive = true,
-                        LastCheckedAt = now
+                        LastCheckedAt = now,
+                        PublicCode = await NewUniquePublicCodeAsync()
                     };
+
+                    await TryGeneratePublicContentAsync(position, now);
 
                     await unitOfWork.JobPositionRepository.AddAsync(position);
                     await unitOfWork.CommitAsync();
@@ -197,6 +202,8 @@ public class SyncJobsRequestHandler(
             // Commit all changes
             await unitOfWork.CommitAsync();
 
+            await BackfillPublicContentAsync(stillActivePositions, now);
+
             logger.LogInformation(
                 "Job synchronization completed. New: {New}, Updated: {Updated}, Closed: {Closed}",
                 response.NewPositions,
@@ -229,5 +236,77 @@ public class SyncJobsRequestHandler(
             logger.LogError(ex, "Error during job synchronization");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Builds the company-neutral version shown on the public job board. Failure is
+    /// logged, not thrown: the position stays internal-only until the next sync fills it.
+    /// </summary>
+    private async Task TryGeneratePublicContentAsync(JobPosition position, DateTime now)
+    {
+        if (string.IsNullOrWhiteSpace(position.Summary) && string.IsNullOrWhiteSpace(position.Requirements))
+            return;
+
+        try
+        {
+            var publicContent = await openAIService.GeneratePublicJobContentAsync(
+                position.Title,
+                new JobPositionSummary(
+                    position.Title,
+                    position.Summary,
+                    position.Responsibilities,
+                    position.Requirements,
+                    position.MustHaveSkills,
+                    position.NiceToHaveSkills));
+
+            position.PublicSummary = publicContent.Summary;
+            position.PublicResponsibilities = publicContent.Responsibilities;
+            position.PublicRequirements = publicContent.Requirements;
+            position.PublicMustHaveSkills = publicContent.MustHaveSkills;
+            position.PublicNiceToHaveSkills = publicContent.NiceToHaveSkills;
+            position.PublicContentGeneratedAt = now;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error generating public content for position {Title}", position.Title);
+        }
+    }
+
+    private async Task BackfillPublicContentAsync(List<JobPosition> activePositions, DateTime now)
+    {
+        var missing = activePositions
+            .Where(p => string.IsNullOrWhiteSpace(p.PublicSummary) && !string.IsNullOrWhiteSpace(p.Summary))
+            .ToList();
+
+        if (missing.Count == 0)
+            return;
+
+        logger.LogInformation("Backfilling public content for {Count} positions", missing.Count);
+
+        foreach (var position in missing)
+        {
+            if (string.IsNullOrWhiteSpace(position.PublicCode))
+                position.PublicCode = await NewUniquePublicCodeAsync();
+
+            await TryGeneratePublicContentAsync(position, now);
+
+            if (position.PublicContentGeneratedAt == now)
+            {
+                unitOfWork.JobPositionRepository.Update(position);
+            }
+        }
+
+        await unitOfWork.CommitAsync();
+    }
+
+    private async Task<string> NewUniquePublicCodeAsync()
+    {
+        string code;
+        do
+        {
+            code = SecureTokenGenerator.NewPublicCode();
+        } while (await unitOfWork.JobPositionRepository.ExistsByPublicCodeAsync(code));
+
+        return code;
     }
 }

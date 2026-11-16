@@ -20,4 +20,7 @@ public interface ICvAnalysisRepository : IBaseEntityRepository<CvAnalysis>
     Task<CvAnalysisMatch?> GetLastAnalysisMatchAsync(long candidateId, long jobPositionId);
     Task DeleteMatchesByJobPositionIdAsync(long jobPositionId);
     Task DeleteByCandidateIdAsync(long candidateId);
+
+    /// <summary>Number of analyses triggered from the public page since <paramref name="since"/> (daily cap).</summary>
+    Task<int> CountPublicAnalysesSinceAsync(System.DateTime since);
 }

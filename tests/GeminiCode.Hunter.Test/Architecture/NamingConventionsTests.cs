@@ -95,7 +95,8 @@ public class NamingConventionsTests
             "Create", "Update", "Delete", "Change", "Add", "Remove",
             "Register", "Login", "Refresh", "Send", "Analyze", "ReAnalyze","Enrich",
             "Cancel", "Activate", "Deactivate", "Enable", "Disable",
-            "Refer", "Screen", "Interview", "Hire", "Reprove", "Sync", "Store", "Start", "Generate", "Upload"
+            "Refer", "Screen", "Interview", "Hire", "Reprove", "Sync", "Store", "Start", "Generate", "Upload",
+            "Accept", "Decline", "Confirm"
         };
 
         // Assert

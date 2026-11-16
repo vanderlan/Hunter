@@ -25,6 +25,8 @@ public class CandidateDeleteRequestHandlerTests
     public CandidateDeleteRequestHandlerTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _unitOfWorkMock.Setup(x => x.ReferralRequestRepository.DeleteByCandidateIdAsync(It.IsAny<long>()))
+            .Returns(Task.CompletedTask);
         _currentUserMock = new Mock<ICurrentUser>();
         _loggerMock = new Mock<ILogger<CandidateDeleteRequestHandler>>();
 
